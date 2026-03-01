@@ -5,6 +5,8 @@ use App\Modules\Auth\Presentation\Controllers\LoginController;
 use App\Modules\Auth\Presentation\Controllers\LogoutController;
 use App\Modules\Auth\Presentation\Controllers\MeController;
 use App\Modules\Auth\Presentation\Controllers\RegisterController;
+use App\Modules\Feeding\Presentation\Controllers\FeedEntryController;
+use App\Modules\Feeding\Presentation\Controllers\FeedTypeController;
 use App\Modules\Production\Presentation\Controllers\CycleController;
 use App\Modules\Production\Presentation\Controllers\FarmController;
 use App\Modules\Production\Presentation\Controllers\HarvestController;
@@ -48,5 +50,12 @@ Route::prefix('v1')->group(function (): void {
         Route::get('/cycles/{cycle}/harvests', [HarvestController::class, 'index']);
         Route::post('/cycles/{cycle}/harvests', [HarvestController::class, 'store']);
         Route::get('/harvests/{harvest}', [HarvestController::class, 'show']);
+
+        Route::get('/feed-types', [FeedTypeController::class, 'index']);
+        Route::post('/feed-types', [FeedTypeController::class, 'store']);
+        Route::patch('/feed-types/{feedType}', [FeedTypeController::class, 'update']);
+
+        Route::get('/cycles/{cycle}/feed-entries', [FeedEntryController::class, 'index']);
+        Route::post('/cycles/{cycle}/feed-entries', [FeedEntryController::class, 'store']);
     });
 });

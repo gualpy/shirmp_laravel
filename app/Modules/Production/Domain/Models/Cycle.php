@@ -2,6 +2,7 @@
 
 namespace App\Modules\Production\Domain\Models;
 
+use App\Modules\Feeding\Domain\Models\FeedEntry;
 use App\Models\Tenant;
 use App\Modules\Production\Domain\Enums\CycleStatus;
 use App\Multitenancy\Traits\HasTenant;
@@ -57,5 +58,10 @@ class Cycle extends Model
     public function harvests(): HasMany
     {
         return $this->hasMany(Harvest::class);
+    }
+
+    public function feedEntries(): HasMany
+    {
+        return $this->hasMany(FeedEntry::class);
     }
 }

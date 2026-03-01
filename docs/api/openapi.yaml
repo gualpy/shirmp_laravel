@@ -177,6 +177,46 @@ components:
             total_kg: { type: number, format: float }
         fcr: { type: number, format: float }
         biomass_kg: { type: number, format: float, nullable: true }
+        recommended_feed_kg_per_day: { type: number, format: float, nullable: true }
+        feeding_strategy_used:
+          type: string
+          enum: [biomass_percentage, growth_table, manual_adjustment]
+    EffectiveSetting:
+      type: object
+      properties:
+        feeding_strategy:
+          type: string
+          enum: [biomass_percentage, growth_table, manual_adjustment]
+        feeding_pct_small: { type: number, format: float }
+        feeding_pct_medium: { type: number, format: float }
+        feeding_pct_large: { type: number, format: float }
+        allow_post_close_adjustments: { type: boolean }
+        unit_system:
+          type: string
+          enum: [metric, imperial]
+        decimals_precision: { type: integer }
+    FeedingGrowthTable:
+      type: object
+      properties:
+        id: { type: integer }
+        tenant_id: { type: integer }
+        farm_id: { type: integer, nullable: true }
+        name: { type: string }
+        is_active: { type: boolean }
+        rows:
+          type: array
+          items: { $ref: '#/components/schemas/FeedingGrowthTableRow' }
+    FeedingGrowthTableRow:
+      type: object
+      properties:
+        id: { type: integer }
+        tenant_id: { type: integer }
+        table_id: { type: integer }
+        day_from: { type: integer }
+        day_to: { type: integer }
+        pp_from_grams: { type: number, format: float, nullable: true }
+        pp_to_grams: { type: number, format: float, nullable: true }
+        feed_pct: { type: number, format: float }
 paths:
   /auth/register:
     post:
@@ -673,3 +713,123 @@ paths:
           content:
             application/json:
               schema: { $ref: '#/components/schemas/CycleMetrics' }
+
+  /tenant/settings:
+    get:
+      security: [{ bearerAuth: [] }]
+      parameters: [{ $ref: '#/components/parameters/TenantHeader' }]
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/EffectiveSetting' }
+    patch:
+      security: [{ bearerAuth: [] }]
+      parameters: [{ $ref: '#/components/parameters/TenantHeader' }]
+      responses:
+        '200':
+          description: Updated
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/EffectiveSetting' }
+
+  /farms/{farm}/settings:
+    get:
+      security: [{ bearerAuth: [] }]
+      parameters:
+        - { $ref: '#/components/parameters/TenantHeader' }
+        - in: path
+          name: farm
+          required: true
+          schema: { type: integer }
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/EffectiveSetting' }
+    patch:
+      security: [{ bearerAuth: [] }]
+      parameters:
+        - { $ref: '#/components/parameters/TenantHeader' }
+        - in: path
+          name: farm
+          required: true
+          schema: { type: integer }
+      responses:
+        '200':
+          description: Updated
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/EffectiveSetting' }
+
+  /feeding-tables:
+    get:
+      security: [{ bearerAuth: [] }]
+      parameters: [{ $ref: '#/components/parameters/TenantHeader' }]
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/FeedingGrowthTable' }
+    post:
+      security: [{ bearerAuth: [] }]
+      parameters: [{ $ref: '#/components/parameters/TenantHeader' }]
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/FeedingGrowthTable' }
+
+  /feeding-tables/{table}:
+    patch:
+      security: [{ bearerAuth: [] }]
+      parameters:
+        - { $ref: '#/components/parameters/TenantHeader' }
+        - in: path
+          name: table
+          required: true
+          schema: { type: integer }
+      responses:
+        '200':
+          description: Updated
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/FeedingGrowthTable' }
+
+  /feeding-tables/{table}/rows:
+    post:
+      security: [{ bearerAuth: [] }]
+      parameters:
+        - { $ref: '#/components/parameters/TenantHeader' }
+        - in: path
+          name: table
+          required: true
+          schema: { type: integer }
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/FeedingGrowthTableRow' }
+
+  /feeding-tables/{table}/rows/{row}:
+    delete:
+      security: [{ bearerAuth: [] }]
+      parameters:
+        - { $ref: '#/components/parameters/TenantHeader' }
+        - in: path
+          name: table
+          required: true
+          schema: { type: integer }
+        - in: path
+          name: row
+          required: true
+          schema: { type: integer }
+      responses:
+        '204': { description: No Content }

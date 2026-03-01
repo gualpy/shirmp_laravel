@@ -32,6 +32,8 @@ final class CycleMetricsResource extends JsonResource
             ],
             'fcr' => $this->resource['fcr'],
             'biomass_kg' => $this->resource['biomass_kg'],
+            'recommended_feed_kg_per_day' => $this->resource['recommended_feed_kg_per_day'],
+            'feeding_strategy_used' => $this->resource['feeding_strategy_used'],
         ];
     }
 }

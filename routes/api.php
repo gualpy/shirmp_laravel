@@ -5,6 +5,10 @@ use App\Modules\Auth\Presentation\Controllers\LoginController;
 use App\Modules\Auth\Presentation\Controllers\LogoutController;
 use App\Modules\Auth\Presentation\Controllers\MeController;
 use App\Modules\Auth\Presentation\Controllers\RegisterController;
+use App\Modules\Configuration\Presentation\Controllers\FarmSettingController;
+use App\Modules\Configuration\Presentation\Controllers\FeedingGrowthTableController;
+use App\Modules\Configuration\Presentation\Controllers\FeedingGrowthTableRowController;
+use App\Modules\Configuration\Presentation\Controllers\TenantSettingController;
 use App\Modules\Feeding\Presentation\Controllers\FeedEntryController;
 use App\Modules\Feeding\Presentation\Controllers\FeedTypeController;
 use App\Modules\Production\Presentation\Controllers\CycleController;
@@ -59,5 +63,16 @@ Route::prefix('v1')->group(function (): void {
 
         Route::get('/cycles/{cycle}/feed-entries', [FeedEntryController::class, 'index']);
         Route::post('/cycles/{cycle}/feed-entries', [FeedEntryController::class, 'store']);
+
+        Route::get('/tenant/settings', [TenantSettingController::class, 'show']);
+        Route::patch('/tenant/settings', [TenantSettingController::class, 'update']);
+        Route::get('/farms/{farm}/settings', [FarmSettingController::class, 'show']);
+        Route::patch('/farms/{farm}/settings', [FarmSettingController::class, 'update']);
+
+        Route::get('/feeding-tables', [FeedingGrowthTableController::class, 'index']);
+        Route::post('/feeding-tables', [FeedingGrowthTableController::class, 'store']);
+        Route::patch('/feeding-tables/{table}', [FeedingGrowthTableController::class, 'update']);
+        Route::post('/feeding-tables/{table}/rows', [FeedingGrowthTableRowController::class, 'store']);
+        Route::delete('/feeding-tables/{table}/rows/{row}', [FeedingGrowthTableRowController::class, 'destroy']);
     });
 });

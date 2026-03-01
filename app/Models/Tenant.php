@@ -2,9 +2,12 @@
 
 namespace App\Models;
 
+use App\Modules\Configuration\Domain\Models\FeedingGrowthTable;
+use App\Modules\Configuration\Domain\Models\TenantSetting;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class Tenant extends Model
 {
@@ -29,5 +32,15 @@ class Tenant extends Model
     public function notes(): HasMany
     {
         return $this->hasMany(TenantNote::class);
+    }
+
+    public function setting(): HasOne
+    {
+        return $this->hasOne(TenantSetting::class);
+    }
+
+    public function feedingTables(): HasMany
+    {
+        return $this->hasMany(FeedingGrowthTable::class);
     }
 }

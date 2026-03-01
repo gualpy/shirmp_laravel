@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Middleware\ResolveTenant;
+use App\Modules\Alerts\Presentation\Controllers\AlertController;
 use App\Modules\Auth\Presentation\Controllers\LoginController;
 use App\Modules\Auth\Presentation\Controllers\LogoutController;
 use App\Modules\Auth\Presentation\Controllers\MeController;
@@ -74,5 +75,8 @@ Route::prefix('v1')->group(function (): void {
         Route::patch('/feeding-tables/{table}', [FeedingGrowthTableController::class, 'update']);
         Route::post('/feeding-tables/{table}/rows', [FeedingGrowthTableRowController::class, 'store']);
         Route::delete('/feeding-tables/{table}/rows/{row}', [FeedingGrowthTableRowController::class, 'destroy']);
+
+        Route::get('/alerts', [AlertController::class, 'index']);
+        Route::post('/alerts/{alert}/acknowledge', [AlertController::class, 'acknowledge']);
     });
 });

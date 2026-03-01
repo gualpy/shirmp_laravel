@@ -217,6 +217,40 @@ components:
         pp_from_grams: { type: number, format: float, nullable: true }
         pp_to_grams: { type: number, format: float, nullable: true }
         feed_pct: { type: number, format: float }
+    AlertRule:
+      type: object
+      properties:
+        id: { type: integer }
+        tenant_id: { type: integer }
+        farm_id: { type: integer, nullable: true }
+        code:
+          type: string
+          enum: [LOW_GROWTH, HIGH_FCR, FEED_DEVIATION, HIGH_BIOMASS]
+        is_active: { type: boolean }
+        params_json: { type: object, nullable: true, additionalProperties: true }
+        severity:
+          type: string
+          enum: [info, warning, critical]
+    AlertEvent:
+      type: object
+      properties:
+        id: { type: integer }
+        tenant_id: { type: integer }
+        farm_id: { type: integer }
+        cycle_id: { type: integer }
+        rule_code:
+          type: string
+          enum: [LOW_GROWTH, HIGH_FCR, FEED_DEVIATION, HIGH_BIOMASS]
+        severity:
+          type: string
+          enum: [info, warning, critical]
+        title: { type: string }
+        message: { type: string }
+        detected_at: { type: string, format: date-time }
+        context_json: { type: object, nullable: true, additionalProperties: true }
+        is_acknowledged: { type: boolean }
+        acknowledged_by_user_id: { type: integer, nullable: true }
+        acknowledged_at: { type: string, format: date-time, nullable: true }
 paths:
   /auth/register:
     post:
@@ -833,3 +867,53 @@ paths:
           schema: { type: integer }
       responses:
         '204': { description: No Content }
+
+  /alerts:
+    get:
+      security: [{ bearerAuth: [] }]
+      parameters:
+        - { $ref: '#/components/parameters/TenantHeader' }
+        - in: query
+          name: farm_id
+          schema: { type: integer }
+        - in: query
+          name: cycle_id
+          schema: { type: integer }
+        - in: query
+          name: severity
+          schema:
+            type: string
+            enum: [info, warning, critical]
+        - in: query
+          name: is_acknowledged
+          schema: { type: boolean }
+        - in: query
+          name: date_from
+          schema: { type: string, format: date }
+        - in: query
+          name: date_to
+          schema: { type: string, format: date }
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/AlertEvent' }
+
+  /alerts/{alert}/acknowledge:
+    post:
+      security: [{ bearerAuth: [] }]
+      parameters:
+        - { $ref: '#/components/parameters/TenantHeader' }
+        - in: path
+          name: alert
+          required: true
+          schema: { type: integer }
+      responses:
+        '200':
+          description: Acknowledged
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/AlertEvent' }

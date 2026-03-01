@@ -1,0 +1,128 @@
+openapi: 3.0.3
+info:
+  title: Shrimp Laravel API
+  version: 1.0.0
+servers:
+  - url: /api/v1
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: Token
+  parameters:
+    TenantHeader:
+      name: X-Tenant
+      in: header
+      required: true
+      schema:
+        type: string
+      description: Tenant slug. Required in all tenant-scoped endpoints.
+  schemas:
+    RegisterRequest:
+      type: object
+      required: [name, email, password, password_confirmation]
+      properties:
+        name: { type: string }
+        email: { type: string, format: email }
+        password: { type: string, format: password }
+        password_confirmation: { type: string, format: password }
+        role:
+          type: string
+          enum: [Owner, Admin, Production, Inventory, Finance, ReadOnly]
+        device_name: { type: string }
+    LoginRequest:
+      type: object
+      required: [email, password]
+      properties:
+        email: { type: string, format: email }
+        password: { type: string, format: password }
+        device_name: { type: string }
+    User:
+      type: object
+      properties:
+        id: { type: integer }
+        tenant_id: { type: integer }
+        name: { type: string }
+        email: { type: string, format: email }
+        role:
+          type: string
+          enum: [Owner, Admin, Production, Inventory, Finance, ReadOnly]
+    AuthTokenResponse:
+      type: object
+      properties:
+        token_type:
+          type: string
+          example: Bearer
+        access_token:
+          type: string
+        user:
+          $ref: '#/components/schemas/User'
+paths:
+  /auth/register:
+    post:
+      summary: Register user in current tenant
+      parameters:
+        - $ref: '#/components/parameters/TenantHeader'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RegisterRequest'
+      responses:
+        '201':
+          description: Registered and authenticated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthTokenResponse'
+  /auth/login:
+    post:
+      summary: Login user in current tenant
+      parameters:
+        - $ref: '#/components/parameters/TenantHeader'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+      responses:
+        '200':
+          description: Authenticated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthTokenResponse'
+        '401':
+          description: Invalid credentials in current tenant
+  /auth/me:
+    get:
+      summary: Get current authenticated user
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/TenantHeader'
+      responses:
+        '200':
+          description: Current user
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  user:
+                    $ref: '#/components/schemas/User'
+        '401':
+          description: Missing or invalid token
+  /auth/logout:
+    post:
+      summary: Revoke current access token
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/TenantHeader'
+      responses:
+        '204':
+          description: Token revoked

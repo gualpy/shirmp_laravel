@@ -2,15 +2,22 @@
 
 namespace App\Models;
 
+use App\Modules\Auth\Domain\Enums\UserRole;
+use App\Multitenancy\Traits\HasTenant;
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Foundation\Auth\User as Authenticatable;
+use Laravel\Sanctum\HasApiTokens;
 use Illuminate\Notifications\Notifiable;
 
 class User extends Authenticatable
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
-    use HasFactory, Notifiable;
+    use HasApiTokens;
+    use HasFactory;
+    use HasTenant;
+    use Notifiable;
 
     /**
      * The attributes that are mass assignable.
@@ -18,9 +25,11 @@ class User extends Authenticatable
      * @var list<string>
      */
     protected $fillable = [
+        'tenant_id',
         'name',
         'email',
         'password',
+        'role',
     ];
 
     /**
@@ -41,8 +50,15 @@ class User extends Authenticatable
     protected function casts(): array
     {
         return [
+            'tenant_id' => 'int',
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'role' => UserRole::class,
         ];
+    }
+
+    public function tenant(): BelongsTo
+    {
+        return $this->belongsTo(Tenant::class);
     }
 }

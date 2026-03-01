@@ -23,3 +23,13 @@ Proceso:
 - Plan checklist
 - Implementación
 - Ejecutar tests
+
+Implementation details:
+- OpenAPI spec actualizado en `docs/api/openapi.yaml`.
+- Endpoints auth documentados:
+  - `POST /api/v1/auth/register`
+  - `POST /api/v1/auth/login`
+  - `GET /api/v1/auth/me`
+  - `POST /api/v1/auth/logout`
+- Header `X-Tenant` requerido para endpoints tenant-scoped.
+- Endpoints protegidos requieren `Authorization: Bearer {token}`.

@@ -153,6 +153,30 @@ components:
             name: { type: string }
         created_at: { type: string, format: date-time }
         updated_at: { type: string, format: date-time }
+    CycleMetrics:
+      type: object
+      properties:
+        densities:
+          type: object
+          properties:
+            pl_m2: { type: number, format: float, nullable: true }
+            pl_ha: { type: number, format: float, nullable: true }
+        sampling:
+          type: object
+          properties:
+            latest_pp_grams: { type: number, format: float, nullable: true }
+            growth_g_per_week: { type: number, format: float, nullable: true }
+        feed:
+          type: object
+          properties:
+            total_feed_kg: { type: number, format: float }
+        harvest:
+          type: object
+          properties:
+            total_lbs: { type: number, format: float }
+            total_kg: { type: number, format: float }
+        fcr: { type: number, format: float }
+        biomass_kg: { type: number, format: float, nullable: true }
 paths:
   /auth/register:
     post:
@@ -625,3 +649,27 @@ paths:
           content:
             application/json:
               schema: { $ref: '#/components/schemas/Error422' }
+
+  /cycles/{cycle}/metrics:
+    get:
+      security: [{ bearerAuth: [] }]
+      parameters:
+        - { $ref: '#/components/parameters/TenantHeader' }
+        - in: path
+          name: cycle
+          required: true
+          schema: { type: integer }
+        - in: query
+          name: survival_estimate
+          schema:
+            type: number
+            format: float
+            minimum: 0
+            maximum: 1
+          description: Optional survival estimate (0-1). If omitted, biomass and estimated_alive_count remain null-derived.
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/CycleMetrics' }

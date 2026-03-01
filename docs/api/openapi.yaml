@@ -1,7 +1,7 @@
 openapi: 3.0.3
 info:
   title: Shrimp Laravel API
-  version: 1.0.0
+  version: 1.1.0
 servers:
   - url: /api/v1
 components:
@@ -17,27 +17,17 @@ components:
       required: true
       schema:
         type: string
-      description: Tenant slug. Required in all tenant-scoped endpoints.
+      description: Tenant slug. Required for tenant-scoped endpoints.
   schemas:
-    RegisterRequest:
+    Error422:
       type: object
-      required: [name, email, password, password_confirmation]
       properties:
-        name: { type: string }
-        email: { type: string, format: email }
-        password: { type: string, format: password }
-        password_confirmation: { type: string, format: password }
-        role:
-          type: string
-          enum: [Owner, Admin, Production, Inventory, Finance, ReadOnly]
-        device_name: { type: string }
-    LoginRequest:
-      type: object
-      required: [email, password]
-      properties:
-        email: { type: string, format: email }
-        password: { type: string, format: password }
-        device_name: { type: string }
+        message: { type: string }
+        errors:
+          type: object
+          additionalProperties:
+            type: array
+            items: { type: string }
     User:
       type: object
       properties:
@@ -51,78 +41,481 @@ components:
     AuthTokenResponse:
       type: object
       properties:
-        token_type:
+        token_type: { type: string, example: Bearer }
+        access_token: { type: string }
+        user: { $ref: '#/components/schemas/User' }
+    Farm:
+      type: object
+      properties:
+        id: { type: integer }
+        tenant_id: { type: integer }
+        name: { type: string }
+        location: { type: string, nullable: true }
+        notes: { type: string, nullable: true }
+        created_at: { type: string, format: date-time }
+        updated_at: { type: string, format: date-time }
+    Pond:
+      type: object
+      properties:
+        id: { type: integer }
+        tenant_id: { type: integer }
+        farm_id: { type: integer }
+        code: { type: string }
+        name: { type: string, nullable: true }
+        area_ha: { type: number, format: float }
+        avg_depth_m: { type: number, format: float, nullable: true }
+        is_active: { type: boolean }
+        created_at: { type: string, format: date-time }
+        updated_at: { type: string, format: date-time }
+    Cycle:
+      type: object
+      properties:
+        id: { type: integer }
+        tenant_id: { type: integer }
+        pond_id: { type: integer }
+        status:
           type: string
-          example: Bearer
-        access_token:
+          enum: [active, harvested, cancelled]
+        started_at: { type: string, format: date }
+        ended_at: { type: string, format: date, nullable: true }
+        notes: { type: string, nullable: true }
+        created_at: { type: string, format: date-time }
+        updated_at: { type: string, format: date-time }
+    Stocking:
+      type: object
+      properties:
+        id: { type: integer }
+        tenant_id: { type: integer }
+        cycle_id: { type: integer }
+        stocked_at: { type: string, format: date }
+        pl_qty: { type: integer }
+        hatchery_code: { type: string, nullable: true }
+        batch_code: { type: string, nullable: true }
+        initial_pp_grams: { type: number, format: float, nullable: true }
+        density_pl_m2: { type: number, format: float }
+        density_pl_ha: { type: number, format: float }
+        created_at: { type: string, format: date-time }
+        updated_at: { type: string, format: date-time }
+    Sampling:
+      type: object
+      properties:
+        id: { type: integer }
+        tenant_id: { type: integer }
+        cycle_id: { type: integer }
+        sampled_at: { type: string, format: date }
+        pp_grams: { type: number, format: float }
+        notes: { type: string, nullable: true }
+        created_at: { type: string, format: date-time }
+        updated_at: { type: string, format: date-time }
+    Harvest:
+      type: object
+      properties:
+        id: { type: integer }
+        tenant_id: { type: integer }
+        cycle_id: { type: integer }
+        harvested_at: { type: string, format: date }
+        type:
           type: string
-        user:
-          $ref: '#/components/schemas/User'
+          enum: [partial, final]
+        total_lbs: { type: number, format: float }
+        avg_pp_grams: { type: number, format: float, nullable: true }
+        guide_number: { type: string, nullable: true }
+        notes: { type: string, nullable: true }
+        created_at: { type: string, format: date-time }
+        updated_at: { type: string, format: date-time }
 paths:
   /auth/register:
     post:
-      summary: Register user in current tenant
-      parameters:
-        - $ref: '#/components/parameters/TenantHeader'
+      parameters: [{ $ref: '#/components/parameters/TenantHeader' }]
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/RegisterRequest'
+              type: object
+              required: [name, email, password, password_confirmation]
+              properties:
+                name: { type: string }
+                email: { type: string, format: email }
+                password: { type: string, format: password }
+                password_confirmation: { type: string, format: password }
+                role:
+                  type: string
+                  enum: [Owner, Admin, Production, Inventory, Finance, ReadOnly]
+                device_name: { type: string }
       responses:
         '201':
-          description: Registered and authenticated
+          description: Created
           content:
             application/json:
-              schema:
-                $ref: '#/components/schemas/AuthTokenResponse'
+              schema: { $ref: '#/components/schemas/AuthTokenResponse' }
   /auth/login:
     post:
-      summary: Login user in current tenant
-      parameters:
-        - $ref: '#/components/parameters/TenantHeader'
+      parameters: [{ $ref: '#/components/parameters/TenantHeader' }]
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/LoginRequest'
+              type: object
+              required: [email, password]
+              properties:
+                email: { type: string, format: email }
+                password: { type: string, format: password }
+                device_name: { type: string }
       responses:
         '200':
-          description: Authenticated
+          description: OK
           content:
             application/json:
-              schema:
-                $ref: '#/components/schemas/AuthTokenResponse'
-        '401':
-          description: Invalid credentials in current tenant
+              schema: { $ref: '#/components/schemas/AuthTokenResponse' }
+        '401': { description: Invalid credentials }
   /auth/me:
     get:
-      summary: Get current authenticated user
-      security:
-        - bearerAuth: []
-      parameters:
-        - $ref: '#/components/parameters/TenantHeader'
+      security: [{ bearerAuth: [] }]
+      parameters: [{ $ref: '#/components/parameters/TenantHeader' }]
       responses:
         '200':
-          description: Current user
+          description: OK
           content:
             application/json:
               schema:
                 type: object
                 properties:
-                  user:
-                    $ref: '#/components/schemas/User'
-        '401':
-          description: Missing or invalid token
+                  user: { $ref: '#/components/schemas/User' }
+        '401': { description: Unauthorized }
   /auth/logout:
     post:
-      summary: Revoke current access token
-      security:
-        - bearerAuth: []
-      parameters:
-        - $ref: '#/components/parameters/TenantHeader'
+      security: [{ bearerAuth: [] }]
+      parameters: [{ $ref: '#/components/parameters/TenantHeader' }]
       responses:
-        '204':
-          description: Token revoked
+        '204': { description: No Content }
+
+  /farms:
+    get:
+      security: [{ bearerAuth: [] }]
+      parameters: [{ $ref: '#/components/parameters/TenantHeader' }]
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/Farm' }
+    post:
+      security: [{ bearerAuth: [] }]
+      parameters: [{ $ref: '#/components/parameters/TenantHeader' }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [name]
+              properties:
+                name: { type: string }
+                location: { type: string }
+                notes: { type: string }
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Farm' }
+  /farms/{farm}:
+    get:
+      security: [{ bearerAuth: [] }]
+      parameters:
+        - { $ref: '#/components/parameters/TenantHeader' }
+        - in: path
+          name: farm
+          required: true
+          schema: { type: integer }
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Farm' }
+    patch:
+      security: [{ bearerAuth: [] }]
+      parameters:
+        - { $ref: '#/components/parameters/TenantHeader' }
+        - in: path
+          name: farm
+          required: true
+          schema: { type: integer }
+      responses:
+        '200':
+          description: Updated
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Farm' }
+    delete:
+      security: [{ bearerAuth: [] }]
+      parameters:
+        - { $ref: '#/components/parameters/TenantHeader' }
+        - in: path
+          name: farm
+          required: true
+          schema: { type: integer }
+      responses:
+        '204': { description: No Content }
+
+  /ponds:
+    get:
+      security: [{ bearerAuth: [] }]
+      parameters:
+        - { $ref: '#/components/parameters/TenantHeader' }
+        - in: query
+          name: farm_id
+          schema: { type: integer }
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/Pond' }
+    post:
+      security: [{ bearerAuth: [] }]
+      parameters: [{ $ref: '#/components/parameters/TenantHeader' }]
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Pond' }
+  /ponds/{pond}:
+    get:
+      security: [{ bearerAuth: [] }]
+      parameters:
+        - { $ref: '#/components/parameters/TenantHeader' }
+        - in: path
+          name: pond
+          required: true
+          schema: { type: integer }
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Pond' }
+    patch:
+      security: [{ bearerAuth: [] }]
+      parameters:
+        - { $ref: '#/components/parameters/TenantHeader' }
+        - in: path
+          name: pond
+          required: true
+          schema: { type: integer }
+      responses:
+        '200':
+          description: Updated
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Pond' }
+    delete:
+      security: [{ bearerAuth: [] }]
+      parameters:
+        - { $ref: '#/components/parameters/TenantHeader' }
+        - in: path
+          name: pond
+          required: true
+          schema: { type: integer }
+      responses:
+        '204': { description: No Content }
+
+  /ponds/{pond}/cycles:
+    get:
+      security: [{ bearerAuth: [] }]
+      parameters:
+        - { $ref: '#/components/parameters/TenantHeader' }
+        - in: path
+          name: pond
+          required: true
+          schema: { type: integer }
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/Cycle' }
+    post:
+      security: [{ bearerAuth: [] }]
+      parameters:
+        - { $ref: '#/components/parameters/TenantHeader' }
+        - in: path
+          name: pond
+          required: true
+          schema: { type: integer }
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Cycle' }
+        '422':
+          description: Validation
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Error422' }
+
+  /cycles/{cycle}:
+    get:
+      security: [{ bearerAuth: [] }]
+      parameters:
+        - { $ref: '#/components/parameters/TenantHeader' }
+        - in: path
+          name: cycle
+          required: true
+          schema: { type: integer }
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Cycle' }
+    patch:
+      security: [{ bearerAuth: [] }]
+      parameters:
+        - { $ref: '#/components/parameters/TenantHeader' }
+        - in: path
+          name: cycle
+          required: true
+          schema: { type: integer }
+      responses:
+        '200':
+          description: Updated
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Cycle' }
+
+  /cycles/{cycle}/stocking:
+    get:
+      security: [{ bearerAuth: [] }]
+      parameters:
+        - { $ref: '#/components/parameters/TenantHeader' }
+        - in: path
+          name: cycle
+          required: true
+          schema: { type: integer }
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Stocking' }
+    post:
+      security: [{ bearerAuth: [] }]
+      parameters:
+        - { $ref: '#/components/parameters/TenantHeader' }
+        - in: path
+          name: cycle
+          required: true
+          schema: { type: integer }
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Stocking' }
+    patch:
+      security: [{ bearerAuth: [] }]
+      parameters:
+        - { $ref: '#/components/parameters/TenantHeader' }
+        - in: path
+          name: cycle
+          required: true
+          schema: { type: integer }
+      responses:
+        '200':
+          description: Updated
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Stocking' }
+
+  /cycles/{cycle}/samplings:
+    get:
+      security: [{ bearerAuth: [] }]
+      parameters:
+        - { $ref: '#/components/parameters/TenantHeader' }
+        - in: path
+          name: cycle
+          required: true
+          schema: { type: integer }
+        - in: query
+          name: date_from
+          schema: { type: string, format: date }
+        - in: query
+          name: date_to
+          schema: { type: string, format: date }
+      responses:
+        '200':
+          description: OK
+    post:
+      security: [{ bearerAuth: [] }]
+      parameters:
+        - { $ref: '#/components/parameters/TenantHeader' }
+        - in: path
+          name: cycle
+          required: true
+          schema: { type: integer }
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Sampling' }
+
+  /cycles/{cycle}/harvests:
+    get:
+      security: [{ bearerAuth: [] }]
+      parameters:
+        - { $ref: '#/components/parameters/TenantHeader' }
+        - in: path
+          name: cycle
+          required: true
+          schema: { type: integer }
+      responses:
+        '200':
+          description: OK
+    post:
+      security: [{ bearerAuth: [] }]
+      parameters:
+        - { $ref: '#/components/parameters/TenantHeader' }
+        - in: path
+          name: cycle
+          required: true
+          schema: { type: integer }
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Harvest' }
+        '422':
+          description: Validation
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Error422' }
+
+  /harvests/{harvest}:
+    get:
+      security: [{ bearerAuth: [] }]
+      parameters:
+        - { $ref: '#/components/parameters/TenantHeader' }
+        - in: path
+          name: harvest
+          required: true
+          schema: { type: integer }
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Harvest' }

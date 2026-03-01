@@ -1,0 +1,17 @@
+<?php
+
+namespace App\Modules\Production\Application\Actions;
+
+use App\Modules\Production\Application\DTO\FarmDataDTO;
+use App\Modules\Production\Domain\Models\Farm;
+use App\Modules\Shared\Application\Actions\BaseAction;
+
+final class UpdateFarmAction extends BaseAction
+{
+    public function execute(Farm $farm, FarmDataDTO $dto): Farm
+    {
+        $farm->update($dto->toArray());
+
+        return $farm->refresh();
+    }
+}

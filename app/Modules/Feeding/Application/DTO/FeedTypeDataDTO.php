@@ -10,6 +10,7 @@ final class FeedTypeDataDTO extends BaseDTO
         public readonly string $name,
         public readonly ?string $brand,
         public readonly ?float $proteinPct,
+        public readonly ?float $costPerKg,
         public readonly ?string $notes,
         public readonly bool $isActive,
     ) {
@@ -21,6 +22,7 @@ final class FeedTypeDataDTO extends BaseDTO
             name: (string) $data['name'],
             brand: isset($data['brand']) ? (string) $data['brand'] : null,
             proteinPct: isset($data['protein_pct']) ? (float) $data['protein_pct'] : null,
+            costPerKg: isset($data['cost_per_kg']) ? (float) $data['cost_per_kg'] : null,
             notes: isset($data['notes']) ? (string) $data['notes'] : null,
             isActive: (bool) ($data['is_active'] ?? true),
         );
@@ -32,6 +34,7 @@ final class FeedTypeDataDTO extends BaseDTO
             'name' => $this->name,
             'brand' => $this->brand,
             'protein_pct' => $this->proteinPct,
+            'cost_per_kg' => $this->costPerKg,
             'notes' => $this->notes,
             'is_active' => $this->isActive,
         ];

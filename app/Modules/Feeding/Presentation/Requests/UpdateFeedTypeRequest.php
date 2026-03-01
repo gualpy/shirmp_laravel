@@ -32,6 +32,7 @@ final class UpdateFeedTypeRequest extends FormRequest
             ],
             'brand' => ['sometimes', 'nullable', 'string', 'max:255'],
             'protein_pct' => ['sometimes', 'nullable', 'numeric', 'min:0', 'max:100'],
+            'cost_per_kg' => ['sometimes', 'nullable', 'numeric', 'gt:0'],
             'notes' => ['sometimes', 'nullable', 'string'],
             'is_active' => ['sometimes', 'boolean'],
         ];

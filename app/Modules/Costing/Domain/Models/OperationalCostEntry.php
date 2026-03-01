@@ -1,35 +1,35 @@
 <?php
 
-namespace App\Modules\Feeding\Domain\Models;
+namespace App\Modules\Costing\Domain\Models;
 
 use App\Models\Tenant;
+use App\Modules\Costing\Domain\Enums\OperationalCostType;
+use App\Modules\Production\Domain\Models\Cycle;
 use App\Multitenancy\Traits\HasTenant;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\HasMany;
 
-class FeedType extends Model
+class OperationalCostEntry extends Model
 {
     use HasFactory;
     use HasTenant;
 
     protected $fillable = [
         'tenant_id',
-        'name',
-        'brand',
-        'protein_pct',
-        'cost_per_kg',
+        'cycle_id',
+        'cost_type',
+        'amount',
+        'occurred_at',
         'notes',
-        'is_active',
     ];
 
     protected function casts(): array
     {
         return [
-            'protein_pct' => 'decimal:2',
-            'cost_per_kg' => 'decimal:4',
-            'is_active' => 'bool',
+            'cost_type' => OperationalCostType::class,
+            'amount' => 'decimal:2',
+            'occurred_at' => 'date',
         ];
     }
 
@@ -38,8 +38,8 @@ class FeedType extends Model
         return $this->belongsTo(Tenant::class);
     }
 
-    public function entries(): HasMany
+    public function cycle(): BelongsTo
     {
-        return $this->hasMany(FeedEntry::class);
+        return $this->belongsTo(Cycle::class);
     }
 }

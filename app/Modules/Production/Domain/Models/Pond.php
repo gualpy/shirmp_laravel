@@ -3,6 +3,7 @@
 namespace App\Modules\Production\Domain\Models;
 
 use App\Models\Tenant;
+use App\Modules\WaterQuality\Domain\Models\WaterQualityEntry;
 use App\Multitenancy\Traits\HasTenant;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -46,5 +47,10 @@ class Pond extends Model
     public function cycles(): HasMany
     {
         return $this->hasMany(Cycle::class);
+    }
+
+    public function waterQualityEntries(): HasMany
+    {
+        return $this->hasMany(WaterQualityEntry::class);
     }
 }

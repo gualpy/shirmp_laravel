@@ -10,6 +10,8 @@ use App\Modules\Configuration\Presentation\Controllers\FarmSettingController;
 use App\Modules\Configuration\Presentation\Controllers\FeedingGrowthTableController;
 use App\Modules\Configuration\Presentation\Controllers\FeedingGrowthTableRowController;
 use App\Modules\Configuration\Presentation\Controllers\TenantSettingController;
+use App\Modules\Costing\Presentation\Controllers\CycleCostController;
+use App\Modules\Costing\Presentation\Controllers\OperationalCostController;
 use App\Modules\Feeding\Presentation\Controllers\FeedEntryController;
 use App\Modules\Feeding\Presentation\Controllers\FeedTypeController;
 use App\Modules\Production\Presentation\Controllers\CycleController;
@@ -22,6 +24,8 @@ use App\Modules\Production\Presentation\Controllers\SamplingController;
 use App\Modules\Production\Presentation\Controllers\StockingController;
 use App\Modules\Shared\Presentation\Controllers\CurrentTenantController;
 use App\Modules\Shared\Presentation\Controllers\TenantNoteController;
+use App\Modules\WaterQuality\Presentation\Controllers\CycleWaterQualityController;
+use App\Modules\WaterQuality\Presentation\Controllers\PondWaterQualityController;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('v1')->group(function (): void {
@@ -64,6 +68,14 @@ Route::prefix('v1')->group(function (): void {
 
         Route::get('/cycles/{cycle}/feed-entries', [FeedEntryController::class, 'index']);
         Route::post('/cycles/{cycle}/feed-entries', [FeedEntryController::class, 'store']);
+        Route::get('/cycles/{cycle}/water-quality', [CycleWaterQualityController::class, 'index']);
+        Route::post('/cycles/{cycle}/water-quality', [CycleWaterQualityController::class, 'store']);
+        Route::get('/cycles/{cycle}/water-quality/latest', [CycleWaterQualityController::class, 'latest']);
+        Route::get('/ponds/{pond}/water-quality', [PondWaterQualityController::class, 'index']);
+
+        Route::get('/cycles/{cycle}/operational-costs', [OperationalCostController::class, 'index']);
+        Route::post('/cycles/{cycle}/operational-costs', [OperationalCostController::class, 'store']);
+        Route::get('/cycles/{cycle}/costs', CycleCostController::class);
 
         Route::get('/tenant/settings', [TenantSettingController::class, 'show']);
         Route::patch('/tenant/settings', [TenantSettingController::class, 'update']);

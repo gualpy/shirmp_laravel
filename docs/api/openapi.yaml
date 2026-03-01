@@ -131,6 +131,7 @@ components:
         name: { type: string }
         brand: { type: string, nullable: true }
         protein_pct: { type: number, format: float, nullable: true }
+        cost_per_kg: { type: number, format: float, nullable: true }
         notes: { type: string, nullable: true }
         is_active: { type: boolean }
         created_at: { type: string, format: date-time }
@@ -225,7 +226,7 @@ components:
         farm_id: { type: integer, nullable: true }
         code:
           type: string
-          enum: [LOW_GROWTH, HIGH_FCR, FEED_DEVIATION, HIGH_BIOMASS]
+          enum: [LOW_GROWTH, HIGH_FCR, FEED_DEVIATION, HIGH_BIOMASS, DO_LOW, PH_OUT_OF_RANGE]
         is_active: { type: boolean }
         params_json: { type: object, nullable: true, additionalProperties: true }
         severity:
@@ -240,7 +241,7 @@ components:
         cycle_id: { type: integer }
         rule_code:
           type: string
-          enum: [LOW_GROWTH, HIGH_FCR, FEED_DEVIATION, HIGH_BIOMASS]
+          enum: [LOW_GROWTH, HIGH_FCR, FEED_DEVIATION, HIGH_BIOMASS, DO_LOW, PH_OUT_OF_RANGE]
         severity:
           type: string
           enum: [info, warning, critical]
@@ -251,6 +252,64 @@ components:
         is_acknowledged: { type: boolean }
         acknowledged_by_user_id: { type: integer, nullable: true }
         acknowledged_at: { type: string, format: date-time, nullable: true }
+    WaterQualityEntry:
+      type: object
+      properties:
+        id: { type: integer }
+        tenant_id: { type: integer }
+        cycle_id: { type: integer }
+        pond_id: { type: integer }
+        measured_at: { type: string, format: date-time }
+        dissolved_oxygen_mg_l: { type: number, format: float, nullable: true }
+        ph: { type: number, format: float, nullable: true }
+        temp_c: { type: number, format: float, nullable: true }
+        salinity_ppt: { type: number, format: float, nullable: true }
+        alkalinity_mg_l: { type: number, format: float, nullable: true }
+        ammonia_mg_l: { type: number, format: float, nullable: true }
+        nitrite_mg_l: { type: number, format: float, nullable: true }
+        notes: { type: string, nullable: true }
+        measured_by_user_id: { type: integer, nullable: true }
+        created_at: { type: string, format: date-time }
+        updated_at: { type: string, format: date-time }
+    OperationalCostEntry:
+      type: object
+      properties:
+        id: { type: integer }
+        tenant_id: { type: integer }
+        cycle_id: { type: integer }
+        cost_type:
+          type: string
+          enum: [labor, energy, fuel, maintenance, chemicals, other]
+        amount: { type: number, format: float }
+        occurred_at: { type: string, format: date }
+        notes: { type: string, nullable: true }
+        created_at: { type: string, format: date-time }
+        updated_at: { type: string, format: date-time }
+    CycleCostSummary:
+      type: object
+      properties:
+        totals:
+          type: object
+          properties:
+            feed_cost: { type: number, format: float }
+            operational_cost: { type: number, format: float }
+            total_cost: { type: number, format: float }
+        production:
+          type: object
+          properties:
+            total_harvest_lbs: { type: number, format: float }
+        metrics:
+          type: object
+          properties:
+            cost_per_lb: { type: number, format: float }
+            cost_per_ha: { type: number, format: float }
+        missing_cost_inputs:
+          type: array
+          items:
+            type: object
+            properties:
+              id: { type: integer }
+              name: { type: string }
 paths:
   /auth/register:
     post:
@@ -724,6 +783,113 @@ paths:
             application/json:
               schema: { $ref: '#/components/schemas/Error422' }
 
+  /cycles/{cycle}/water-quality:
+    get:
+      security: [{ bearerAuth: [] }]
+      parameters:
+        - { $ref: '#/components/parameters/TenantHeader' }
+        - in: path
+          name: cycle
+          required: true
+          schema: { type: integer }
+        - in: query
+          name: date_from
+          schema: { type: string, format: date }
+        - in: query
+          name: date_to
+          schema: { type: string, format: date }
+        - in: query
+          name: per_page
+          schema: { type: integer, minimum: 1, maximum: 100 }
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/WaterQualityEntry' }
+    post:
+      security: [{ bearerAuth: [] }]
+      parameters:
+        - { $ref: '#/components/parameters/TenantHeader' }
+        - in: path
+          name: cycle
+          required: true
+          schema: { type: integer }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [measured_at]
+              properties:
+                measured_at: { type: string, format: date-time }
+                dissolved_oxygen_mg_l: { type: number, format: float }
+                ph: { type: number, format: float }
+                temp_c: { type: number, format: float }
+                salinity_ppt: { type: number, format: float }
+                alkalinity_mg_l: { type: number, format: float }
+                ammonia_mg_l: { type: number, format: float }
+                nitrite_mg_l: { type: number, format: float }
+                notes: { type: string, nullable: true }
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/WaterQualityEntry' }
+        '422':
+          description: Validation
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Error422' }
+
+  /cycles/{cycle}/water-quality/latest:
+    get:
+      security: [{ bearerAuth: [] }]
+      parameters:
+        - { $ref: '#/components/parameters/TenantHeader' }
+        - in: path
+          name: cycle
+          required: true
+          schema: { type: integer }
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/WaterQualityEntry' }
+        '404': { description: Not Found }
+
+  /ponds/{pond}/water-quality:
+    get:
+      security: [{ bearerAuth: [] }]
+      parameters:
+        - { $ref: '#/components/parameters/TenantHeader' }
+        - in: path
+          name: pond
+          required: true
+          schema: { type: integer }
+        - in: query
+          name: date_from
+          schema: { type: string, format: date }
+        - in: query
+          name: date_to
+          schema: { type: string, format: date }
+        - in: query
+          name: per_page
+          schema: { type: integer, minimum: 1, maximum: 100 }
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/WaterQualityEntry' }
+
   /cycles/{cycle}/metrics:
     get:
       security: [{ bearerAuth: [] }]
@@ -747,6 +913,73 @@ paths:
           content:
             application/json:
               schema: { $ref: '#/components/schemas/CycleMetrics' }
+
+  /cycles/{cycle}/operational-costs:
+    get:
+      security: [{ bearerAuth: [] }]
+      parameters:
+        - { $ref: '#/components/parameters/TenantHeader' }
+        - in: path
+          name: cycle
+          required: true
+          schema: { type: integer }
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/OperationalCostEntry' }
+    post:
+      security: [{ bearerAuth: [] }]
+      parameters:
+        - { $ref: '#/components/parameters/TenantHeader' }
+        - in: path
+          name: cycle
+          required: true
+          schema: { type: integer }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [cost_type, amount, occurred_at]
+              properties:
+                cost_type:
+                  type: string
+                  enum: [labor, energy, fuel, maintenance, chemicals, other]
+                amount: { type: number, format: float, minimum: 0.01 }
+                occurred_at: { type: string, format: date }
+                notes: { type: string, nullable: true }
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/OperationalCostEntry' }
+        '422':
+          description: Validation
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Error422' }
+
+  /cycles/{cycle}/costs:
+    get:
+      security: [{ bearerAuth: [] }]
+      parameters:
+        - { $ref: '#/components/parameters/TenantHeader' }
+        - in: path
+          name: cycle
+          required: true
+          schema: { type: integer }
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/CycleCostSummary' }
 
   /tenant/settings:
     get:

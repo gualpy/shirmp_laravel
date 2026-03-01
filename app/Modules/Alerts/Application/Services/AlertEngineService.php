@@ -11,6 +11,7 @@ use App\Modules\Production\Application\Services\MetricsService;
 use App\Modules\Production\Domain\Enums\CycleStatus;
 use App\Modules\Production\Domain\Models\Cycle;
 use App\Modules\Shared\Application\Services\BaseService;
+use App\Modules\WaterQuality\Domain\Models\WaterQualityEntry;
 use Illuminate\Support\Carbon;
 
 final class AlertEngineService extends BaseService
@@ -43,6 +44,11 @@ final class AlertEngineService extends BaseService
         $feedTodayKg = (float) $cycle->feedEntries()
             ->whereDate('fed_at', $evaluationDate->toDateString())
             ->sum('amount_kg');
+        $waterEntriesToday = WaterQualityEntry::query()
+            ->where('cycle_id', $cycle->id)
+            ->whereDate('measured_at', $evaluationDate->toDateString())
+            ->orderByDesc('measured_at')
+            ->get();
 
         foreach ($rules as $rule) {
             $params = $rule['params'];
@@ -122,6 +128,65 @@ final class AlertEngineService extends BaseService
                         ],
                     );
                 }
+
+                continue;
+            }
+
+            if ($code === AlertCode::DO_LOW) {
+                $threshold = (float) ($params['threshold'] ?? 3.5);
+                $criticalThreshold = (float) ($params['critical_threshold'] ?? 3.0);
+                $lowestDo = $waterEntriesToday
+                    ->filter(fn (WaterQualityEntry $entry) => $entry->dissolved_oxygen_mg_l !== null)
+                    ->sortBy('dissolved_oxygen_mg_l')
+                    ->first();
+
+                if ($lowestDo !== null && (float) $lowestDo->dissolved_oxygen_mg_l < $threshold) {
+                    $severity = (float) $lowestDo->dissolved_oxygen_mg_l < $criticalThreshold
+                        ? AlertSeverity::CRITICAL
+                        : AlertSeverity::WARNING;
+
+                    $events[] = $this->emit(
+                        cycle: $cycle,
+                        ruleCode: $code,
+                        severity: $severity,
+                        title: 'Low dissolved oxygen detected',
+                        message: 'Dissolved oxygen is below the safe threshold.',
+                        detectedAt: $evaluationDate,
+                        context: [
+                            'dissolved_oxygen_mg_l' => (float) $lowestDo->dissolved_oxygen_mg_l,
+                            'threshold' => $threshold,
+                            'critical_threshold' => $criticalThreshold,
+                            'measured_at' => $lowestDo->measured_at?->toISOString(),
+                        ],
+                    );
+                }
+
+                continue;
+            }
+
+            if ($code === AlertCode::PH_OUT_OF_RANGE) {
+                $min = (float) ($params['min'] ?? 7.2);
+                $max = (float) ($params['max'] ?? 8.8);
+                $outside = $waterEntriesToday
+                    ->filter(fn (WaterQualityEntry $entry) => $entry->ph !== null)
+                    ->first(fn (WaterQualityEntry $entry) => (float) $entry->ph < $min || (float) $entry->ph > $max);
+
+                if ($outside !== null) {
+                    $events[] = $this->emit(
+                        cycle: $cycle,
+                        ruleCode: $code,
+                        severity: AlertSeverity::WARNING,
+                        title: 'pH out of range',
+                        message: 'Measured pH is outside the configured range.',
+                        detectedAt: $evaluationDate,
+                        context: [
+                            'ph' => (float) $outside->ph,
+                            'min' => $min,
+                            'max' => $max,
+                            'measured_at' => $outside->measured_at?->toISOString(),
+                        ],
+                    );
+                }
             }
         }
 
@@ -154,6 +219,8 @@ final class AlertEngineService extends BaseService
             ['code' => AlertCode::HIGH_FCR->value, 'severity' => AlertSeverity::WARNING->value, 'params' => ['threshold' => 1.7]],
             ['code' => AlertCode::FEED_DEVIATION->value, 'severity' => AlertSeverity::INFO->value, 'params' => ['deviation_pct' => 0.2]],
             ['code' => AlertCode::HIGH_BIOMASS->value, 'severity' => AlertSeverity::CRITICAL->value, 'params' => ['threshold' => 4000]],
+            ['code' => AlertCode::DO_LOW->value, 'severity' => AlertSeverity::WARNING->value, 'params' => ['threshold' => 3.5, 'critical_threshold' => 3.0]],
+            ['code' => AlertCode::PH_OUT_OF_RANGE->value, 'severity' => AlertSeverity::WARNING->value, 'params' => ['min' => 7.2, 'max' => 8.8]],
         ];
     }
 

@@ -2,7 +2,9 @@
 
 namespace App\Modules\Production\Domain\Models;
 
+use App\Modules\Costing\Domain\Models\OperationalCostEntry;
 use App\Modules\Feeding\Domain\Models\FeedEntry;
+use App\Modules\WaterQuality\Domain\Models\WaterQualityEntry;
 use App\Models\Tenant;
 use App\Modules\Production\Domain\Enums\CycleStatus;
 use App\Multitenancy\Traits\HasTenant;
@@ -63,5 +65,15 @@ class Cycle extends Model
     public function feedEntries(): HasMany
     {
         return $this->hasMany(FeedEntry::class);
+    }
+
+    public function operationalCosts(): HasMany
+    {
+        return $this->hasMany(OperationalCostEntry::class);
+    }
+
+    public function waterQualityEntries(): HasMany
+    {
+        return $this->hasMany(WaterQualityEntry::class);
     }
 }

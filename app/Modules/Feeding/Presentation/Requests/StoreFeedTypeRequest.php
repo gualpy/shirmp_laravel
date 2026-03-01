@@ -26,6 +26,7 @@ final class StoreFeedTypeRequest extends FormRequest
             ],
             'brand' => ['nullable', 'string', 'max:255'],
             'protein_pct' => ['nullable', 'numeric', 'min:0', 'max:100'],
+            'cost_per_kg' => ['nullable', 'numeric', 'gt:0'],
             'notes' => ['nullable', 'string'],
             'is_active' => ['nullable', 'boolean'],
         ];

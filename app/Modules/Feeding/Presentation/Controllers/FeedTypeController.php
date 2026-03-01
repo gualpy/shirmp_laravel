@@ -30,7 +30,7 @@ final class FeedTypeController extends Controller
 
     public function update(UpdateFeedTypeRequest $request, FeedType $feedType, UpdateFeedTypeAction $action): FeedTypeResource
     {
-        $payload = array_merge($feedType->only(['name', 'brand', 'protein_pct', 'notes', 'is_active']), $request->validated());
+        $payload = array_merge($feedType->only(['name', 'brand', 'protein_pct', 'cost_per_kg', 'notes', 'is_active']), $request->validated());
 
         return new FeedTypeResource($action->execute($feedType, FeedTypeDataDTO::fromArray($payload)));
     }

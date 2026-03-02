@@ -417,8 +417,36 @@ components:
         starts_at: { type: string, format: date-time }
         ends_at: { type: string, format: date-time, nullable: true }
         license_key: { type: string, nullable: true }
+        last_verified_at: { type: string, format: date-time, nullable: true }
+        offline_grace_days: { type: integer, nullable: true }
+        offline_mode_enabled: { type: boolean }
+        verification_source:
+          type: string
+          enum: [cloud, onprem, manual]
         created_at: { type: string, format: date-time }
         updated_at: { type: string, format: date-time }
+    SubscriptionStatusResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          nullable: true
+          enum: [active, trial, suspended, expired]
+        plan:
+          type: object
+          nullable: true
+          properties:
+            id: { type: integer, nullable: true }
+            code: { type: string, nullable: true }
+            name: { type: string, nullable: true }
+            billing_type:
+              type: string
+              nullable: true
+              enum: [monthly, yearly, lifetime, onprem]
+        ends_at: { type: string, format: date-time, nullable: true }
+        last_verified_at: { type: string, format: date-time, nullable: true }
+        offline_grace_days: { type: integer, nullable: true }
+        read_only_mode: { type: boolean }
 paths:
   /auth/register:
     post:
@@ -487,6 +515,17 @@ paths:
       responses:
         '204': { description: No Content }
 
+  /subscription/status:
+    get:
+      security: [{ bearerAuth: [] }]
+      parameters: [{ $ref: '#/components/parameters/TenantHeader' }]
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/SubscriptionStatusResponse' }
+
   /farms:
     get:
       security: [{ bearerAuth: [] }]
@@ -494,6 +533,10 @@ paths:
       responses:
         '200':
           description: OK
+          headers:
+            X-Read-Only-Mode:
+              description: Present with value `1` when tenant is allowed through offline grace in read-only mode.
+              schema: { type: string }
           content:
             application/json:
               schema:
@@ -520,7 +563,7 @@ paths:
             application/json:
               schema: { $ref: '#/components/schemas/Farm' }
         '403':
-          description: Forbidden (subscription inactive or plan limit reached)
+          description: Forbidden (subscription inactive, read-only mode, or plan limit reached)
           content:
             application/json:
               schema: { $ref: '#/components/schemas/Error403' }
@@ -1406,6 +1449,12 @@ paths:
                 starts_at: { type: string, format: date-time }
                 ends_at: { type: string, format: date-time, nullable: true }
                 license_key: { type: string, nullable: true }
+                last_verified_at: { type: string, format: date-time, nullable: true }
+                offline_grace_days: { type: integer }
+                offline_mode_enabled: { type: boolean }
+                verification_source:
+                  type: string
+                  enum: [cloud, onprem, manual]
       responses:
         '201':
           description: Created
@@ -1436,9 +1485,61 @@ paths:
                 starts_at: { type: string, format: date-time }
                 ends_at: { type: string, format: date-time, nullable: true }
                 license_key: { type: string, nullable: true }
+                last_verified_at: { type: string, format: date-time, nullable: true }
+                offline_grace_days: { type: integer }
+                offline_mode_enabled: { type: boolean }
+                verification_source:
+                  type: string
+                  enum: [cloud, onprem, manual]
       responses:
         '200':
           description: Updated
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/TenantSubscription' }
+
+  /admin/tenants/{tenant}/activate-onprem:
+    post:
+      security: [{ bearerAuth: [] }]
+      parameters:
+        - { $ref: '#/components/parameters/TenantHeader' }
+        - in: path
+          name: tenant
+          required: true
+          schema: { type: integer }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [license_key]
+              properties:
+                license_key: { type: string }
+                offline_grace_days: { type: integer }
+                machine_fingerprint: { type: string, nullable: true }
+                notes: { type: string, nullable: true }
+      responses:
+        '201':
+          description: Activated
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/TenantSubscription' }
+        '403':
+          description: Forbidden (super admin required)
+
+  /admin/tenants/{tenant}/verify-now:
+    post:
+      security: [{ bearerAuth: [] }]
+      parameters:
+        - { $ref: '#/components/parameters/TenantHeader' }
+        - in: path
+          name: tenant
+          required: true
+          schema: { type: integer }
+      responses:
+        '200':
+          description: Verified
           content:
             application/json:
               schema: { $ref: '#/components/schemas/TenantSubscription' }

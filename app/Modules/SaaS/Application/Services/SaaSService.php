@@ -9,6 +9,7 @@ use App\Modules\Production\Domain\Models\Cycle;
 use App\Modules\Production\Domain\Models\Farm;
 use App\Modules\Production\Domain\Models\Pond;
 use App\Modules\SaaS\Domain\Enums\SubscriptionStatus;
+use App\Modules\SaaS\Domain\Enums\VerificationSource;
 use App\Modules\SaaS\Domain\Models\Plan;
 use App\Modules\SaaS\Domain\Models\PlanFeature;
 use App\Modules\SaaS\Domain\Models\PlanLimit;
@@ -139,6 +140,7 @@ final class SaaSService
     public function assignPlan(Tenant $tenant, Plan $plan, array $payload): TenantSubscription
     {
         $status = (string) ($payload['status'] ?? SubscriptionStatus::ACTIVE->value);
+        $isOnPrem = $plan->billing_type->value === 'onprem';
 
         if (in_array($status, [SubscriptionStatus::ACTIVE->value, SubscriptionStatus::TRIAL->value], true)) {
             $this->assertSingleActiveOrTrialSubscription($tenant);
@@ -151,6 +153,10 @@ final class SaaSService
             'starts_at' => (string) ($payload['starts_at'] ?? now()->toDateTimeString()),
             'ends_at' => $payload['ends_at'] ?? null,
             'license_key' => $payload['license_key'] ?? null,
+            'last_verified_at' => $payload['last_verified_at'] ?? ($isOnPrem ? now() : null),
+            'offline_grace_days' => (int) ($payload['offline_grace_days'] ?? 7),
+            'offline_mode_enabled' => (bool) ($payload['offline_mode_enabled'] ?? $isOnPrem),
+            'verification_source' => $payload['verification_source'] ?? ($isOnPrem ? VerificationSource::ONPREM->value : VerificationSource::CLOUD->value),
         ]);
     }
 
@@ -166,6 +172,16 @@ final class SaaSService
         }
 
         $subscription->fill($payload);
+
+        if (isset($payload['plan_id'])) {
+            $subscription->load('plan');
+            if ($subscription->plan?->billing_type->value === 'onprem') {
+                $subscription->offline_mode_enabled = true;
+                $subscription->verification_source = VerificationSource::ONPREM;
+                $subscription->last_verified_at = $subscription->last_verified_at ?? now();
+            }
+        }
+
         $subscription->save();
 
         return $subscription->refresh();

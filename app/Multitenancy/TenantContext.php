@@ -9,6 +9,7 @@ class TenantContext
     private ?Tenant $tenant = null;
 
     private bool $bypass = false;
+    private bool $readOnlyMode = false;
 
     public function setCurrentTenant(Tenant $tenant): void
     {
@@ -24,6 +25,7 @@ class TenantContext
     {
         $this->tenant = null;
         $this->bypass = false;
+        $this->readOnlyMode = false;
     }
 
     public function enableBypass(): void
@@ -39,5 +41,15 @@ class TenantContext
     public function isBypassed(): bool
     {
         return $this->bypass;
+    }
+
+    public function setReadOnlyMode(bool $readOnlyMode): void
+    {
+        $this->readOnlyMode = $readOnlyMode;
+    }
+
+    public function isReadOnlyMode(): bool
+    {
+        return $this->readOnlyMode;
     }
 }

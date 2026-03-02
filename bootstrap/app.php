@@ -3,6 +3,7 @@
 use App\Http\Middleware\EnsureFeatureEnabled;
 use App\Http\Middleware\EnsureSuperAdmin;
 use App\Http\Middleware\EnsureTenantSubscriptionActive;
+use App\Http\Middleware\EnsureWriteAllowed;
 use App\Http\Middleware\ResolveTenant;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
@@ -22,6 +23,7 @@ return Application::configure(basePath: dirname(__DIR__))
         ]);
         $middleware->alias([
             'subscription.active' => EnsureTenantSubscriptionActive::class,
+            'write.allowed' => EnsureWriteAllowed::class,
             'feature' => EnsureFeatureEnabled::class,
             'superadmin' => EnsureSuperAdmin::class,
         ]);

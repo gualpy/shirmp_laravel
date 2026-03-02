@@ -17,9 +17,12 @@ final class TenantSubscriptionResource extends JsonResource
             'starts_at' => $this->starts_at?->toISOString(),
             'ends_at' => $this->ends_at?->toISOString(),
             'license_key' => $this->license_key,
+            'last_verified_at' => $this->last_verified_at?->toISOString(),
+            'offline_grace_days' => $this->offline_grace_days,
+            'offline_mode_enabled' => (bool) $this->offline_mode_enabled,
+            'verification_source' => is_string($this->verification_source) ? $this->verification_source : $this->verification_source?->value,
             'created_at' => $this->created_at?->toISOString(),
             'updated_at' => $this->updated_at?->toISOString(),
         ];
     }
 }
-

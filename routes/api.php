@@ -28,6 +28,7 @@ use App\Modules\SaaS\Presentation\Controllers\AdminPlanController;
 use App\Modules\SaaS\Presentation\Controllers\AdminPlanFeatureController;
 use App\Modules\SaaS\Presentation\Controllers\AdminPlanLimitController;
 use App\Modules\SaaS\Presentation\Controllers\AdminTenantSubscriptionController;
+use App\Modules\SaaS\Presentation\Controllers\SubscriptionStatusController;
 use App\Modules\Shared\Presentation\Controllers\CurrentTenantController;
 use App\Modules\Shared\Presentation\Controllers\TenantNoteController;
 use App\Modules\WaterQuality\Presentation\Controllers\CycleWaterQualityController;
@@ -44,10 +45,12 @@ Route::prefix('v1')->group(function (): void {
         Route::post('/register', RegisterController::class);
         Route::post('/login', LoginController::class);
         Route::get('/me', MeController::class)->middleware(['auth:sanctum', 'subscription.active']);
-        Route::post('/logout', LogoutController::class)->middleware(['auth:sanctum', 'subscription.active']);
+        Route::post('/logout', LogoutController::class)->middleware(['auth:sanctum', 'subscription.active', 'write.allowed']);
     });
 
-    Route::middleware(['auth:sanctum', 'subscription.active'])->group(function (): void {
+    Route::get('/subscription/status', SubscriptionStatusController::class)->middleware('auth:sanctum');
+
+    Route::middleware(['auth:sanctum', 'subscription.active', 'write.allowed'])->group(function (): void {
         Route::apiResource('farms', FarmController::class);
         Route::apiResource('ponds', PondController::class);
 
@@ -116,6 +119,8 @@ Route::prefix('v1')->group(function (): void {
             Route::post('/plans/{plan}/limits', [AdminPlanLimitController::class, 'store']);
             Route::post('/plans/{plan}/features', [AdminPlanFeatureController::class, 'store']);
             Route::post('/tenants/{tenant}/assign-plan', [AdminTenantSubscriptionController::class, 'assignPlan']);
+            Route::post('/tenants/{tenant}/activate-onprem', [AdminTenantSubscriptionController::class, 'activateOnPrem']);
+            Route::post('/tenants/{tenant}/verify-now', [AdminTenantSubscriptionController::class, 'verifyNow']);
             Route::patch('/subscriptions/{subscription}', [AdminTenantSubscriptionController::class, 'update']);
     });
 });

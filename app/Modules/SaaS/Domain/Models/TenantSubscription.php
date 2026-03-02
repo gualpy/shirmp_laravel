@@ -4,9 +4,11 @@ namespace App\Modules\SaaS\Domain\Models;
 
 use App\Models\Tenant;
 use App\Modules\SaaS\Domain\Enums\SubscriptionStatus;
+use App\Modules\SaaS\Domain\Enums\VerificationSource;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class TenantSubscription extends Model
 {
@@ -19,6 +21,10 @@ class TenantSubscription extends Model
         'starts_at',
         'ends_at',
         'license_key',
+        'last_verified_at',
+        'offline_grace_days',
+        'offline_mode_enabled',
+        'verification_source',
     ];
 
     protected function casts(): array
@@ -27,6 +33,10 @@ class TenantSubscription extends Model
             'status' => SubscriptionStatus::class,
             'starts_at' => 'datetime',
             'ends_at' => 'datetime',
+            'last_verified_at' => 'datetime',
+            'offline_grace_days' => 'int',
+            'offline_mode_enabled' => 'bool',
+            'verification_source' => VerificationSource::class,
         ];
     }
 
@@ -39,5 +49,9 @@ class TenantSubscription extends Model
     {
         return $this->belongsTo(Plan::class);
     }
-}
 
+    public function activations(): HasMany
+    {
+        return $this->hasMany(LicenseActivation::class, 'subscription_id');
+    }
+}

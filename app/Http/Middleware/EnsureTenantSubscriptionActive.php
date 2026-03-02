@@ -3,7 +3,7 @@
 namespace App\Http\Middleware;
 
 use App\Modules\SaaS\Application\Services\SaaSService;
-use App\Modules\SaaS\Domain\Enums\SubscriptionStatus;
+use App\Modules\SaaS\Application\Services\LicenseService;
 use App\Multitenancy\TenantContext;
 use Closure;
 use Illuminate\Http\JsonResponse;
@@ -15,6 +15,7 @@ class EnsureTenantSubscriptionActive
     public function __construct(
         private readonly TenantContext $tenantContext,
         private readonly SaaSService $saasService,
+        private readonly LicenseService $licenseService,
     ) {
     }
 
@@ -33,11 +34,17 @@ class EnsureTenantSubscriptionActive
             return $next($request);
         }
 
-        if (! in_array($subscription->status, [SubscriptionStatus::ACTIVE, SubscriptionStatus::TRIAL], true)) {
-            return new JsonResponse(['message' => 'Tenant subscription is not active.'], 403);
+        $resolution = $this->licenseService->requireActiveOrGrace($tenant);
+        $readOnly = (bool) $resolution['read_only_mode'];
+        $this->tenantContext->setReadOnlyMode($readOnly);
+        $request->attributes->set('read_only_mode', $readOnly);
+
+        $response = $next($request);
+
+        if ($readOnly) {
+            $response->headers->set('X-Read-Only-Mode', '1');
         }
 
-        return $next($request);
+        return $response;
     }
 }
-

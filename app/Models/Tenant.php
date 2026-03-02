@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Modules\Configuration\Domain\Models\FeedingGrowthTable;
 use App\Modules\Configuration\Domain\Models\TenantSetting;
+use App\Modules\SaaS\Domain\Models\LicenseActivation;
 use App\Modules\SaaS\Domain\Models\TenantSubscription;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -48,5 +49,10 @@ class Tenant extends Model
     public function subscriptions(): HasMany
     {
         return $this->hasMany(TenantSubscription::class);
+    }
+
+    public function licenseActivations(): HasMany
+    {
+        return $this->hasMany(LicenseActivation::class);
     }
 }

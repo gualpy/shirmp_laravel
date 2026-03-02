@@ -1,0 +1,203 @@
+<?php
+
+namespace App\Modules\SaaS\Application\Services;
+
+use App\Models\Tenant;
+use App\Models\User;
+use App\Modules\Production\Domain\Enums\CycleStatus;
+use App\Modules\Production\Domain\Models\Cycle;
+use App\Modules\Production\Domain\Models\Farm;
+use App\Modules\Production\Domain\Models\Pond;
+use App\Modules\SaaS\Domain\Enums\SubscriptionStatus;
+use App\Modules\SaaS\Domain\Models\Plan;
+use App\Modules\SaaS\Domain\Models\PlanFeature;
+use App\Modules\SaaS\Domain\Models\PlanLimit;
+use App\Modules\SaaS\Domain\Models\TenantSubscription;
+use Illuminate\Http\Exceptions\HttpResponseException;
+use Illuminate\Http\JsonResponse;
+
+final class SaaSService
+{
+    public function getTenantPlan(Tenant $tenant): ?Plan
+    {
+        $subscription = $this->currentSubscription($tenant);
+
+        return $subscription?->plan;
+    }
+
+    public function checkLimit(Tenant $tenant, string $key): bool
+    {
+        $plan = $this->getTenantPlan($tenant);
+
+        if ($plan === null) {
+            return true;
+        }
+
+        $limit = $plan->limits()->where('key', $key)->value('value');
+
+        if ($limit === null) {
+            return true;
+        }
+
+        return $this->currentUsage($tenant, $key) < (int) $limit;
+    }
+
+    public function checkFeature(Tenant $tenant, string $featureKey): bool
+    {
+        $plan = $this->getTenantPlan($tenant);
+
+        if ($plan === null) {
+            return true;
+        }
+
+        $feature = $plan->features()->where('feature_key', $featureKey)->first();
+
+        if ($feature === null) {
+            return false;
+        }
+
+        return (bool) $feature->is_enabled;
+    }
+
+    public function enforceLimitOrFail(Tenant $tenant, string $key): void
+    {
+        if ($this->checkLimit($tenant, $key)) {
+            return;
+        }
+
+        throw new HttpResponseException(new JsonResponse([
+            'message' => sprintf('Plan limit reached for `%s`.', $key),
+        ], 403));
+    }
+
+    public function enforceFeatureOrFail(Tenant $tenant, string $featureKey): void
+    {
+        if ($this->checkFeature($tenant, $featureKey)) {
+            return;
+        }
+
+        throw new HttpResponseException(new JsonResponse([
+            'message' => sprintf('Feature `%s` is not enabled for the current plan.', $featureKey),
+        ], 403));
+    }
+
+    public function currentSubscription(Tenant $tenant): ?TenantSubscription
+    {
+        $subscription = TenantSubscription::query()
+            ->where('tenant_id', $tenant->id)
+            ->latest('starts_at')
+            ->with('plan')
+            ->first();
+
+        if ($subscription === null) {
+            return null;
+        }
+
+        if ($subscription->ends_at !== null && $subscription->ends_at->isPast() && $subscription->status !== SubscriptionStatus::EXPIRED) {
+            $subscription->status = SubscriptionStatus::EXPIRED;
+            $subscription->save();
+            $subscription->refresh();
+        }
+
+        return $subscription;
+    }
+
+    private function currentUsage(Tenant $tenant, string $key): int
+    {
+        return match ($key) {
+            'max_farms' => Farm::query()->where('tenant_id', $tenant->id)->count(),
+            'max_ponds' => Pond::query()->where('tenant_id', $tenant->id)->count(),
+            'max_cycles_active' => Cycle::query()
+                ->where('tenant_id', $tenant->id)
+                ->where('status', CycleStatus::ACTIVE->value)
+                ->count(),
+            'max_users' => User::withoutGlobalScopes()->where('tenant_id', $tenant->id)->count(),
+            default => 0,
+        };
+    }
+
+    public function assertSingleActiveOrTrialSubscription(Tenant $tenant, ?int $ignoreSubscriptionId = null): void
+    {
+        $query = TenantSubscription::query()
+            ->where('tenant_id', $tenant->id)
+            ->whereIn('status', [SubscriptionStatus::ACTIVE->value, SubscriptionStatus::TRIAL->value]);
+
+        if ($ignoreSubscriptionId !== null) {
+            $query->where('id', '!=', $ignoreSubscriptionId);
+        }
+
+        if ($query->exists()) {
+            throw new HttpResponseException(new JsonResponse([
+                'message' => 'Tenant already has an active or trial subscription.',
+            ], 422));
+        }
+    }
+
+    /**
+     * @param  array<string, mixed>  $payload
+     */
+    public function assignPlan(Tenant $tenant, Plan $plan, array $payload): TenantSubscription
+    {
+        $status = (string) ($payload['status'] ?? SubscriptionStatus::ACTIVE->value);
+
+        if (in_array($status, [SubscriptionStatus::ACTIVE->value, SubscriptionStatus::TRIAL->value], true)) {
+            $this->assertSingleActiveOrTrialSubscription($tenant);
+        }
+
+        return TenantSubscription::query()->create([
+            'tenant_id' => $tenant->id,
+            'plan_id' => $plan->id,
+            'status' => $status,
+            'starts_at' => (string) ($payload['starts_at'] ?? now()->toDateTimeString()),
+            'ends_at' => $payload['ends_at'] ?? null,
+            'license_key' => $payload['license_key'] ?? null,
+        ]);
+    }
+
+    /**
+     * @param  array<string, mixed>  $payload
+     */
+    public function updateSubscription(TenantSubscription $subscription, array $payload): TenantSubscription
+    {
+        $nextStatus = (string) ($payload['status'] ?? $subscription->status->value);
+
+        if (in_array($nextStatus, [SubscriptionStatus::ACTIVE->value, SubscriptionStatus::TRIAL->value], true)) {
+            $this->assertSingleActiveOrTrialSubscription($subscription->tenant, $subscription->id);
+        }
+
+        $subscription->fill($payload);
+        $subscription->save();
+
+        return $subscription->refresh();
+    }
+
+    /**
+     * @param  array<string, mixed>  $payload
+     */
+    public function createPlan(array $payload): Plan
+    {
+        return Plan::query()->create($payload);
+    }
+
+    /**
+     * @param  array<string, mixed>  $payload
+     */
+    public function upsertPlanLimit(Plan $plan, array $payload): PlanLimit
+    {
+        return PlanLimit::query()->updateOrCreate(
+            ['plan_id' => $plan->id, 'key' => (string) $payload['key']],
+            ['value' => $payload['value'] ?? null],
+        );
+    }
+
+    /**
+     * @param  array<string, mixed>  $payload
+     */
+    public function upsertPlanFeature(Plan $plan, array $payload): PlanFeature
+    {
+        return PlanFeature::query()->updateOrCreate(
+            ['plan_id' => $plan->id, 'feature_key' => (string) $payload['feature_key']],
+            ['is_enabled' => (bool) ($payload['is_enabled'] ?? false)],
+        );
+    }
+}

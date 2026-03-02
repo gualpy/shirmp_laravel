@@ -22,7 +22,7 @@ final class RegisterRequest extends FormRequest
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'email', 'max:255'],
             'password' => ['required', 'string', 'min:8', 'confirmed'],
-            'role' => ['nullable', Rule::enum(UserRole::class)],
+            'role' => ['nullable', Rule::enum(UserRole::class), Rule::notIn([UserRole::SUPER_ADMIN->value])],
             'device_name' => ['nullable', 'string', 'max:255'],
         ];
     }

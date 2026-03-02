@@ -122,5 +122,7 @@ class DatabaseSeeder extends Seeder
                 'notes' => 'Second demo sampling',
             ],
         );
+
+        $this->call(SaaSPlanSeeder::class);
     }
 }

@@ -24,6 +24,10 @@ use App\Modules\Production\Presentation\Controllers\HealthController;
 use App\Modules\Production\Presentation\Controllers\PondController;
 use App\Modules\Production\Presentation\Controllers\SamplingController;
 use App\Modules\Production\Presentation\Controllers\StockingController;
+use App\Modules\SaaS\Presentation\Controllers\AdminPlanController;
+use App\Modules\SaaS\Presentation\Controllers\AdminPlanFeatureController;
+use App\Modules\SaaS\Presentation\Controllers\AdminPlanLimitController;
+use App\Modules\SaaS\Presentation\Controllers\AdminTenantSubscriptionController;
 use App\Modules\Shared\Presentation\Controllers\CurrentTenantController;
 use App\Modules\Shared\Presentation\Controllers\TenantNoteController;
 use App\Modules\WaterQuality\Presentation\Controllers\CycleWaterQualityController;
@@ -39,11 +43,11 @@ Route::prefix('v1')->group(function (): void {
     Route::prefix('auth')->group(function (): void {
         Route::post('/register', RegisterController::class);
         Route::post('/login', LoginController::class);
-        Route::get('/me', MeController::class)->middleware('auth:sanctum');
-        Route::post('/logout', LogoutController::class)->middleware('auth:sanctum');
+        Route::get('/me', MeController::class)->middleware(['auth:sanctum', 'subscription.active']);
+        Route::post('/logout', LogoutController::class)->middleware(['auth:sanctum', 'subscription.active']);
     });
 
-    Route::middleware('auth:sanctum')->group(function (): void {
+    Route::middleware(['auth:sanctum', 'subscription.active'])->group(function (): void {
         Route::apiResource('farms', FarmController::class);
         Route::apiResource('ponds', PondController::class);
 
@@ -70,14 +74,18 @@ Route::prefix('v1')->group(function (): void {
 
         Route::get('/cycles/{cycle}/feed-entries', [FeedEntryController::class, 'index']);
         Route::post('/cycles/{cycle}/feed-entries', [FeedEntryController::class, 'store']);
-        Route::get('/cycles/{cycle}/water-quality', [CycleWaterQualityController::class, 'index']);
-        Route::post('/cycles/{cycle}/water-quality', [CycleWaterQualityController::class, 'store']);
-        Route::get('/cycles/{cycle}/water-quality/latest', [CycleWaterQualityController::class, 'latest']);
-        Route::get('/ponds/{pond}/water-quality', [PondWaterQualityController::class, 'index']);
+        Route::middleware('feature:water_quality')->group(function (): void {
+            Route::get('/cycles/{cycle}/water-quality', [CycleWaterQualityController::class, 'index']);
+            Route::post('/cycles/{cycle}/water-quality', [CycleWaterQualityController::class, 'store']);
+            Route::get('/cycles/{cycle}/water-quality/latest', [CycleWaterQualityController::class, 'latest']);
+            Route::get('/ponds/{pond}/water-quality', [PondWaterQualityController::class, 'index']);
+        });
 
-        Route::get('/cycles/{cycle}/operational-costs', [OperationalCostController::class, 'index']);
-        Route::post('/cycles/{cycle}/operational-costs', [OperationalCostController::class, 'store']);
-        Route::get('/cycles/{cycle}/costs', CycleCostController::class);
+        Route::middleware('feature:cost_engine')->group(function (): void {
+            Route::get('/cycles/{cycle}/operational-costs', [OperationalCostController::class, 'index']);
+            Route::post('/cycles/{cycle}/operational-costs', [OperationalCostController::class, 'store']);
+            Route::get('/cycles/{cycle}/costs', CycleCostController::class);
+        });
 
         Route::get('/tenant/settings', [TenantSettingController::class, 'show']);
         Route::patch('/tenant/settings', [TenantSettingController::class, 'update']);
@@ -90,10 +98,24 @@ Route::prefix('v1')->group(function (): void {
         Route::post('/feeding-tables/{table}/rows', [FeedingGrowthTableRowController::class, 'store']);
         Route::delete('/feeding-tables/{table}/rows/{row}', [FeedingGrowthTableRowController::class, 'destroy']);
 
-        Route::get('/alerts', [AlertController::class, 'index']);
-        Route::post('/alerts/{alert}/acknowledge', [AlertController::class, 'acknowledge']);
+        Route::middleware('feature:alerts')->group(function (): void {
+            Route::get('/alerts', [AlertController::class, 'index']);
+            Route::post('/alerts/{alert}/acknowledge', [AlertController::class, 'acknowledge']);
+        });
 
-        Route::get('/dashboard/tenant', TenantDashboardController::class);
-        Route::get('/dashboard/farms/{farm}', FarmDashboardController::class);
+        Route::middleware('feature:dashboard')->group(function (): void {
+            Route::get('/dashboard/tenant', TenantDashboardController::class);
+            Route::get('/dashboard/farms/{farm}', FarmDashboardController::class);
+        });
+    });
+
+    Route::prefix('admin')
+        ->middleware(['auth:sanctum', 'superadmin'])
+        ->group(function (): void {
+            Route::post('/plans', [AdminPlanController::class, 'store']);
+            Route::post('/plans/{plan}/limits', [AdminPlanLimitController::class, 'store']);
+            Route::post('/plans/{plan}/features', [AdminPlanFeatureController::class, 'store']);
+            Route::post('/tenants/{tenant}/assign-plan', [AdminTenantSubscriptionController::class, 'assignPlan']);
+            Route::patch('/subscriptions/{subscription}', [AdminTenantSubscriptionController::class, 'update']);
     });
 });

@@ -28,6 +28,10 @@ components:
           additionalProperties:
             type: array
             items: { type: string }
+    Error403:
+      type: object
+      properties:
+        message: { type: string }
     User:
       type: object
       properties:
@@ -370,6 +374,51 @@ components:
         cycles:
           type: array
           items: { $ref: '#/components/schemas/FarmDashboardCycle' }
+    Plan:
+      type: object
+      properties:
+        id: { type: integer }
+        code: { type: string }
+        name: { type: string }
+        billing_type:
+          type: string
+          enum: [monthly, yearly, lifetime, onprem]
+        price_usd: { type: number, format: float, nullable: true }
+        is_active: { type: boolean }
+        created_at: { type: string, format: date-time }
+        updated_at: { type: string, format: date-time }
+    PlanLimit:
+      type: object
+      properties:
+        id: { type: integer }
+        plan_id: { type: integer }
+        key: { type: string }
+        value: { type: integer, nullable: true }
+        created_at: { type: string, format: date-time }
+        updated_at: { type: string, format: date-time }
+    PlanFeature:
+      type: object
+      properties:
+        id: { type: integer }
+        plan_id: { type: integer }
+        feature_key: { type: string }
+        is_enabled: { type: boolean }
+        created_at: { type: string, format: date-time }
+        updated_at: { type: string, format: date-time }
+    TenantSubscription:
+      type: object
+      properties:
+        id: { type: integer }
+        tenant_id: { type: integer }
+        plan_id: { type: integer }
+        status:
+          type: string
+          enum: [active, trial, suspended, expired]
+        starts_at: { type: string, format: date-time }
+        ends_at: { type: string, format: date-time, nullable: true }
+        license_key: { type: string, nullable: true }
+        created_at: { type: string, format: date-time }
+        updated_at: { type: string, format: date-time }
 paths:
   /auth/register:
     post:
@@ -470,6 +519,11 @@ paths:
           content:
             application/json:
               schema: { $ref: '#/components/schemas/Farm' }
+        '403':
+          description: Forbidden (subscription inactive or plan limit reached)
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Error403' }
   /farms/{farm}:
     get:
       security: [{ bearerAuth: [] }]
@@ -1221,6 +1275,11 @@ paths:
           content:
             application/json:
               schema: { $ref: '#/components/schemas/TenantDashboard' }
+        '403':
+          description: Forbidden (feature disabled or subscription inactive)
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Error403' }
 
   /dashboard/farms/{farm}:
     get:
@@ -1237,3 +1296,149 @@ paths:
           content:
             application/json:
               schema: { $ref: '#/components/schemas/FarmDashboard' }
+        '403':
+          description: Forbidden (feature disabled or subscription inactive)
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Error403' }
+
+  /admin/plans:
+    post:
+      security: [{ bearerAuth: [] }]
+      parameters: [{ $ref: '#/components/parameters/TenantHeader' }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [code, name, billing_type]
+              properties:
+                code: { type: string }
+                name: { type: string }
+                billing_type:
+                  type: string
+                  enum: [monthly, yearly, lifetime, onprem]
+                price_usd: { type: number, format: float, nullable: true }
+                is_active: { type: boolean }
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Plan' }
+        '403':
+          description: Forbidden (super admin required)
+
+  /admin/plans/{plan}/limits:
+    post:
+      security: [{ bearerAuth: [] }]
+      parameters:
+        - { $ref: '#/components/parameters/TenantHeader' }
+        - in: path
+          name: plan
+          required: true
+          schema: { type: integer }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [key]
+              properties:
+                key: { type: string }
+                value: { type: integer, nullable: true }
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/PlanLimit' }
+
+  /admin/plans/{plan}/features:
+    post:
+      security: [{ bearerAuth: [] }]
+      parameters:
+        - { $ref: '#/components/parameters/TenantHeader' }
+        - in: path
+          name: plan
+          required: true
+          schema: { type: integer }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [feature_key, is_enabled]
+              properties:
+                feature_key: { type: string }
+                is_enabled: { type: boolean }
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/PlanFeature' }
+
+  /admin/tenants/{tenant}/assign-plan:
+    post:
+      security: [{ bearerAuth: [] }]
+      parameters:
+        - { $ref: '#/components/parameters/TenantHeader' }
+        - in: path
+          name: tenant
+          required: true
+          schema: { type: integer }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [plan_id]
+              properties:
+                plan_id: { type: integer }
+                status:
+                  type: string
+                  enum: [active, trial, suspended, expired]
+                starts_at: { type: string, format: date-time }
+                ends_at: { type: string, format: date-time, nullable: true }
+                license_key: { type: string, nullable: true }
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/TenantSubscription' }
+
+  /admin/subscriptions/{subscription}:
+    patch:
+      security: [{ bearerAuth: [] }]
+      parameters:
+        - { $ref: '#/components/parameters/TenantHeader' }
+        - in: path
+          name: subscription
+          required: true
+          schema: { type: integer }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                plan_id: { type: integer }
+                status:
+                  type: string
+                  enum: [active, trial, suspended, expired]
+                starts_at: { type: string, format: date-time }
+                ends_at: { type: string, format: date-time, nullable: true }
+                license_key: { type: string, nullable: true }
+      responses:
+        '200':
+          description: Updated
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/TenantSubscription' }

@@ -12,6 +12,8 @@ use App\Modules\Configuration\Presentation\Controllers\FeedingGrowthTableRowCont
 use App\Modules\Configuration\Presentation\Controllers\TenantSettingController;
 use App\Modules\Costing\Presentation\Controllers\CycleCostController;
 use App\Modules\Costing\Presentation\Controllers\OperationalCostController;
+use App\Modules\Dashboard\Presentation\Controllers\FarmDashboardController;
+use App\Modules\Dashboard\Presentation\Controllers\TenantDashboardController;
 use App\Modules\Feeding\Presentation\Controllers\FeedEntryController;
 use App\Modules\Feeding\Presentation\Controllers\FeedTypeController;
 use App\Modules\Production\Presentation\Controllers\CycleController;
@@ -90,5 +92,8 @@ Route::prefix('v1')->group(function (): void {
 
         Route::get('/alerts', [AlertController::class, 'index']);
         Route::post('/alerts/{alert}/acknowledge', [AlertController::class, 'acknowledge']);
+
+        Route::get('/dashboard/tenant', TenantDashboardController::class);
+        Route::get('/dashboard/farms/{farm}', FarmDashboardController::class);
     });
 });

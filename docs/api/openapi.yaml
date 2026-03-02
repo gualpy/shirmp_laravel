@@ -310,6 +310,66 @@ components:
             properties:
               id: { type: integer }
               name: { type: string }
+    TenantDashboardFarmSummary:
+      type: object
+      properties:
+        farm_id: { type: integer }
+        farm_name: { type: string }
+        active_cycles: { type: integer }
+        biomass_kg: { type: number, format: float }
+        alerts: { type: integer }
+    TenantDashboard:
+      type: object
+      properties:
+        active_cycles: { type: integer }
+        total_active_area_ha: { type: number, format: float }
+        total_biomass_kg: { type: number, format: float }
+        total_projected_tons: { type: number, format: float }
+        average_fcr: { type: number, format: float, nullable: true }
+        total_feed_kg: { type: number, format: float }
+        total_cost: { type: number, format: float }
+        cost_per_lb_global: { type: number, format: float, nullable: true }
+        critical_alerts: { type: integer }
+        warning_alerts: { type: integer }
+        farms_summary:
+          type: array
+          items: { $ref: '#/components/schemas/TenantDashboardFarmSummary' }
+    FarmDashboardCycle:
+      type: object
+      properties:
+        cycle_id: { type: integer }
+        pond_code: { type: string }
+        biomass_kg: { type: number, format: float }
+        latest_pp: { type: number, format: float, nullable: true }
+        fcr: { type: number, format: float, nullable: true }
+        alerts: { type: integer }
+    FarmDashboard:
+      type: object
+      properties:
+        active_cycles: { type: integer }
+        total_area_ha: { type: number, format: float }
+        biomass_kg: { type: number, format: float }
+        biomass_kg_per_ha: { type: number, format: float }
+        avg_growth_g_per_week: { type: number, format: float, nullable: true }
+        avg_fcr: { type: number, format: float, nullable: true }
+        total_feed_kg: { type: number, format: float }
+        total_cost: { type: number, format: float }
+        cost_per_lb: { type: number, format: float, nullable: true }
+        water_quality_latest:
+          type: object
+          properties:
+            avg_do: { type: number, format: float, nullable: true }
+            avg_ph: { type: number, format: float, nullable: true }
+            avg_temp: { type: number, format: float, nullable: true }
+        alerts:
+          type: object
+          properties:
+            critical: { type: integer }
+            warning: { type: integer }
+            info: { type: integer }
+        cycles:
+          type: array
+          items: { $ref: '#/components/schemas/FarmDashboardCycle' }
 paths:
   /auth/register:
     post:
@@ -1150,3 +1210,30 @@ paths:
           content:
             application/json:
               schema: { $ref: '#/components/schemas/AlertEvent' }
+
+  /dashboard/tenant:
+    get:
+      security: [{ bearerAuth: [] }]
+      parameters: [{ $ref: '#/components/parameters/TenantHeader' }]
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/TenantDashboard' }
+
+  /dashboard/farms/{farm}:
+    get:
+      security: [{ bearerAuth: [] }]
+      parameters:
+        - { $ref: '#/components/parameters/TenantHeader' }
+        - in: path
+          name: farm
+          required: true
+          schema: { type: integer }
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/FarmDashboard' }

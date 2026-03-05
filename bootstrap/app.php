@@ -4,6 +4,7 @@ use App\Http\Middleware\EnsureFeatureEnabled;
 use App\Http\Middleware\EnsureSuperAdmin;
 use App\Http\Middleware\EnsureTenantSubscriptionActive;
 use App\Http\Middleware\EnsureWriteAllowed;
+use App\Http\Middleware\ResolveTenantForBackoffice;
 use App\Http\Middleware\ResolveTenant;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
@@ -26,6 +27,7 @@ return Application::configure(basePath: dirname(__DIR__))
             'write.allowed' => EnsureWriteAllowed::class,
             'feature' => EnsureFeatureEnabled::class,
             'superadmin' => EnsureSuperAdmin::class,
+            'tenant.backoffice' => ResolveTenantForBackoffice::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

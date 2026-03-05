@@ -2,6 +2,7 @@
 
 namespace App\Modules\Production\Domain\Models;
 
+use App\Modules\Alerts\Domain\Models\AlertEvent;
 use App\Modules\Costing\Domain\Models\OperationalCostEntry;
 use App\Modules\Feeding\Domain\Models\FeedEntry;
 use App\Modules\WaterQuality\Domain\Models\WaterQualityEntry;
@@ -75,5 +76,10 @@ class Cycle extends Model
     public function waterQualityEntries(): HasMany
     {
         return $this->hasMany(WaterQualityEntry::class);
+    }
+
+    public function alerts(): HasMany
+    {
+        return $this->hasMany(AlertEvent::class);
     }
 }

@@ -8,6 +8,7 @@ use App\Modules\Production\Domain\Enums\CycleStatus;
 use App\Modules\Production\Domain\Models\Cycle;
 use App\Modules\Production\Domain\Models\Farm;
 use App\Modules\Production\Domain\Models\Pond;
+use App\Modules\SaaS\Domain\Enums\PlanBillingType;
 use App\Modules\SaaS\Domain\Enums\SubscriptionStatus;
 use App\Modules\SaaS\Domain\Enums\VerificationSource;
 use App\Modules\SaaS\Domain\Models\Plan;
@@ -16,6 +17,7 @@ use App\Modules\SaaS\Domain\Models\PlanLimit;
 use App\Modules\SaaS\Domain\Models\TenantSubscription;
 use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Validation\ValidationException;
 
 final class SaaSService
 {
@@ -62,24 +64,20 @@ final class SaaSService
 
     public function enforceLimitOrFail(Tenant $tenant, string $key): void
     {
-        if ($this->checkLimit($tenant, $key)) {
-            return;
+        if (! $this->checkLimit($tenant, $key)) {
+            throw new HttpResponseException(new JsonResponse([
+                'message' => sprintf('Plan limit reached for `%s`.', $key),
+            ], 403));
         }
-
-        throw new HttpResponseException(new JsonResponse([
-            'message' => sprintf('Plan limit reached for `%s`.', $key),
-        ], 403));
     }
 
     public function enforceFeatureOrFail(Tenant $tenant, string $featureKey): void
     {
-        if ($this->checkFeature($tenant, $featureKey)) {
-            return;
+        if (! $this->checkFeature($tenant, $featureKey)) {
+            throw new HttpResponseException(new JsonResponse([
+                'message' => sprintf('Feature `%s` is not enabled for the current plan.', $featureKey),
+            ], 403));
         }
-
-        throw new HttpResponseException(new JsonResponse([
-            'message' => sprintf('Feature `%s` is not enabled for the current plan.', $featureKey),
-        ], 403));
     }
 
     public function currentSubscription(Tenant $tenant): ?TenantSubscription
@@ -140,7 +138,13 @@ final class SaaSService
     public function assignPlan(Tenant $tenant, Plan $plan, array $payload): TenantSubscription
     {
         $status = (string) ($payload['status'] ?? SubscriptionStatus::ACTIVE->value);
-        $isOnPrem = $plan->billing_type->value === 'onprem';
+        $isOnPrem = $plan->billing_type === PlanBillingType::ONPREM;
+
+        if ($isOnPrem && empty($payload['license_key'])) {
+            throw ValidationException::withMessages([
+                'license_key' => ['license_key is required for onprem plans.'],
+            ]);
+        }
 
         if (in_array($status, [SubscriptionStatus::ACTIVE->value, SubscriptionStatus::TRIAL->value], true)) {
             $this->assertSingleActiveOrTrialSubscription($tenant);
@@ -165,7 +169,8 @@ final class SaaSService
      */
     public function updateSubscription(TenantSubscription $subscription, array $payload): TenantSubscription
     {
-        $nextStatus = (string) ($payload['status'] ?? $subscription->status->value);
+        $currentStatus = is_string($subscription->status) ? $subscription->status : $subscription->status->value;
+        $nextStatus = (string) ($payload['status'] ?? $currentStatus);
 
         if (in_array($nextStatus, [SubscriptionStatus::ACTIVE->value, SubscriptionStatus::TRIAL->value], true)) {
             $this->assertSingleActiveOrTrialSubscription($subscription->tenant, $subscription->id);
@@ -175,7 +180,12 @@ final class SaaSService
 
         if (isset($payload['plan_id'])) {
             $subscription->load('plan');
-            if ($subscription->plan?->billing_type->value === 'onprem') {
+            if ($subscription->plan?->billing_type === PlanBillingType::ONPREM) {
+                if (empty($subscription->license_key)) {
+                    throw ValidationException::withMessages([
+                        'license_key' => ['license_key is required for onprem plans.'],
+                    ]);
+                }
                 $subscription->offline_mode_enabled = true;
                 $subscription->verification_source = VerificationSource::ONPREM;
                 $subscription->last_verified_at = $subscription->last_verified_at ?? now();
@@ -217,3 +227,4 @@ final class SaaSService
         );
     }
 }
+

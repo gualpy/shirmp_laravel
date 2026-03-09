@@ -5,6 +5,7 @@ namespace App\Modules\Alerts\Presentation\Controllers;
 use App\Http\Controllers\Controller;
 use App\Modules\Alerts\Application\Actions\AcknowledgeAlertAction;
 use App\Modules\Alerts\Application\Actions\ListAlertsAction;
+use App\Modules\Alerts\Application\Actions\ResolveAlertAction;
 use App\Modules\Alerts\Domain\Models\AlertEvent;
 use App\Modules\Alerts\Presentation\Requests\ListAlertsRequest;
 use App\Modules\Alerts\Presentation\Resources\AlertEventResource;
@@ -23,6 +24,16 @@ final class AlertController extends Controller
         AlertEvent $alert,
         Request $request,
         AcknowledgeAlertAction $action,
+    ): JsonResponse {
+        $updated = $action->execute($alert, $request->user());
+
+        return (new AlertEventResource($updated))->response();
+    }
+
+    public function resolve(
+        AlertEvent $alert,
+        Request $request,
+        ResolveAlertAction $action,
     ): JsonResponse {
         $updated = $action->execute($alert, $request->user());
 

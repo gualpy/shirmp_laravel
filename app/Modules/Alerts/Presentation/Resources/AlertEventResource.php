@@ -20,9 +20,12 @@ final class AlertEventResource extends JsonResource
             'message' => $this->message,
             'detected_at' => $this->detected_at?->toISOString(),
             'context_json' => $this->context_json,
+            'state' => $this->resolved_at !== null ? 'resolved' : ($this->is_acknowledged ? 'acknowledged' : 'open'),
             'is_acknowledged' => (bool) $this->is_acknowledged,
             'acknowledged_by_user_id' => $this->acknowledged_by_user_id,
             'acknowledged_at' => $this->acknowledged_at?->toISOString(),
+            'resolved_by_user_id' => $this->resolved_by_user_id,
+            'resolved_at' => $this->resolved_at?->toISOString(),
             'created_at' => $this->created_at?->toISOString(),
             'updated_at' => $this->updated_at?->toISOString(),
         ];

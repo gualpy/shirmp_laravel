@@ -19,10 +19,12 @@ final class ListAlertsRequest extends FormRequest
     {
         return [
             'farm_id' => ['nullable', 'integer'],
+            'pond_id' => ['nullable', 'integer'],
             'cycle_id' => ['nullable', 'integer'],
             'rule_code' => ['nullable', Rule::enum(AlertCode::class)],
             'severity' => ['nullable', Rule::enum(AlertSeverity::class)],
             'is_acknowledged' => ['nullable', 'boolean'],
+            'state' => ['nullable', Rule::in(['open', 'acknowledged', 'resolved'])],
             'date_from' => ['nullable', 'date'],
             'date_to' => ['nullable', 'date'],
             'per_page' => ['nullable', 'integer', 'min:1', 'max:100'],

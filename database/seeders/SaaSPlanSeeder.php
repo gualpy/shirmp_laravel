@@ -31,7 +31,7 @@ class SaaSPlanSeeder extends Seeder
             ],
         );
 
-        $this->upsertPlan(
+        $pro = $this->upsertPlan(
             code: 'pro',
             name: 'Pro',
             billingType: PlanBillingType::MONTHLY,
@@ -101,17 +101,8 @@ class SaaSPlanSeeder extends Seeder
             ],
         );
 
-        $tenant = Tenant::query()->where('slug', 'demo')->first();
-        if ($tenant !== null) {
-            TenantSubscription::query()->updateOrCreate(
-                ['tenant_id' => $tenant->id, 'plan_id' => $starter->id],
-                [
-                    'status' => SubscriptionStatus::TRIAL->value,
-                    'starts_at' => now()->subDays(5),
-                    'ends_at' => now()->addDays(25),
-                ],
-            );
-        }
+        $this->assignSeedSubscription('demo', $starter, SubscriptionStatus::TRIAL);
+        $this->assignSeedSubscription('tenant-a', $pro, SubscriptionStatus::ACTIVE);
     }
 
     /**
@@ -152,5 +143,27 @@ class SaaSPlanSeeder extends Seeder
 
         return $plan;
     }
-}
 
+    private function assignSeedSubscription(string $tenantSlug, Plan $plan, SubscriptionStatus $status): void
+    {
+        $tenant = Tenant::query()->where('slug', $tenantSlug)->first();
+
+        if ($tenant === null) {
+            return;
+        }
+
+        TenantSubscription::query()->updateOrCreate(
+            ['tenant_id' => $tenant->id],
+            [
+                'plan_id' => $plan->id,
+                'status' => $status->value,
+                'starts_at' => now()->subDays(5),
+                'ends_at' => now()->addDays(25),
+                'offline_mode_enabled' => false,
+                'offline_grace_days' => 7,
+                'verification_source' => 'cloud',
+                'last_verified_at' => now(),
+            ],
+        );
+    }
+}

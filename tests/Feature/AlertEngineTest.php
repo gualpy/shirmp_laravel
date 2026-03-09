@@ -164,6 +164,31 @@ final class AlertEngineTest extends TestCase
         ]);
     }
 
+    public function test_resolve_marks_alert_resolved(): void
+    {
+        [$tenant, $token] = $this->tenantToken('tenant-a', 'owner@a.local');
+        $cycle = $this->makeCycle($tenant, '2026-01-01', 2.0, 500000);
+
+        Sampling::query()->create([
+            'tenant_id' => $tenant->id,
+            'cycle_id' => $cycle->id,
+            'sampled_at' => '2026-01-20',
+            'pp_grams' => 20.00,
+        ]);
+
+        $this->artisan('alerts:evaluate --date=2026-01-21')->assertSuccessful();
+
+        $alert = AlertEvent::withoutGlobalScopes()->firstOrFail();
+
+        $this->withToken($token)
+            ->withHeader('X-Tenant', $tenant->slug)
+            ->postJson('/api/v1/alerts/'.$alert->id.'/resolve')
+            ->assertOk()
+            ->assertJsonPath('data.state', 'resolved');
+
+        $this->assertNotNull($alert->fresh()->resolved_at);
+    }
+
     /** @return array{Tenant, string} */
     private function tenantToken(string $slug, string $email): array
     {

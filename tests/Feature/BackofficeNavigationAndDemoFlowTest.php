@@ -11,6 +11,7 @@ use App\Modules\Production\Domain\Models\Farm;
 use App\Modules\Production\Domain\Models\Pond;
 use App\Modules\Production\Domain\Models\Sampling;
 use App\Modules\Production\Domain\Models\Stocking;
+use App\Modules\Production\Domain\Models\SurvivalEstimate;
 use App\Modules\SaaS\Domain\Enums\PlanBillingType;
 use App\Modules\SaaS\Domain\Enums\SubscriptionStatus;
 use App\Modules\SaaS\Domain\Models\Plan;
@@ -50,6 +51,12 @@ final class BackofficeNavigationAndDemoFlowTest extends TestCase
             ->assertSee('Ciclos Activos')
             ->assertSee((string) $cycle->pond->code)
             ->assertSee('/backoffice/cycles/'.$cycle->id, false);
+
+        $this->actingAs($user)
+            ->withHeader('X-Tenant', $tenant->slug)
+            ->get('/backoffice/cycles/'.$cycle->id)
+            ->assertOk()
+            ->assertSee('Detalle Operativo del Ciclo #'.$cycle->id);
     }
 
     public function test_read_only_shows_banner(): void
@@ -83,6 +90,19 @@ final class BackofficeNavigationAndDemoFlowTest extends TestCase
             ->assertOk()
             ->assertHeader('X-Read-Only-Mode', '1')
             ->assertSee('Modo solo lectura activo');
+    }
+
+    public function test_backoffice_cycle_detail_renders_projection_block(): void
+    {
+        [$tenant, $user] = $this->tenantUser('tenant-a', 'owner@a.local');
+        $this->activeSubscription($tenant);
+        $cycle = $this->makeActiveCycle($tenant, 'FA-3');
+
+        $this->actingAs($user)
+            ->withHeader('X-Tenant', $tenant->slug)
+            ->get('/backoffice/cycles/'.$cycle->id)
+            ->assertOk()
+            ->assertSee('Proyección de Cosecha');
     }
 
     /** @return array{Tenant, User} */
@@ -161,7 +181,13 @@ final class BackofficeNavigationAndDemoFlowTest extends TestCase
             'pp_grams' => 8.2,
         ]);
 
+        SurvivalEstimate::query()->create([
+            'tenant_id' => $tenant->id,
+            'cycle_id' => $cycle->id,
+            'estimated_at' => '2026-02-21',
+            'survival_pct' => 72.0,
+        ]);
+
         return $cycle;
     }
 }
-

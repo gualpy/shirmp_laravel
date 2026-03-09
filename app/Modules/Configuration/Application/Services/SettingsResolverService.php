@@ -25,6 +25,9 @@ final class SettingsResolverService extends BaseService
             'allow_post_close_adjustments' => false,
             'unit_system' => UnitSystem::METRIC->value,
             'decimals_precision' => 2,
+            'default_target_pp_grams' => 20.00,
+            'default_sale_price_per_lb' => 3.50,
+            'default_feed_cost_factor_per_kg_gain' => 1.20,
         ];
     }
 
@@ -67,6 +70,9 @@ final class SettingsResolverService extends BaseService
             'allow_post_close_adjustments',
             'unit_system',
             'decimals_precision',
+            'default_target_pp_grams',
+            'default_sale_price_per_lb',
+            'default_feed_cost_factor_per_kg_gain',
         ];
 
         $data = [];

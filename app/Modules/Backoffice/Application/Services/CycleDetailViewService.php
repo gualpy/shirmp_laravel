@@ -4,6 +4,7 @@ namespace App\Modules\Backoffice\Application\Services;
 
 use App\Modules\Alerts\Domain\Models\AlertEvent;
 use App\Modules\Costing\Application\Services\CostingService;
+use App\Modules\Production\Application\Services\HarvestProjectionService;
 use App\Modules\Production\Application\Services\MetricsService;
 use App\Modules\Production\Domain\Models\Cycle;
 use App\Modules\SaaS\Application\Services\LicenseService;
@@ -16,6 +17,7 @@ final class CycleDetailViewService
     public function __construct(
         private readonly MetricsService $metricsService,
         private readonly CostingService $costingService,
+        private readonly HarvestProjectionService $projectionService,
         private readonly SaaSService $saasService,
         private readonly LicenseService $licenseService,
         private readonly TenantContext $tenantContext,
@@ -42,6 +44,7 @@ final class CycleDetailViewService
         $costs = $this->costingService->summarizeCycleCosts($cycle);
         $alerts = $this->alertsTimeline($cycle);
         $water = $this->latestWaterPanel($cycle);
+        $projection = $this->projectionService->projectCycle($cycle);
 
         return [
             'header' => [
@@ -69,6 +72,7 @@ final class CycleDetailViewService
                 'alerts_timeline' => $alerts,
             ],
             'water_quality_latest' => $water,
+            'projection' => $projection,
             'actions' => $this->resolvedActions($cycle, $readOnlyMode, $tenant),
             'read_only_mode' => $readOnlyMode,
             'feature_flags' => [

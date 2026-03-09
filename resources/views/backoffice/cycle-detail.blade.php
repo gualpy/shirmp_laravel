@@ -4,106 +4,479 @@
 
 @push('head')
 <style>
-    .actions { display:grid; grid-template-columns:repeat(auto-fit,minmax(170px,1fr)); gap:10px; margin-bottom:14px; }
-    .action-btn {
-        background: linear-gradient(140deg, #0f8d79, #0a6f95);
-        color:#fff; border:none; border-radius:12px; padding:11px 12px; font-size:.92rem; font-weight:700;
-        text-align:left; box-shadow: var(--shadow); text-decoration:none; display:flex; align-items:center; justify-content:space-between;
-        min-height:52px;
+    .detail-shell { display: grid; gap: 18px; }
+    .detail-hero {
+        background:
+            linear-gradient(120deg, rgba(255, 255, 255, 0.97), rgba(247, 251, 255, 0.92)),
+            radial-gradient(circle at top right, rgba(47, 143, 255, 0.12), transparent 32%);
     }
-    .action-btn:after { content:"›"; font-size:1.2rem; opacity:.9; }
-    .action-btn.disabled { background:#d3dae2; color:#6a7682; box-shadow:none; pointer-events:none; }
-    .kpis { display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:10px; margin-bottom:14px; }
-    .kpi { background:var(--card); border:1px solid var(--border); border-radius:12px; padding:10px; }
-    .kpi .label { font-size:.76rem; color:var(--muted); font-weight:600; margin-bottom:4px; text-transform:uppercase; letter-spacing:.05em; }
-    .kpi .value { font-size:1.34rem; font-weight:750; }
-    .grid { display:grid; gap:12px; grid-template-columns:1.5fr 1fr; }
-    .row-2 { display:grid; gap:12px; grid-template-columns:1fr 1fr; margin-top:12px; }
-    .chart-box { position:relative; height:250px; }
-    canvas { width:100%; height:100%; }
-    .alert-list { display:grid; gap:8px; max-height:290px; overflow:auto; }
-    .alert-item { border:1px solid var(--border); border-left-width:5px; border-radius:10px; padding:8px; font-size:.86rem; }
-    .sev-critical { border-left-color:#c63636; }
-    .sev-warning { border-left-color:#db8d1b; }
-    .sev-info { border-left-color:#2f8fff; }
-    .water-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:8px; }
-    .water-box { border:1px solid var(--border); border-radius:10px; padding:8px; text-align:center; }
-    .water-box .big { font-size:1.2rem; font-weight:700; }
-    .legend { display:flex; gap:10px; flex-wrap:wrap; font-size:.8rem; color:var(--muted); }
-    .dot { width:9px; height:9px; border-radius:999px; display:inline-block; margin-right:5px; }
-    @media (max-width:980px){ .grid,.row-2{grid-template-columns:1fr;} .chart-box{height:230px;} }
+    .detail-hero__row {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        gap: 16px;
+        flex-wrap: wrap;
+    }
+    .detail-status {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 6px 10px;
+        border-radius: 999px;
+        background: rgba(12, 122, 106, 0.08);
+        color: var(--primary);
+        font-weight: 800;
+        font-size: .76rem;
+        letter-spacing: .08em;
+        text-transform: uppercase;
+    }
+    .detail-status::before {
+        content: "";
+        width: 8px;
+        height: 8px;
+        border-radius: 999px;
+        background: currentColor;
+    }
+    .detail-meta {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+        margin-top: 8px;
+        color: var(--muted);
+        font-size: .9rem;
+    }
+    .actions {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+        gap: 12px;
+    }
+    .action-btn {
+        background: linear-gradient(145deg, #0f8d79, #0a6f95);
+        color: #fff;
+        border: none;
+        border-radius: 18px;
+        padding: 14px 16px;
+        font-size: .94rem;
+        font-weight: 800;
+        box-shadow: 0 14px 28px rgba(11, 98, 109, 0.2);
+        text-decoration: none;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        min-height: 62px;
+        transition: transform .18s ease, box-shadow .18s ease;
+    }
+    .action-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 18px 32px rgba(11, 98, 109, 0.24);
+    }
+    .action-btn:after {
+        content: "›";
+        font-size: 1.2rem;
+        opacity: .95;
+    }
+    .action-btn.disabled {
+        background: linear-gradient(180deg, #dce3ea, #cfd6de);
+        color: #61707f;
+        box-shadow: none;
+        pointer-events: none;
+    }
+    .kpis {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(155px, 1fr));
+        gap: 12px;
+    }
+    .kpi {
+        background: linear-gradient(180deg, #ffffff, #fbfdff);
+        border: 1px solid var(--border);
+        border-radius: 18px;
+        padding: 16px;
+        box-shadow: var(--shadow-soft);
+    }
+    .kpi .label {
+        font-size: .74rem;
+        color: var(--muted);
+        font-weight: 700;
+        margin-bottom: 6px;
+        text-transform: uppercase;
+        letter-spacing: .08em;
+    }
+    .kpi .value {
+        font-size: 1.46rem;
+        font-weight: 800;
+        letter-spacing: -.04em;
+    }
+    .chart-grid {
+        display: grid;
+        gap: 14px;
+        grid-template-columns: minmax(0, 1.6fr) minmax(320px, 1fr);
+    }
+    .chart-stack {
+        display: grid;
+        gap: 14px;
+    }
+    .chart-card {
+        padding: 18px;
+    }
+    .chart-card--hero {
+        min-height: 380px;
+    }
+    .chart-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        gap: 12px;
+        margin-bottom: 12px;
+        flex-wrap: wrap;
+    }
+    .chart-title {
+        margin: 0 0 4px;
+        font-size: 1.06rem;
+        font-weight: 800;
+    }
+    .chart-subtitle {
+        color: var(--muted);
+        font-size: .86rem;
+    }
+    .chart-box {
+        position: relative;
+        height: 100%;
+        min-height: 230px;
+        overflow: hidden;
+    }
+    .chart-card--hero .chart-box { min-height: 290px; }
+    .chart-box--compact {
+        height: 220px;
+        min-height: 220px;
+    }
+    canvas {
+        width: 100%;
+        height: 100%;
+        display: block;
+    }
+    .support-grid {
+        display: grid;
+        gap: 14px;
+        grid-template-columns: minmax(0, 1.05fr) minmax(290px, .95fr);
+    }
+    .projection-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+        gap: 10px;
+    }
+    .projection-box {
+        border: 1px solid var(--border);
+        border-radius: 16px;
+        padding: 14px;
+        background: linear-gradient(180deg, #ffffff, #fbfdff);
+        box-shadow: var(--shadow-soft);
+    }
+    .projection-box__label {
+        color: var(--muted);
+        font-size: .74rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: .08em;
+        margin-bottom: 6px;
+    }
+    .projection-box__value {
+        font-size: 1.18rem;
+        font-weight: 800;
+        letter-spacing: -.03em;
+    }
+    .projection-summary {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        gap: 12px;
+        margin-bottom: 14px;
+        flex-wrap: wrap;
+    }
+    .projection-assumptions {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+    }
+    .panel-title {
+        margin: 0 0 12px;
+        font-size: 1rem;
+        font-weight: 800;
+    }
+    .panel-head {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 12px;
+        flex-wrap: wrap;
+        margin-bottom: 12px;
+    }
+    .panel-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        color: var(--primary);
+        text-decoration: none;
+        font-weight: 800;
+        font-size: .84rem;
+    }
+    .panel-link::after {
+        content: "›";
+        font-size: 1rem;
+    }
+    .secondary-action {
+        border: 1px solid rgba(47, 143, 255, 0.16);
+        background: rgba(47, 143, 255, 0.08);
+        color: #1f5ea8;
+    }
+    .water-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 10px;
+    }
+    .water-box {
+        border: 1px solid var(--border);
+        border-radius: 16px;
+        padding: 14px 10px;
+        text-align: center;
+        background: linear-gradient(180deg, #ffffff, #fbfdff);
+    }
+    .water-box .mini {
+        color: var(--muted);
+        font-size: .75rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: .08em;
+        margin-bottom: 8px;
+    }
+    .water-box .big {
+        font-size: 1.22rem;
+        font-weight: 800;
+        letter-spacing: -.03em;
+    }
+    .legend {
+        display: flex;
+        gap: 12px;
+        flex-wrap: wrap;
+        font-size: .8rem;
+        color: var(--muted);
+        margin-top: 10px;
+    }
+    .dot {
+        width: 9px;
+        height: 9px;
+        border-radius: 999px;
+        display: inline-block;
+        margin-right: 5px;
+    }
+    .alert-list {
+        display: grid;
+        gap: 10px;
+        max-height: 340px;
+        overflow: auto;
+    }
+    .alert-item {
+        border: 1px solid var(--border);
+        border-left-width: 5px;
+        border-radius: 14px;
+        padding: 12px;
+        font-size: .88rem;
+        background: linear-gradient(180deg, #ffffff, #fcfdff);
+    }
+    .alert-item__head {
+        display: flex;
+        justify-content: space-between;
+        gap: 10px;
+        margin-bottom: 6px;
+        align-items: baseline;
+    }
+    .sev-critical { border-left-color: #c63636; }
+    .sev-warning { border-left-color: #db8d1b; }
+    .sev-info { border-left-color: #2f8fff; }
+    .empty-copy {
+        border: 1px dashed #c9d7e4;
+        border-radius: 16px;
+        padding: 18px;
+        color: var(--muted);
+        background: rgba(255, 255, 255, 0.58);
+    }
+    @media (max-width: 980px) {
+        .chart-grid,
+        .support-grid,
+        .water-grid {
+            grid-template-columns: 1fr;
+        }
+        .chart-card--hero {
+            min-height: auto;
+        }
+        .chart-card--hero .chart-box {
+            min-height: 240px;
+        }
+    }
 </style>
 @endpush
 
 @section('content')
-    <div class="card" style="margin-bottom:12px;">
-        <h1 style="margin:0 0 4px;font-size:1.35rem;">Detalle Operativo de Ciclo #{{ $vm['header']['cycle_id'] }}</h1>
-        <div class="muted">Finca {{ $vm['header']['farm_name'] }} · Piscina {{ $vm['header']['pond_code'] }} · Inicio {{ $vm['header']['started_at'] }}</div>
-    </div>
-
-    <div class="actions">
-        @foreach($vm['actions'] as $action)
-            <a class="action-btn {{ $action['disabled'] ? 'disabled' : '' }}"
-               href="{{ $action['disabled'] ? '#' : $action['href'] }}"
-               title="{{ $action['disabled'] ? $action['disabled_reason'] : 'Acción rápida operativa' }}">
-                {{ $action['label'] }}
-            </a>
-        @endforeach
-    </div>
-
-    <div class="kpis">
-        <div class="kpi"><div class="label">Biomasa Estimada</div><div class="value">{{ number_format($vm['kpis']['biomass_kg'],2) }} kg</div></div>
-        <div class="kpi"><div class="label">Peso Promedio</div><div class="value">{{ $vm['kpis']['latest_pp_grams'] !== null ? number_format($vm['kpis']['latest_pp_grams'],2).' g' : 'N/D' }}</div></div>
-        <div class="kpi"><div class="label">FCR</div><div class="value">{{ number_format($vm['kpis']['fcr'],3) }}</div></div>
-        <div class="kpi"><div class="label">Alimento Acum.</div><div class="value">{{ number_format($vm['kpis']['total_feed_kg'],2) }} kg</div></div>
-        <div class="kpi"><div class="label">Costo Acum.</div><div class="value">${{ number_format($vm['kpis']['total_cost_usd'],2) }}</div></div>
-        <div class="kpi"><div class="label">Alertas Abiertas</div><div class="value">{{ $vm['kpis']['open_alerts'] }}</div></div>
-    </div>
-
-    <div class="grid">
-        <div class="card">
-            <h3 style="margin:0 0 8px;">Biomasa vs Tiempo</h3>
-            <div class="chart-box"><canvas id="biomassChart"></canvas></div>
-        </div>
-        <div class="card">
-            <h3 style="margin:0 0 8px;">FCR Semanal</h3>
-            <div class="chart-box"><canvas id="fcrChart"></canvas></div>
-        </div>
-    </div>
-
-    <div class="row-2">
-        <div class="card">
-            <h3 style="margin:0 0 8px;">Distribución de Costos</h3>
-            <div class="chart-box"><canvas id="costChart"></canvas></div>
-            <div class="legend">
-                <span><span class="dot" style="background:#2f8fff;"></span>Alimento</span>
-                <span><span class="dot" style="background:#0c7a6a;"></span>Operación</span>
-            </div>
-        </div>
-        <div class="card">
-            <h3 style="margin:0 0 8px;">Calidad de Agua (Últimos 3 días)</h3>
-            <div class="water-grid">
-                <div class="water-box"><div class="muted">DO</div><div class="big">{{ $vm['water_quality_latest']['avg_do'] !== null ? number_format($vm['water_quality_latest']['avg_do'],2) : 'N/D' }}</div></div>
-                <div class="water-box"><div class="muted">pH</div><div class="big">{{ $vm['water_quality_latest']['avg_ph'] !== null ? number_format($vm['water_quality_latest']['avg_ph'],2) : 'N/D' }}</div></div>
-                <div class="water-box"><div class="muted">Temp °C</div><div class="big">{{ $vm['water_quality_latest']['avg_temp'] !== null ? number_format($vm['water_quality_latest']['avg_temp'],2) : 'N/D' }}</div></div>
-            </div>
-        </div>
-    </div>
-
-    <div class="card" style="margin-top:12px;">
-        <h3 style="margin:0 0 8px;">Timeline de Alertas</h3>
-        <div class="alert-list">
-            @forelse($vm['charts']['alerts_timeline'] as $alert)
-                <div class="alert-item sev-{{ $alert['severity'] }}">
-                    <div style="display:flex;justify-content:space-between;gap:10px;">
-                        <strong>{{ $alert['title'] }}</strong>
-                        <span class="muted">{{ $alert['detected_at'] }}</span>
+    <div class="detail-shell">
+        <div class="card card-soft detail-hero">
+            <div class="detail-hero__row">
+                <div>
+                    <h1 class="section-heading" style="margin-bottom:4px;">Detalle Operativo del Ciclo #{{ $vm['header']['cycle_id'] }}</h1>
+                    <div class="section-subtitle">Vista central para control biológico, eficiencia operativa y seguimiento diario del ciclo.</div>
+                    <div class="detail-meta">
+                        <span>Finca {{ $vm['header']['farm_name'] }}</span>
+                        <span>Piscina {{ $vm['header']['pond_code'] }}</span>
+                        <span>Inicio {{ $vm['header']['started_at'] }}</span>
                     </div>
-                    <div>{{ $alert['message'] }}</div>
                 </div>
-            @empty
-                <div class="muted">Sin alertas recientes para este ciclo.</div>
-            @endforelse
+                <span class="detail-status">{{ $vm['header']['status'] }}</span>
+            </div>
+        </div>
+
+        <div class="actions">
+            <a class="action-btn secondary-action" href="/backoffice/cycles/{{ $vm['header']['cycle_id'] }}/costs" title="Ver costos del ciclo">
+                Ver costos
+            </a>
+            <a class="action-btn secondary-action" href="/backoffice/water?cycle={{ $vm['header']['cycle_id'] }}#register-water" title="Registrar calidad de agua para este ciclo">
+                Registrar calidad de agua
+            </a>
+            @foreach($vm['actions'] as $action)
+                <a class="action-btn {{ $action['disabled'] ? 'disabled' : '' }}"
+                   href="{{ $action['disabled'] ? '#' : $action['href'] }}"
+                   title="{{ $action['disabled'] ? $action['disabled_reason'] : 'Acción rápida operativa' }}">
+                    {{ $action['label'] }}
+                </a>
+            @endforeach
+        </div>
+
+        <div class="kpis">
+            <div class="kpi"><div class="label">Biomasa estimada</div><div class="value">{{ number_format($vm['kpis']['biomass_kg'],2) }} kg</div></div>
+            <div class="kpi"><div class="label">Peso promedio</div><div class="value">{{ $vm['kpis']['latest_pp_grams'] !== null ? number_format($vm['kpis']['latest_pp_grams'],2).' g' : 'N/D' }}</div></div>
+            <div class="kpi"><div class="label">FCR</div><div class="value">{{ number_format($vm['kpis']['fcr'],3) }}</div></div>
+            <div class="kpi"><div class="label">Alimento acum.</div><div class="value">{{ number_format($vm['kpis']['total_feed_kg'],2) }} kg</div></div>
+            <div class="kpi"><div class="label">Costo acum.</div><div class="value">${{ number_format($vm['kpis']['total_cost_usd'],2) }}</div></div>
+            <div class="kpi"><div class="label">Alertas abiertas</div><div class="value">{{ $vm['kpis']['open_alerts'] }}</div></div>
+        </div>
+
+        <div class="chart-grid">
+            <div class="card chart-card chart-card--hero">
+                <div class="chart-header">
+                    <div>
+                        <h3 class="chart-title">Biomasa vs Tiempo</h3>
+                        <div class="chart-subtitle">Curva principal de crecimiento para lectura biológica y decisiones de alimentación.</div>
+                    </div>
+                </div>
+                <div class="chart-box"><canvas id="biomassChart"></canvas></div>
+            </div>
+
+            <div class="chart-stack">
+                <div class="card chart-card">
+                    <div class="chart-header">
+                        <div>
+                            <h3 class="chart-title">FCR Semanal</h3>
+                            <div class="chart-subtitle">Seguimiento de eficiencia operativa por semana.</div>
+                        </div>
+                    </div>
+                    <div class="chart-box"><canvas id="fcrChart"></canvas></div>
+                </div>
+
+                <div class="card chart-card">
+                    <div class="chart-header">
+                        <div>
+                            <h3 class="chart-title">Distribución de Costos</h3>
+                            <div class="chart-subtitle">Peso relativo entre alimento y operación acumulada.</div>
+                        </div>
+                    </div>
+                    <div class="chart-box chart-box--compact"><canvas id="costChart"></canvas></div>
+                    <div class="legend">
+                        <span><span class="dot" style="background:#2f8fff;"></span>Alimento</span>
+                        <span><span class="dot" style="background:#0c7a6a;"></span>Operación</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="projection-summary">
+                <div>
+                    <h3 class="panel-title" style="margin-bottom:4px;">Proyección de Cosecha</h3>
+                    <div class="section-subtitle" style="font-size:.88rem;">Escenario base explicable para decisión operativa y económica con los datos actuales del ciclo.</div>
+                </div>
+                <div class="projection-assumptions">
+                    <span class="chip">Meta {{ number_format($vm['projection']['projection']['target_pp_grams'], 1) }} g</span>
+                    <span class="chip">Venta ${{ number_format($vm['projection']['assumptions']['sale_price_per_lb'], 2) }}/lb</span>
+                    <span class="chip">Growth {{ $vm['projection']['assumptions']['growth_g_per_week'] !== null ? number_format($vm['projection']['assumptions']['growth_g_per_week'], 2).' g/sem' : 'N/D' }}</span>
+                </div>
+            </div>
+
+            @if(
+                $vm['projection']['projection']['projected_harvest_date'] === null &&
+                $vm['projection']['projection']['projected_biomass_kg'] === null &&
+                $vm['projection']['projection']['projected_profit'] === null
+            )
+                <div class="empty-copy">Aún no hay datos suficientes para una proyección confiable.</div>
+            @else
+                <div class="projection-grid">
+                    <div class="projection-box">
+                        <div class="projection-box__label">Fecha estimada</div>
+                        <div class="projection-box__value">{{ $vm['projection']['projection']['projected_harvest_date'] ?? 'N/D' }}</div>
+                    </div>
+                    <div class="projection-box">
+                        <div class="projection-box__label">Biomasa proyectada</div>
+                        <div class="projection-box__value">{{ $vm['projection']['projection']['projected_biomass_kg'] !== null ? number_format($vm['projection']['projection']['projected_biomass_kg'], 2).' kg' : 'N/D' }}</div>
+                    </div>
+                    <div class="projection-box">
+                        <div class="projection-box__label">Libras proyectadas</div>
+                        <div class="projection-box__value">{{ $vm['projection']['projection']['projected_total_lbs'] !== null ? number_format($vm['projection']['projection']['projected_total_lbs'], 2).' lb' : 'N/D' }}</div>
+                    </div>
+                    <div class="projection-box">
+                        <div class="projection-box__label">Ingreso proyectado</div>
+                        <div class="projection-box__value">{{ $vm['projection']['projection']['projected_revenue'] !== null ? '$'.number_format($vm['projection']['projection']['projected_revenue'], 2) : 'N/D' }}</div>
+                    </div>
+                    <div class="projection-box">
+                        <div class="projection-box__label">Costo proyectado</div>
+                        <div class="projection-box__value">{{ $vm['projection']['projection']['projected_cost'] !== null ? '$'.number_format($vm['projection']['projection']['projected_cost'], 2) : 'N/D' }}</div>
+                    </div>
+                    <div class="projection-box">
+                        <div class="projection-box__label">Utilidad proyectada</div>
+                        <div class="projection-box__value">{{ $vm['projection']['projection']['projected_profit'] !== null ? '$'.number_format($vm['projection']['projection']['projected_profit'], 2) : 'N/D' }}</div>
+                    </div>
+                </div>
+            @endif
+        </div>
+
+        <div class="support-grid">
+            <div class="card">
+                <div class="panel-head">
+                    <h3 class="panel-title" style="margin:0;">Timeline de Alertas</h3>
+                    <a href="/backoffice/alerts?cycle={{ $vm['header']['cycle_id'] }}" class="panel-link">Ver todas las alertas</a>
+                </div>
+                <div class="alert-list">
+                    @forelse($vm['charts']['alerts_timeline'] as $alert)
+                        <div class="alert-item sev-{{ $alert['severity'] }}">
+                            <div class="alert-item__head">
+                                <strong>{{ $alert['title'] }}</strong>
+                                <span class="muted">{{ $alert['detected_at'] }}</span>
+                            </div>
+                            <div>{{ $alert['message'] }}</div>
+                        </div>
+                    @empty
+                        <div class="empty-copy">No hay alertas activas para este ciclo.</div>
+                    @endforelse
+                </div>
+            </div>
+
+            <div class="card">
+                <h3 class="panel-title">Calidad de Agua Reciente</h3>
+                @if($vm['water_quality_latest']['avg_do'] === null && $vm['water_quality_latest']['avg_ph'] === null && $vm['water_quality_latest']['avg_temp'] === null)
+                    <div class="empty-copy">No hay registros de calidad de agua.</div>
+                @else
+                    <div class="water-grid">
+                        <div class="water-box"><div class="mini">DO</div><div class="big">{{ $vm['water_quality_latest']['avg_do'] !== null ? number_format($vm['water_quality_latest']['avg_do'],2) : 'N/D' }}</div></div>
+                        <div class="water-box"><div class="mini">pH</div><div class="big">{{ $vm['water_quality_latest']['avg_ph'] !== null ? number_format($vm['water_quality_latest']['avg_ph'],2) : 'N/D' }}</div></div>
+                        <div class="water-box"><div class="mini">Temp °C</div><div class="big">{{ $vm['water_quality_latest']['avg_temp'] !== null ? number_format($vm['water_quality_latest']['avg_temp'],2) : 'N/D' }}</div></div>
+                    </div>
+                @endif
+            </div>
         </div>
     </div>
 
@@ -165,4 +538,3 @@
         drawDonut('costChart', costData);
     </script>
 @endsection
-

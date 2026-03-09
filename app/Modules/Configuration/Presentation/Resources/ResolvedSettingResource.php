@@ -19,6 +19,9 @@ final class ResolvedSettingResource extends JsonResource
             'allow_post_close_adjustments' => (bool) $this->resource['allow_post_close_adjustments'],
             'unit_system' => $this->resource['unit_system'],
             'decimals_precision' => (int) $this->resource['decimals_precision'],
+            'default_target_pp_grams' => (float) $this->resource['default_target_pp_grams'],
+            'default_sale_price_per_lb' => (float) $this->resource['default_sale_price_per_lb'],
+            'default_feed_cost_factor_per_kg_gain' => (float) $this->resource['default_feed_cost_factor_per_kg_gain'],
         ];
     }
 }

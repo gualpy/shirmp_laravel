@@ -3,6 +3,7 @@
 namespace App\Modules\Production\Application\Services;
 
 use App\Modules\Production\Domain\Models\Cycle;
+use App\Modules\Production\Domain\Models\SurvivalEstimate;
 use App\Modules\Shared\Application\Services\BaseService;
 
 final class MetricsService extends BaseService
@@ -143,6 +144,16 @@ final class MetricsService extends BaseService
         }
 
         return round(((int) $stocking->pl_qty) * $survivalEstimate, 2);
+    }
+
+    public function latest_survival_pct(Cycle $cycle): ?float
+    {
+        $estimate = $cycle->survivalEstimates()
+            ->latest('estimated_at')
+            ->latest('id')
+            ->first();
+
+        return $estimate instanceof SurvivalEstimate ? (float) $estimate->survival_pct : null;
     }
 
     public function biomass_kg(Cycle $cycle, ?float $survivalEstimate = null): ?float

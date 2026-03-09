@@ -24,6 +24,9 @@ class TenantSetting extends Model
         'allow_post_close_adjustments',
         'unit_system',
         'decimals_precision',
+        'default_target_pp_grams',
+        'default_sale_price_per_lb',
+        'default_feed_cost_factor_per_kg_gain',
     ];
 
     protected function casts(): array
@@ -36,6 +39,9 @@ class TenantSetting extends Model
             'allow_post_close_adjustments' => 'bool',
             'unit_system' => UnitSystem::class,
             'decimals_precision' => 'int',
+            'default_target_pp_grams' => 'decimal:2',
+            'default_sale_price_per_lb' => 'decimal:2',
+            'default_feed_cost_factor_per_kg_gain' => 'decimal:2',
         ];
     }
 

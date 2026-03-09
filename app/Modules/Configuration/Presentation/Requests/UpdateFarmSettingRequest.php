@@ -24,6 +24,9 @@ final class UpdateFarmSettingRequest extends FormRequest
             'allow_post_close_adjustments' => ['sometimes', 'nullable', 'boolean'],
             'unit_system' => ['sometimes', 'nullable', Rule::enum(UnitSystem::class)],
             'decimals_precision' => ['sometimes', 'nullable', 'integer', 'min:0', 'max:6'],
+            'default_target_pp_grams' => ['sometimes', 'nullable', 'numeric', 'gt:0', 'max:100'],
+            'default_sale_price_per_lb' => ['sometimes', 'nullable', 'numeric', 'gt:0', 'max:1000'],
+            'default_feed_cost_factor_per_kg_gain' => ['sometimes', 'nullable', 'numeric', 'gt:0', 'max:100'],
         ];
     }
 }

@@ -30,6 +30,8 @@ class AlertEvent extends Model
         'is_acknowledged',
         'acknowledged_by_user_id',
         'acknowledged_at',
+        'resolved_by_user_id',
+        'resolved_at',
     ];
 
     protected function casts(): array
@@ -40,6 +42,7 @@ class AlertEvent extends Model
             'context_json' => 'array',
             'is_acknowledged' => 'bool',
             'acknowledged_at' => 'datetime',
+            'resolved_at' => 'datetime',
         ];
     }
 
@@ -61,5 +64,10 @@ class AlertEvent extends Model
     public function acknowledgedBy(): BelongsTo
     {
         return $this->belongsTo(User::class, 'acknowledged_by_user_id');
+    }
+
+    public function resolvedBy(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'resolved_by_user_id');
     }
 }

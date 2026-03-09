@@ -41,15 +41,15 @@ final class BackofficeShellService
             'plan_code' => $subscription?->plan?->code,
             'read_only_mode' => $readOnlyMode,
             'write_block_tooltip' => 'Deshabilitado: tenant en modo solo lectura.',
+            'menu_disabled_tooltip' => 'Disponible pronto en Backoffice web. Actualmente solo via API.',
             'features' => $features,
             'menu' => [
                 ['key' => 'dashboard', 'label' => 'Dashboard', 'href' => '/backoffice', 'visible' => true, 'enabled' => true],
                 ['key' => 'cycles', 'label' => 'Cycles', 'href' => '/backoffice/cycles', 'visible' => true, 'enabled' => true],
-                ['key' => 'alerts', 'label' => 'Alerts', 'href' => '/api/v1/alerts', 'visible' => $features['alerts'], 'enabled' => $features['alerts']],
-                ['key' => 'cost_engine', 'label' => 'Costs', 'href' => '/api/v1/cycles', 'visible' => $features['cost_engine'], 'enabled' => $features['cost_engine']],
-                ['key' => 'water_quality', 'label' => 'Water', 'href' => '/api/v1/ponds', 'visible' => $features['water_quality'], 'enabled' => $features['water_quality']],
+                ['key' => 'alerts', 'label' => 'Alerts', 'href' => '/backoffice/alerts', 'visible' => $features['alerts'], 'enabled' => true],
+                ['key' => 'cost_engine', 'label' => 'Costs', 'href' => '#', 'visible' => $features['cost_engine'], 'enabled' => false],
+                ['key' => 'water_quality', 'label' => 'Water', 'href' => '/backoffice/water', 'visible' => $features['water_quality'], 'enabled' => true],
             ],
         ];
     }
 }
-

@@ -6,6 +6,9 @@ use App\Http\Middleware\EnsureTenantSubscriptionActive;
 use App\Http\Middleware\EnsureWriteAllowed;
 use App\Http\Middleware\ResolveTenantForBackoffice;
 use App\Http\Middleware\ResolveTenant;
+use Illuminate\Auth\Middleware\Authenticate;
+use Illuminate\Http\Request;
+use Illuminate\Session\TokenMismatchException;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
@@ -29,7 +32,22 @@ return Application::configure(basePath: dirname(__DIR__))
             'superadmin' => EnsureSuperAdmin::class,
             'tenant.backoffice' => ResolveTenantForBackoffice::class,
         ]);
+        $middleware->priority([
+            ResolveTenantForBackoffice::class,
+            Authenticate::class,
+        ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
-        //
+        $exceptions->render(function (TokenMismatchException $e, Request $request) {
+            if ($request->is('login') || $request->is('backoffice/*') || $request->is('backoffice')) {
+                return redirect()
+                    ->route('login')
+                    ->withErrors([
+                        'csrf' => 'Tu sesión expiró o el token CSRF es inválido. Recarga la página e intenta de nuevo.',
+                    ])
+                    ->withInput($request->except('password'));
+            }
+
+            return null;
+        });
     })->create();

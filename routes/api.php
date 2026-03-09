@@ -18,6 +18,7 @@ use App\Modules\Feeding\Presentation\Controllers\FeedEntryController;
 use App\Modules\Feeding\Presentation\Controllers\FeedTypeController;
 use App\Modules\Production\Presentation\Controllers\CycleController;
 use App\Modules\Production\Presentation\Controllers\CycleMetricsController;
+use App\Modules\Production\Presentation\Controllers\CycleProjectionController;
 use App\Modules\Production\Presentation\Controllers\FarmController;
 use App\Modules\Production\Presentation\Controllers\HarvestController;
 use App\Modules\Production\Presentation\Controllers\HealthController;
@@ -33,6 +34,7 @@ use App\Modules\Shared\Presentation\Controllers\CurrentTenantController;
 use App\Modules\Shared\Presentation\Controllers\TenantNoteController;
 use App\Modules\WaterQuality\Presentation\Controllers\CycleWaterQualityController;
 use App\Modules\WaterQuality\Presentation\Controllers\PondWaterQualityController;
+use App\Modules\WaterQuality\Presentation\Controllers\QuickWaterQualityController;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('v1')->group(function (): void {
@@ -70,6 +72,7 @@ Route::prefix('v1')->group(function (): void {
         Route::post('/cycles/{cycle}/harvests', [HarvestController::class, 'store']);
         Route::get('/harvests/{harvest}', [HarvestController::class, 'show']);
         Route::get('/cycles/{cycle}/metrics', CycleMetricsController::class);
+        Route::get('/cycles/{cycle}/projection', CycleProjectionController::class);
 
         Route::get('/feed-types', [FeedTypeController::class, 'index']);
         Route::post('/feed-types', [FeedTypeController::class, 'store']);
@@ -78,6 +81,7 @@ Route::prefix('v1')->group(function (): void {
         Route::get('/cycles/{cycle}/feed-entries', [FeedEntryController::class, 'index']);
         Route::post('/cycles/{cycle}/feed-entries', [FeedEntryController::class, 'store']);
         Route::middleware('feature:water_quality')->group(function (): void {
+            Route::post('/water-quality', QuickWaterQualityController::class);
             Route::get('/cycles/{cycle}/water-quality', [CycleWaterQualityController::class, 'index']);
             Route::post('/cycles/{cycle}/water-quality', [CycleWaterQualityController::class, 'store']);
             Route::get('/cycles/{cycle}/water-quality/latest', [CycleWaterQualityController::class, 'latest']);
@@ -104,6 +108,7 @@ Route::prefix('v1')->group(function (): void {
         Route::middleware('feature:alerts')->group(function (): void {
             Route::get('/alerts', [AlertController::class, 'index']);
             Route::post('/alerts/{alert}/acknowledge', [AlertController::class, 'acknowledge']);
+            Route::post('/alerts/{alert}/resolve', [AlertController::class, 'resolve']);
         });
 
         Route::middleware('feature:dashboard')->group(function (): void {

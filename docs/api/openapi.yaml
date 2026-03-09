@@ -186,6 +186,35 @@ components:
         feeding_strategy_used:
           type: string
           enum: [biomass_percentage, growth_table, manual_adjustment]
+    CycleProjection:
+      type: object
+      properties:
+        current:
+          type: object
+          properties:
+            latest_pp_grams: { type: number, format: float, nullable: true }
+            latest_survival_pct: { type: number, format: float, nullable: true }
+            current_biomass_kg: { type: number, format: float, nullable: true }
+            current_fcr: { type: number, format: float, nullable: true }
+            current_total_cost: { type: number, format: float }
+        projection:
+          type: object
+          properties:
+            target_pp_grams: { type: number, format: float }
+            projected_avg_pp_grams: { type: number, format: float }
+            projected_harvest_date: { type: string, format: date, nullable: true }
+            projected_biomass_kg: { type: number, format: float, nullable: true }
+            projected_total_lbs: { type: number, format: float, nullable: true }
+            projected_fcr: { type: number, format: float, nullable: true }
+            projected_revenue: { type: number, format: float, nullable: true }
+            projected_cost: { type: number, format: float, nullable: true }
+            projected_profit: { type: number, format: float, nullable: true }
+        assumptions:
+          type: object
+          properties:
+            sale_price_per_lb: { type: number, format: float }
+            feed_cost_factor_per_kg_gain: { type: number, format: float }
+            growth_g_per_week: { type: number, format: float, nullable: true }
     EffectiveSetting:
       type: object
       properties:
@@ -200,6 +229,9 @@ components:
           type: string
           enum: [metric, imperial]
         decimals_precision: { type: integer }
+        default_target_pp_grams: { type: number, format: float }
+        default_sale_price_per_lb: { type: number, format: float }
+        default_feed_cost_factor_per_kg_gain: { type: number, format: float }
     FeedingGrowthTable:
       type: object
       properties:
@@ -253,9 +285,14 @@ components:
         message: { type: string }
         detected_at: { type: string, format: date-time }
         context_json: { type: object, nullable: true, additionalProperties: true }
+        state:
+          type: string
+          enum: [open, acknowledged, resolved]
         is_acknowledged: { type: boolean }
         acknowledged_by_user_id: { type: integer, nullable: true }
         acknowledged_at: { type: string, format: date-time, nullable: true }
+        resolved_by_user_id: { type: integer, nullable: true }
+        resolved_at: { type: string, format: date-time, nullable: true }
     WaterQualityEntry:
       type: object
       properties:
@@ -1003,6 +1040,41 @@ paths:
             application/json:
               schema: { $ref: '#/components/schemas/Error422' }
 
+  /water-quality:
+    post:
+      security: [{ bearerAuth: [] }]
+      parameters:
+        - { $ref: '#/components/parameters/TenantHeader' }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [pond, measured_at]
+              properties:
+                pond: { type: integer }
+                measured_at: { type: string, format: date-time }
+                do: { type: number, format: float }
+                ph: { type: number, format: float }
+                temperature: { type: number, format: float }
+                salinity: { type: number, format: float }
+                alkalinity: { type: number, format: float }
+                ammonia: { type: number, format: float }
+                nitrite: { type: number, format: float }
+                notes: { type: string, nullable: true }
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/WaterQualityEntry' }
+        '422':
+          description: Validation
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Error422' }
+
   /cycles/{cycle}/water-quality/latest:
     get:
       security: [{ bearerAuth: [] }]
@@ -1070,6 +1142,22 @@ paths:
           content:
             application/json:
               schema: { $ref: '#/components/schemas/CycleMetrics' }
+
+  /cycles/{cycle}/projection:
+    get:
+      security: [{ bearerAuth: [] }]
+      parameters:
+        - { $ref: '#/components/parameters/TenantHeader' }
+        - in: path
+          name: cycle
+          required: true
+          schema: { type: integer }
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/CycleProjection' }
 
   /cycles/{cycle}/operational-costs:
     get:
@@ -1270,10 +1358,18 @@ paths:
           name: cycle_id
           schema: { type: integer }
         - in: query
+          name: pond_id
+          schema: { type: integer }
+        - in: query
           name: severity
           schema:
             type: string
             enum: [info, warning, critical]
+        - in: query
+          name: state
+          schema:
+            type: string
+            enum: [open, acknowledged, resolved]
         - in: query
           name: is_acknowledged
           schema: { type: boolean }
@@ -1304,6 +1400,22 @@ paths:
       responses:
         '200':
           description: Acknowledged
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/AlertEvent' }
+
+  /alerts/{alert}/resolve:
+    post:
+      security: [{ bearerAuth: [] }]
+      parameters:
+        - { $ref: '#/components/parameters/TenantHeader' }
+        - in: path
+          name: alert
+          required: true
+          schema: { type: integer }
+      responses:
+        '200':
+          description: Resolved
           content:
             application/json:
               schema: { $ref: '#/components/schemas/AlertEvent' }

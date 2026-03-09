@@ -82,4 +82,14 @@ class Cycle extends Model
     {
         return $this->hasMany(AlertEvent::class);
     }
+
+    public function survivalEstimates(): HasMany
+    {
+        return $this->hasMany(SurvivalEstimate::class);
+    }
+
+    public function dailyMortalities(): HasMany
+    {
+        return $this->hasMany(DailyMortality::class);
+    }
 }

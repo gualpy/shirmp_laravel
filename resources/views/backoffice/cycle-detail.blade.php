@@ -299,6 +299,33 @@
         color: var(--muted);
         background: rgba(255, 255, 255, 0.58);
     }
+    .exports-panel {
+        display: grid;
+        gap: 12px;
+    }
+    .exports-actions {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+        gap: 10px;
+    }
+    .export-btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+        padding: 10px 12px;
+        border-radius: 12px;
+        border: 1px solid rgba(47, 143, 255, 0.16);
+        background: rgba(47, 143, 255, 0.06);
+        color: #1f5ea8;
+        text-decoration: none;
+        font-weight: 800;
+        font-size: .86rem;
+    }
+    .export-btn::after {
+        content: "›";
+        font-size: 1rem;
+    }
     @media (max-width: 980px) {
         .chart-grid,
         .support-grid,
@@ -316,8 +343,12 @@
 @endpush
 
 @section('content')
+    @php($canManageMortality = ($shell['permissions']['mortality.manage'] ?? false) && ! $shell['read_only_mode'])
+    @php($canViewCosts = $shell['permissions']['costs.view'] ?? false)
+    @php($canManageWater = ($shell['permissions']['water.manage'] ?? false) && ! $shell['read_only_mode'])
+    @php($canViewReports = $shell['permissions']['reports.view'] ?? false)
     <div class="detail-shell">
-        <div class="card card-soft detail-hero">
+        <div class="card card-soft detail-hero animate-enter-down">
             <div class="detail-hero__row">
                 <div>
                     <h1 class="section-heading" style="margin-bottom:4px;">Detalle Operativo del Ciclo #{{ $vm['header']['cycle_id'] }}</h1>
@@ -332,13 +363,22 @@
             </div>
         </div>
 
-        <div class="actions">
-            <a class="action-btn secondary-action" href="/backoffice/cycles/{{ $vm['header']['cycle_id'] }}/costs" title="Ver costos del ciclo">
-                Ver costos
-            </a>
-            <a class="action-btn secondary-action" href="/backoffice/water?cycle={{ $vm['header']['cycle_id'] }}#register-water" title="Registrar calidad de agua para este ciclo">
-                Registrar calidad de agua
-            </a>
+        <div class="actions animate-enter-down animate-enter-down-delay-1">
+            @if($shell['permissions']['mortality.view'] ?? false)
+                <a class="action-btn secondary-action" href="/backoffice/cycles/{{ $vm['header']['cycle_id'] }}/mortalities" title="{{ $canManageMortality ? 'Registrar y revisar mortalidad diaria' : 'Ver historial de mortalidad' }}">
+                    {{ $canManageMortality ? 'Registrar mortalidad' : 'Ver mortalidad' }}
+                </a>
+            @endif
+            @if($canViewCosts)
+                <a class="action-btn secondary-action" href="/backoffice/cycles/{{ $vm['header']['cycle_id'] }}/costs" title="Ver costos del ciclo">
+                    Ver costos
+                </a>
+            @endif
+            @if($shell['permissions']['water.view'] ?? false)
+                <a class="action-btn secondary-action" href="/backoffice/water?cycle={{ $vm['header']['cycle_id'] }}{{ $canManageWater ? '#register-water' : '' }}" title="{{ $canManageWater ? 'Registrar calidad de agua para este ciclo' : 'Ver registros de calidad de agua' }}">
+                    {{ $canManageWater ? 'Registrar calidad de agua' : 'Ver calidad de agua' }}
+                </a>
+            @endif
             @foreach($vm['actions'] as $action)
                 <a class="action-btn {{ $action['disabled'] ? 'disabled' : '' }}"
                    href="{{ $action['disabled'] ? '#' : $action['href'] }}"
@@ -348,7 +388,28 @@
             @endforeach
         </div>
 
-        <div class="kpis">
+        @if($canViewReports)
+            <div class="card exports-panel animate-enter-down animate-enter-down-delay-1">
+                <div>
+                    <h3 class="panel-title" style="margin-bottom:4px;">Reportes y Exportes</h3>
+                    <div class="section-subtitle" style="font-size:.88rem;">Datasets listos para Excel o CSV, más acceso directo al reporte ejecutivo.</div>
+                </div>
+                <div class="exports-actions">
+                    <a class="export-btn" href="/backoffice/cycles/{{ $vm['header']['cycle_id'] }}/exports/samplings.csv">Muestreos CSV</a>
+                    <a class="export-btn" href="/backoffice/cycles/{{ $vm['header']['cycle_id'] }}/exports/samplings.xlsx">Muestreos Excel</a>
+                    <a class="export-btn" href="/backoffice/cycles/{{ $vm['header']['cycle_id'] }}/exports/feed.csv">Alimentación CSV</a>
+                    <a class="export-btn" href="/backoffice/cycles/{{ $vm['header']['cycle_id'] }}/exports/feed.xlsx">Alimentación Excel</a>
+                    <a class="export-btn" href="/backoffice/cycles/{{ $vm['header']['cycle_id'] }}/exports/mortalities.csv">Mortalidad CSV</a>
+                    <a class="export-btn" href="/backoffice/cycles/{{ $vm['header']['cycle_id'] }}/exports/mortalities.xlsx">Mortalidad Excel</a>
+                    <a class="export-btn" href="/backoffice/cycles/{{ $vm['header']['cycle_id'] }}/exports/water.csv">Agua CSV</a>
+                    <a class="export-btn" href="/backoffice/cycles/{{ $vm['header']['cycle_id'] }}/exports/water.xlsx">Agua Excel</a>
+                    <a class="export-btn" href="/backoffice/cycles/{{ $vm['header']['cycle_id'] }}/report">Reporte Ejecutivo</a>
+                    <a class="export-btn" href="/backoffice/cycles/{{ $vm['header']['cycle_id'] }}/report" target="_blank" rel="noopener">Imprimir</a>
+                </div>
+            </div>
+        @endif
+
+        <div class="kpis animate-enter-down animate-enter-down-delay-2">
             <div class="kpi"><div class="label">Biomasa estimada</div><div class="value">{{ number_format($vm['kpis']['biomass_kg'],2) }} kg</div></div>
             <div class="kpi"><div class="label">Peso promedio</div><div class="value">{{ $vm['kpis']['latest_pp_grams'] !== null ? number_format($vm['kpis']['latest_pp_grams'],2).' g' : 'N/D' }}</div></div>
             <div class="kpi"><div class="label">FCR</div><div class="value">{{ number_format($vm['kpis']['fcr'],3) }}</div></div>
@@ -358,35 +419,35 @@
         </div>
 
         <div class="chart-grid">
-            <div class="card chart-card chart-card--hero">
+            <div class="card chart-card chart-card--hero animate-enter-down animate-enter-down-delay-2">
                 <div class="chart-header">
                     <div>
                         <h3 class="chart-title">Biomasa vs Tiempo</h3>
                         <div class="chart-subtitle">Curva principal de crecimiento para lectura biológica y decisiones de alimentación.</div>
                     </div>
                 </div>
-                <div class="chart-box"><canvas id="biomassChart"></canvas></div>
+                <div class="chart-box animate-enter-down animate-enter-down-delay-3"><canvas id="biomassChart"></canvas></div>
             </div>
 
             <div class="chart-stack">
-                <div class="card chart-card">
+                <div class="card chart-card animate-enter-down animate-enter-down-delay-2">
                     <div class="chart-header">
                         <div>
                             <h3 class="chart-title">FCR Semanal</h3>
                             <div class="chart-subtitle">Seguimiento de eficiencia operativa por semana.</div>
                         </div>
                     </div>
-                    <div class="chart-box"><canvas id="fcrChart"></canvas></div>
+                    <div class="chart-box animate-enter-down animate-enter-down-delay-3"><canvas id="fcrChart"></canvas></div>
                 </div>
 
-                <div class="card chart-card">
+                <div class="card chart-card animate-enter-down animate-enter-down-delay-3">
                     <div class="chart-header">
                         <div>
                             <h3 class="chart-title">Distribución de Costos</h3>
                             <div class="chart-subtitle">Peso relativo entre alimento y operación acumulada.</div>
                         </div>
                     </div>
-                    <div class="chart-box chart-box--compact"><canvas id="costChart"></canvas></div>
+                    <div class="chart-box chart-box--compact animate-enter-down animate-enter-down-delay-3"><canvas id="costChart"></canvas></div>
                     <div class="legend">
                         <span><span class="dot" style="background:#2f8fff;"></span>Alimento</span>
                         <span><span class="dot" style="background:#0c7a6a;"></span>Operación</span>
@@ -395,7 +456,7 @@
             </div>
         </div>
 
-        <div class="card">
+        <div class="card animate-enter-down animate-enter-down-delay-2">
             <div class="projection-summary">
                 <div>
                     <h3 class="panel-title" style="margin-bottom:4px;">Proyección de Cosecha</h3>
@@ -445,7 +506,7 @@
         </div>
 
         <div class="support-grid">
-            <div class="card">
+            <div class="card animate-enter-down animate-enter-down-delay-3">
                 <div class="panel-head">
                     <h3 class="panel-title" style="margin:0;">Timeline de Alertas</h3>
                     <a href="/backoffice/alerts?cycle={{ $vm['header']['cycle_id'] }}" class="panel-link">Ver todas las alertas</a>
@@ -465,7 +526,7 @@
                 </div>
             </div>
 
-            <div class="card">
+            <div class="card animate-enter-down animate-enter-down-delay-3">
                 <h3 class="panel-title">Calidad de Agua Reciente</h3>
                 @if($vm['water_quality_latest']['avg_do'] === null && $vm['water_quality_latest']['avg_ph'] === null && $vm['water_quality_latest']['avg_temp'] === null)
                     <div class="empty-copy">No hay registros de calidad de agua.</div>

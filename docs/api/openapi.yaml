@@ -180,12 +180,30 @@ components:
           properties:
             total_lbs: { type: number, format: float }
             total_kg: { type: number, format: float }
+        mortality:
+          type: object
+          properties:
+            total_mortality: { type: integer }
+        estimated_alive_count: { type: number, format: float, nullable: true }
         fcr: { type: number, format: float }
         biomass_kg: { type: number, format: float, nullable: true }
         recommended_feed_kg_per_day: { type: number, format: float, nullable: true }
         feeding_strategy_used:
           type: string
           enum: [biomass_percentage, growth_table, manual_adjustment]
+    DailyMortality:
+      type: object
+      properties:
+        id: { type: integer }
+        tenant_id: { type: integer }
+        cycle_id: { type: integer }
+        pond_id: { type: integer }
+        recorded_at: { type: string, format: date }
+        mortality_count: { type: integer }
+        notes: { type: string, nullable: true }
+        created_by: { type: integer, nullable: true }
+        created_at: { type: string, format: date-time }
+        updated_at: { type: string, format: date-time }
     CycleProjection:
       type: object
       properties:
@@ -262,7 +280,7 @@ components:
         farm_id: { type: integer, nullable: true }
         code:
           type: string
-          enum: [LOW_GROWTH, HIGH_FCR, FEED_DEVIATION, HIGH_BIOMASS, DO_LOW, PH_OUT_OF_RANGE]
+          enum: [LOW_GROWTH, HIGH_FCR, FEED_DEVIATION, HIGH_BIOMASS, HIGH_DAILY_MORTALITY, DO_LOW, PH_OUT_OF_RANGE]
         is_active: { type: boolean }
         params_json: { type: object, nullable: true, additionalProperties: true }
         severity:
@@ -277,7 +295,7 @@ components:
         cycle_id: { type: integer }
         rule_code:
           type: string
-          enum: [LOW_GROWTH, HIGH_FCR, FEED_DEVIATION, HIGH_BIOMASS, DO_LOW, PH_OUT_OF_RANGE]
+          enum: [LOW_GROWTH, HIGH_FCR, FEED_DEVIATION, HIGH_BIOMASS, HIGH_DAILY_MORTALITY, DO_LOW, PH_OUT_OF_RANGE]
         severity:
           type: string
           enum: [info, warning, critical]
@@ -1142,6 +1160,53 @@ paths:
           content:
             application/json:
               schema: { $ref: '#/components/schemas/CycleMetrics' }
+
+  /mortalities:
+    post:
+      security: [{ bearerAuth: [] }]
+      parameters:
+        - { $ref: '#/components/parameters/TenantHeader' }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [pond_id, recorded_at, mortality_count]
+              properties:
+                pond_id: { type: integer }
+                recorded_at: { type: string, format: date }
+                mortality_count: { type: integer, minimum: 1 }
+                notes: { type: string, nullable: true }
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/DailyMortality' }
+        '422':
+          description: Validation
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Error422' }
+
+  /cycles/{cycle}/mortalities:
+    get:
+      security: [{ bearerAuth: [] }]
+      parameters:
+        - { $ref: '#/components/parameters/TenantHeader' }
+        - in: path
+          name: cycle
+          required: true
+          schema: { type: integer }
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/DailyMortality' }
 
   /cycles/{cycle}/projection:
     get:

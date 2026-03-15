@@ -17,6 +17,7 @@ use App\Modules\Dashboard\Presentation\Controllers\TenantDashboardController;
 use App\Modules\Feeding\Presentation\Controllers\FeedEntryController;
 use App\Modules\Feeding\Presentation\Controllers\FeedTypeController;
 use App\Modules\Production\Presentation\Controllers\CycleController;
+use App\Modules\Production\Presentation\Controllers\DailyMortalityController;
 use App\Modules\Production\Presentation\Controllers\CycleMetricsController;
 use App\Modules\Production\Presentation\Controllers\CycleProjectionController;
 use App\Modules\Production\Presentation\Controllers\FarmController;
@@ -53,34 +54,42 @@ Route::prefix('v1')->group(function (): void {
     Route::get('/subscription/status', SubscriptionStatusController::class)->middleware('auth:sanctum');
 
     Route::middleware(['auth:sanctum', 'subscription.active', 'write.allowed'])->group(function (): void {
-        Route::apiResource('farms', FarmController::class);
-        Route::apiResource('ponds', PondController::class);
+        Route::middleware('role.module:production')->group(function (): void {
+            Route::apiResource('farms', FarmController::class);
+            Route::apiResource('ponds', PondController::class);
 
-        Route::get('/ponds/{pond}/cycles', [CycleController::class, 'indexByPond']);
-        Route::post('/ponds/{pond}/cycles', [CycleController::class, 'store']);
-        Route::get('/cycles/{cycle}', [CycleController::class, 'show']);
-        Route::patch('/cycles/{cycle}', [CycleController::class, 'update']);
+            Route::get('/ponds/{pond}/cycles', [CycleController::class, 'indexByPond']);
+            Route::post('/ponds/{pond}/cycles', [CycleController::class, 'store']);
+            Route::get('/cycles/{cycle}', [CycleController::class, 'show']);
+            Route::patch('/cycles/{cycle}', [CycleController::class, 'update']);
 
-        Route::get('/cycles/{cycle}/stocking', [StockingController::class, 'show']);
-        Route::post('/cycles/{cycle}/stocking', [StockingController::class, 'store']);
-        Route::patch('/cycles/{cycle}/stocking', [StockingController::class, 'update']);
+            Route::get('/cycles/{cycle}/stocking', [StockingController::class, 'show']);
+            Route::post('/cycles/{cycle}/stocking', [StockingController::class, 'store']);
+            Route::patch('/cycles/{cycle}/stocking', [StockingController::class, 'update']);
 
-        Route::get('/cycles/{cycle}/samplings', [SamplingController::class, 'index']);
-        Route::post('/cycles/{cycle}/samplings', [SamplingController::class, 'store']);
+            Route::get('/cycles/{cycle}/samplings', [SamplingController::class, 'index']);
+            Route::post('/cycles/{cycle}/samplings', [SamplingController::class, 'store']);
 
-        Route::get('/cycles/{cycle}/harvests', [HarvestController::class, 'index']);
-        Route::post('/cycles/{cycle}/harvests', [HarvestController::class, 'store']);
-        Route::get('/harvests/{harvest}', [HarvestController::class, 'show']);
-        Route::get('/cycles/{cycle}/metrics', CycleMetricsController::class);
-        Route::get('/cycles/{cycle}/projection', CycleProjectionController::class);
+            Route::get('/cycles/{cycle}/harvests', [HarvestController::class, 'index']);
+            Route::post('/cycles/{cycle}/harvests', [HarvestController::class, 'store']);
+            Route::get('/harvests/{harvest}', [HarvestController::class, 'show']);
+            Route::get('/cycles/{cycle}/metrics', CycleMetricsController::class);
+            Route::get('/cycles/{cycle}/projection', CycleProjectionController::class);
 
-        Route::get('/feed-types', [FeedTypeController::class, 'index']);
-        Route::post('/feed-types', [FeedTypeController::class, 'store']);
-        Route::patch('/feed-types/{feedType}', [FeedTypeController::class, 'update']);
+            Route::get('/feed-types', [FeedTypeController::class, 'index']);
+            Route::post('/feed-types', [FeedTypeController::class, 'store']);
+            Route::patch('/feed-types/{feedType}', [FeedTypeController::class, 'update']);
 
-        Route::get('/cycles/{cycle}/feed-entries', [FeedEntryController::class, 'index']);
-        Route::post('/cycles/{cycle}/feed-entries', [FeedEntryController::class, 'store']);
-        Route::middleware('feature:water_quality')->group(function (): void {
+            Route::get('/cycles/{cycle}/feed-entries', [FeedEntryController::class, 'index']);
+            Route::post('/cycles/{cycle}/feed-entries', [FeedEntryController::class, 'store']);
+        });
+
+        Route::middleware('role.module:mortality')->group(function (): void {
+            Route::get('/cycles/{cycle}/mortalities', [DailyMortalityController::class, 'index']);
+            Route::post('/mortalities', [DailyMortalityController::class, 'store']);
+        });
+
+        Route::middleware(['feature:water_quality', 'role.module:water'])->group(function (): void {
             Route::post('/water-quality', QuickWaterQualityController::class);
             Route::get('/cycles/{cycle}/water-quality', [CycleWaterQualityController::class, 'index']);
             Route::post('/cycles/{cycle}/water-quality', [CycleWaterQualityController::class, 'store']);
@@ -88,30 +97,34 @@ Route::prefix('v1')->group(function (): void {
             Route::get('/ponds/{pond}/water-quality', [PondWaterQualityController::class, 'index']);
         });
 
-        Route::middleware('feature:cost_engine')->group(function (): void {
+        Route::middleware(['feature:cost_engine', 'role.module:costs'])->group(function (): void {
             Route::get('/cycles/{cycle}/operational-costs', [OperationalCostController::class, 'index']);
             Route::post('/cycles/{cycle}/operational-costs', [OperationalCostController::class, 'store']);
             Route::get('/cycles/{cycle}/costs', CycleCostController::class);
         });
 
-        Route::get('/tenant/settings', [TenantSettingController::class, 'show']);
-        Route::patch('/tenant/settings', [TenantSettingController::class, 'update']);
-        Route::get('/farms/{farm}/settings', [FarmSettingController::class, 'show']);
-        Route::patch('/farms/{farm}/settings', [FarmSettingController::class, 'update']);
+        Route::middleware('role.module:settings')->group(function (): void {
+            Route::get('/tenant/settings', [TenantSettingController::class, 'show']);
+            Route::patch('/tenant/settings', [TenantSettingController::class, 'update']);
+            Route::get('/farms/{farm}/settings', [FarmSettingController::class, 'show']);
+            Route::patch('/farms/{farm}/settings', [FarmSettingController::class, 'update']);
+        });
 
-        Route::get('/feeding-tables', [FeedingGrowthTableController::class, 'index']);
-        Route::post('/feeding-tables', [FeedingGrowthTableController::class, 'store']);
-        Route::patch('/feeding-tables/{table}', [FeedingGrowthTableController::class, 'update']);
-        Route::post('/feeding-tables/{table}/rows', [FeedingGrowthTableRowController::class, 'store']);
-        Route::delete('/feeding-tables/{table}/rows/{row}', [FeedingGrowthTableRowController::class, 'destroy']);
+        Route::middleware('role.module:settings')->group(function (): void {
+            Route::get('/feeding-tables', [FeedingGrowthTableController::class, 'index']);
+            Route::post('/feeding-tables', [FeedingGrowthTableController::class, 'store']);
+            Route::patch('/feeding-tables/{table}', [FeedingGrowthTableController::class, 'update']);
+            Route::post('/feeding-tables/{table}/rows', [FeedingGrowthTableRowController::class, 'store']);
+            Route::delete('/feeding-tables/{table}/rows/{row}', [FeedingGrowthTableRowController::class, 'destroy']);
+        });
 
-        Route::middleware('feature:alerts')->group(function (): void {
+        Route::middleware(['feature:alerts', 'role.module:alerts'])->group(function (): void {
             Route::get('/alerts', [AlertController::class, 'index']);
             Route::post('/alerts/{alert}/acknowledge', [AlertController::class, 'acknowledge']);
             Route::post('/alerts/{alert}/resolve', [AlertController::class, 'resolve']);
         });
 
-        Route::middleware('feature:dashboard')->group(function (): void {
+        Route::middleware(['feature:dashboard', 'role.module:dashboard'])->group(function (): void {
             Route::get('/dashboard/tenant', TenantDashboardController::class);
             Route::get('/dashboard/farms/{farm}', FarmDashboardController::class);
         });

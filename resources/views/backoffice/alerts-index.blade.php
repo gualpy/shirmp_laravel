@@ -191,13 +191,15 @@
 @endpush
 
 @section('content')
+    @php($canManageAlerts = ($shell['permissions']['alerts.manage'] ?? false) && ! $vm['read_only_mode'])
     <div class="alerts-shell">
-        <div class="card card-soft alerts-filter-card">
+        <div class="card card-soft alerts-filter-card animate-enter-down">
             <div style="display:flex;justify-content:space-between;align-items:flex-end;gap:12px;flex-wrap:wrap;margin-bottom:14px;">
                 <div>
                     <h1 class="section-heading" style="font-size:1.34rem;margin-bottom:4px;">Alertas Operativas</h1>
                     <div class="section-subtitle" style="font-size:.92rem;">Vista central para priorizar problemas por finca, piscina y ciclo sin perder contexto operativo.</div>
                 </div>
+                <a href="/backoffice/alerts/export.xlsx" class="filter-btn">Exportar Excel</a>
             </div>
 
             @if(session('status'))
@@ -265,7 +267,7 @@
             </form>
         </div>
 
-        <div class="card">
+        <div class="card animate-enter-down animate-enter-down-delay-1">
             @if($vm['rows'] === [])
                 <div class="empty-state">No hay alertas activas para los filtros seleccionados.</div>
             @else
@@ -297,18 +299,22 @@
                                     <td><span class="state-badge state-{{ $row['state'] }}">{{ $row['state'] }}</span></td>
                                     <td>
                                         <div class="action-stack">
-                                            <form method="POST" action="/backoffice/alerts/{{ $row['id'] }}/acknowledge">
-                                                @csrf
-                                                <button type="submit" class="action-btn action-btn--ack" {{ ($row['can_acknowledge'] && ! $vm['read_only_mode']) ? '' : 'disabled' }} title="{{ $vm['read_only_mode'] ? $shell['write_block_tooltip'] : '' }}">
-                                                    Reconocer
-                                                </button>
-                                            </form>
-                                            <form method="POST" action="/backoffice/alerts/{{ $row['id'] }}/resolve">
-                                                @csrf
-                                                <button type="submit" class="action-btn action-btn--resolve" {{ ($row['can_resolve'] && ! $vm['read_only_mode']) ? '' : 'disabled' }} title="{{ $vm['read_only_mode'] ? $shell['write_block_tooltip'] : '' }}">
-                                                    Resolver
-                                                </button>
-                                            </form>
+                                            @if($canManageAlerts)
+                                                <form method="POST" action="/backoffice/alerts/{{ $row['id'] }}/acknowledge">
+                                                    @csrf
+                                                    <button type="submit" class="action-btn action-btn--ack" {{ $row['can_acknowledge'] ? '' : 'disabled' }}>
+                                                        Reconocer
+                                                    </button>
+                                                </form>
+                                                <form method="POST" action="/backoffice/alerts/{{ $row['id'] }}/resolve">
+                                                    @csrf
+                                                    <button type="submit" class="action-btn action-btn--resolve" {{ $row['can_resolve'] ? '' : 'disabled' }}>
+                                                        Resolver
+                                                    </button>
+                                                </form>
+                                            @else
+                                                <span class="muted">Solo lectura</span>
+                                            @endif
                                         </div>
                                     </td>
                                 </tr>

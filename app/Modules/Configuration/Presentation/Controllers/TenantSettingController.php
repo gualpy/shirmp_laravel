@@ -4,6 +4,7 @@ namespace App\Modules\Configuration\Presentation\Controllers;
 
 use App\Http\Controllers\Controller;
 use App\Models\Tenant;
+use App\Modules\Audit\Application\Services\AuditLogService;
 use App\Modules\Configuration\Application\Actions\GetTenantSettingsAction;
 use App\Modules\Configuration\Application\Actions\UpdateTenantSettingsAction;
 use App\Modules\Configuration\Application\DTO\SettingPatchDTO;
@@ -26,11 +27,21 @@ final class TenantSettingController extends Controller
         UpdateTenantSettingRequest $request,
         TenantContext $tenantContext,
         UpdateTenantSettingsAction $action,
+        AuditLogService $auditLogService,
     ): JsonResponse {
         $tenant = $tenantContext->currentTenant();
         abort_unless($tenant instanceof Tenant, 400, 'Tenant context is not available.');
 
         $resolved = $action->execute($tenant, SettingPatchDTO::fromArray($request->validated()));
+
+        $auditLogService->record(
+            actionKey: 'settings.updated',
+            entityType: 'TenantSetting',
+            entityId: $tenant->id,
+            context: ['scope' => 'tenant', 'keys' => array_keys($request->validated())],
+            tenant: $tenant,
+            user: $request->user(),
+        );
 
         return (new ResolvedSettingResource($resolved))->response();
     }

@@ -165,6 +165,7 @@
 @endpush
 
 @section('content')
+    @php($canManageCosts = ($shell['permissions']['costs.manage'] ?? false) && ! $vm['read_only_mode'])
     <div class="costs-shell">
         <div class="card card-soft">
             <div class="costs-hero">
@@ -177,7 +178,10 @@
                         <span>Inicio {{ $vm['header']['started_at'] }}</span>
                     </div>
                 </div>
-                <a href="/backoffice/cycles/{{ $vm['header']['cycle_id'] }}" class="inline-link">Volver al ciclo</a>
+                <div style="display:flex;gap:10px;flex-wrap:wrap;">
+                    <a href="/backoffice/cycles/{{ $vm['header']['cycle_id'] }}/exports/costs.xlsx" class="inline-link">Exportar Excel</a>
+                    <a href="/backoffice/cycles/{{ $vm['header']['cycle_id'] }}" class="inline-link">Volver al ciclo</a>
+                </div>
             </div>
         </div>
 
@@ -234,7 +238,7 @@
                         </div>
                     @endif
                     <div class="form-actions">
-                        <button type="submit" class="primary-btn" {{ $vm['read_only_mode'] ? 'disabled' : '' }} title="{{ $vm['read_only_mode'] ? $shell['write_block_tooltip'] : 'Registrar costo operativo' }}">Guardar costo</button>
+                        <button type="submit" class="primary-btn" {{ $canManageCosts ? '' : 'disabled' }} title="{{ $canManageCosts ? 'Registrar costo operativo' : (($shell['permissions']['costs.manage'] ?? false) ? $shell['write_block_tooltip'] : $shell['permission_block_tooltip']) }}">Guardar costo</button>
                     </div>
                 </form>
             </div>

@@ -30,6 +30,10 @@ final class CycleMetricsResource extends JsonResource
                 'total_lbs' => $this->resource['harvest']['total_lbs'],
                 'total_kg' => $this->resource['harvest']['total_kg'],
             ],
+            'mortality' => [
+                'total_mortality' => $this->resource['mortality']['total_mortality'],
+            ],
+            'estimated_alive_count' => $this->resource['estimated_alive_count'],
             'fcr' => $this->resource['fcr'],
             'biomass_kg' => $this->resource['biomass_kg'],
             'recommended_feed_kg_per_day' => $this->resource['recommended_feed_kg_per_day'],

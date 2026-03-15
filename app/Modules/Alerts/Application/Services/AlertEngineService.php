@@ -12,7 +12,7 @@ use App\Modules\Production\Domain\Enums\CycleStatus;
 use App\Modules\Production\Domain\Models\Cycle;
 use App\Modules\Shared\Application\Services\BaseService;
 use App\Modules\WaterQuality\Domain\Models\WaterQualityEntry;
-use Illuminate\Support\Carbon;
+use Carbon\Carbon;
 
 final class AlertEngineService extends BaseService
 {
@@ -193,6 +193,36 @@ final class AlertEngineService extends BaseService
         return array_values(array_filter($events));
     }
 
+    public function emitHighDailyMortalityAlert(Cycle $cycle, Carbon $date, int $mortalityCount): ?AlertEvent
+    {
+        $stockingQty = (int) ($cycle->stocking?->pl_qty ?? 0);
+
+        if ($stockingQty <= 0) {
+            return null;
+        }
+
+        $thresholdPct = 0.02;
+        $thresholdCount = (int) ceil($stockingQty * $thresholdPct);
+
+        if ($mortalityCount <= $thresholdCount) {
+            return null;
+        }
+
+        return $this->emit(
+            cycle: $cycle,
+            ruleCode: AlertCode::HIGH_DAILY_MORTALITY,
+            severity: AlertSeverity::CRITICAL,
+            title: 'High daily mortality detected',
+            message: 'Daily mortality exceeds the default 2% threshold.',
+            detectedAt: $date->copy(),
+            context: [
+                'mortality_count' => $mortalityCount,
+                'threshold_pct' => $thresholdPct,
+                'threshold_count' => $thresholdCount,
+            ],
+        );
+    }
+
     /**
      * @return array<int, array{code: string, severity: string, params: array<string, mixed>}>
      */
@@ -219,6 +249,7 @@ final class AlertEngineService extends BaseService
             ['code' => AlertCode::HIGH_FCR->value, 'severity' => AlertSeverity::WARNING->value, 'params' => ['threshold' => 1.7]],
             ['code' => AlertCode::FEED_DEVIATION->value, 'severity' => AlertSeverity::INFO->value, 'params' => ['deviation_pct' => 0.2]],
             ['code' => AlertCode::HIGH_BIOMASS->value, 'severity' => AlertSeverity::CRITICAL->value, 'params' => ['threshold' => 4000]],
+            ['code' => AlertCode::HIGH_DAILY_MORTALITY->value, 'severity' => AlertSeverity::CRITICAL->value, 'params' => ['threshold_pct' => 0.02]],
             ['code' => AlertCode::DO_LOW->value, 'severity' => AlertSeverity::WARNING->value, 'params' => ['threshold' => 3.5, 'critical_threshold' => 3.0]],
             ['code' => AlertCode::PH_OUT_OF_RANGE->value, 'severity' => AlertSeverity::WARNING->value, 'params' => ['min' => 7.2, 'max' => 8.8]],
         ];

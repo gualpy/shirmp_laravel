@@ -38,6 +38,10 @@ final class GetCycleMetricsAction extends BaseAction
                 'total_lbs' => $this->metricsService->total_harvest_lbs($cycle),
                 'total_kg' => $this->metricsService->total_harvest_kg($cycle),
             ],
+            'mortality' => [
+                'total_mortality' => $this->metricsService->total_mortality($cycle),
+            ],
+            'estimated_alive_count' => $this->metricsService->estimated_alive_count($cycle, $survivalEstimate),
             'fcr' => $this->metricsService->fcr($cycle),
             'biomass_kg' => $this->metricsService->biomass_kg($cycle, $survivalEstimate),
             'recommended_feed_kg_per_day' => $recommendation['recommended_feed_kg_per_day'],

@@ -4,6 +4,7 @@ namespace App\Modules\SaaS\Presentation\Controllers;
 
 use App\Http\Controllers\Controller;
 use App\Models\Tenant;
+use App\Modules\Audit\Application\Services\AuditLogService;
 use App\Modules\SaaS\Application\Services\LicenseService;
 use App\Modules\SaaS\Application\Services\SaaSService;
 use App\Modules\SaaS\Domain\Enums\PlanBillingType;
@@ -56,6 +57,7 @@ final class AdminTenantSubscriptionController extends Controller
         ActivateOnPremRequest $request,
         SaaSService $service,
         LicenseService $licenseService,
+        AuditLogService $auditLogService,
     ): JsonResponse {
         $plan = Plan::query()->where('code', 'onprem')->where('is_active', true)->first();
         if ($plan === null || $plan->billing_type !== PlanBillingType::ONPREM) {
@@ -98,18 +100,44 @@ final class AdminTenantSubscriptionController extends Controller
             'notes' => $payload['notes'] ?? null,
         ]);
 
+        $auditLogService->record(
+            actionKey: 'subscription.activate_onprem',
+            entityType: 'TenantSubscription',
+            entityId: $subscription->id,
+            context: [
+                'tenant_id' => $tenant->id,
+                'plan_code' => $plan->code,
+                'offline_grace_days' => $subscription->offline_grace_days,
+            ],
+            tenant: $tenant,
+            user: $request->user(),
+        );
+
         return (new TenantSubscriptionResource($subscription))->response()->setStatusCode(201);
     }
 
     public function verifyNow(
         Tenant $tenant,
         LicenseService $licenseService,
+        AuditLogService $auditLogService,
     ): TenantSubscriptionResource|JsonResponse {
         $subscription = $licenseService->verifySubscriptionNow($tenant, VerificationSource::MANUAL);
 
         if ($subscription === null) {
             return response()->json(['message' => 'Tenant subscription not found.'], 404);
         }
+
+        $auditLogService->record(
+            actionKey: 'subscription.verify_now',
+            entityType: 'TenantSubscription',
+            entityId: $subscription->id,
+            context: [
+                'tenant_id' => $tenant->id,
+                'verification_source' => VerificationSource::MANUAL->value,
+            ],
+            tenant: $tenant,
+            user: request()->user(),
+        );
 
         return new TenantSubscriptionResource($subscription);
     }

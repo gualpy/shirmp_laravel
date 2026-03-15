@@ -164,7 +164,7 @@
 
 @section('content')
     <div class="page-shell">
-        <div class="card card-soft filter-card">
+        <div class="card card-soft filter-card animate-enter-down">
             <div class="filter-head">
                 <div>
                     <h1 class="section-heading" style="font-size:1.34rem;margin-bottom:4px;">Ciclos Activos</h1>
@@ -202,7 +202,7 @@
 
         <div class="cycles-grid">
             @forelse($vm['rows'] as $row)
-                <a href="{{ $row['detail_href'] }}" class="card cycle-card">
+                <a href="{{ $row['detail_href'] }}" class="card cycle-card animate-enter-down animate-enter-down-delay-1">
                     <div class="cycle-card__row">
                         <div>
                             <div class="cycle-card__title">{{ $row['pond_code'] }} · {{ $row['farm'] }}</div>
@@ -223,7 +223,7 @@
                     </div>
                 </a>
             @empty
-                <div class="empty-state">No hay ciclos activos para los filtros seleccionados.</div>
+                <div class="empty-state animate-enter-down animate-enter-down-delay-1">No hay ciclos activos para los filtros seleccionados.</div>
             @endforelse
         </div>
     </div>

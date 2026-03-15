@@ -3,6 +3,7 @@
 namespace App\Modules\Production\Application\Services;
 
 use App\Modules\Production\Domain\Models\Cycle;
+use App\Modules\Production\Domain\Models\Harvest;
 use App\Modules\Production\Domain\Models\SurvivalEstimate;
 use App\Modules\Shared\Application\Services\BaseService;
 
@@ -133,17 +134,25 @@ final class MetricsService extends BaseService
 
     public function estimated_alive_count(Cycle $cycle, ?float $survivalEstimate = null): ?float
     {
-        if ($survivalEstimate === null) {
-            return null;
-        }
-
         $stocking = $cycle->stocking;
 
         if ($stocking === null) {
             return null;
         }
 
-        return round(((int) $stocking->pl_qty) * $survivalEstimate, 2);
+        $stockedPl = (int) $stocking->pl_qty;
+        $totalMortality = $this->total_mortality($cycle);
+        $harvestedCount = $this->total_harvest_count($cycle);
+
+        if ($survivalEstimate === null && $totalMortality <= 0 && $harvestedCount <= 0) {
+            return null;
+        }
+
+        $baseAlive = $survivalEstimate !== null
+            ? $stockedPl * $survivalEstimate
+            : $stockedPl;
+
+        return round(max(0, $baseAlive - $totalMortality - $harvestedCount), 2);
     }
 
     public function latest_survival_pct(Cycle $cycle): ?float
@@ -153,7 +162,11 @@ final class MetricsService extends BaseService
             ->latest('id')
             ->first();
 
-        return $estimate instanceof SurvivalEstimate ? (float) $estimate->survival_pct : null;
+        if ($estimate instanceof SurvivalEstimate) {
+            return (float) $estimate->survival_pct;
+        }
+
+        return $this->derived_survival_pct($cycle);
     }
 
     public function biomass_kg(Cycle $cycle, ?float $survivalEstimate = null): ?float
@@ -166,5 +179,55 @@ final class MetricsService extends BaseService
         }
 
         return round($aliveCount * ($latestPpGrams / 1000), 3);
+    }
+
+    public function total_mortality(Cycle $cycle): int
+    {
+        return (int) $cycle->dailyMortalities()->sum('mortality_count');
+    }
+
+    public function total_harvest_count(Cycle $cycle): int
+    {
+        $count = $cycle->harvests()
+            ->get(['total_lbs', 'avg_pp_grams'])
+            ->sum(function (Harvest $harvest): float {
+                $avgPp = $harvest->avg_pp_grams !== null ? (float) $harvest->avg_pp_grams : 0.0;
+
+                if ($avgPp <= 0) {
+                    return 0.0;
+                }
+
+                $harvestKg = ((float) $harvest->total_lbs) * 0.45359237;
+
+                return ($harvestKg * 1000) / $avgPp;
+            });
+
+        return (int) round($count);
+    }
+
+    public function derived_survival_pct(Cycle $cycle): ?float
+    {
+        $stocking = $cycle->stocking;
+
+        if ($stocking === null) {
+            return null;
+        }
+
+        $stockedPl = (int) $stocking->pl_qty;
+
+        if ($stockedPl <= 0) {
+            return null;
+        }
+
+        $totalMortality = $this->total_mortality($cycle);
+        $harvestedCount = $this->total_harvest_count($cycle);
+
+        if ($totalMortality <= 0 && $harvestedCount <= 0) {
+            return null;
+        }
+
+        $aliveCount = max(0, $stockedPl - $totalMortality - $harvestedCount);
+
+        return round(($aliveCount / $stockedPl) * 100, 2);
     }
 }

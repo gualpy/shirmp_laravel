@@ -3,6 +3,7 @@
 namespace App\Modules\Configuration\Presentation\Controllers;
 
 use App\Http\Controllers\Controller;
+use App\Modules\Audit\Application\Services\AuditLogService;
 use App\Modules\Configuration\Application\Actions\GetFarmSettingsAction;
 use App\Modules\Configuration\Application\Actions\UpdateFarmSettingsAction;
 use App\Modules\Configuration\Application\DTO\SettingPatchDTO;
@@ -22,8 +23,18 @@ final class FarmSettingController extends Controller
         UpdateFarmSettingRequest $request,
         Farm $farm,
         UpdateFarmSettingsAction $action,
+        AuditLogService $auditLogService,
     ): JsonResponse {
         $resolved = $action->execute($farm, SettingPatchDTO::fromArray($request->validated()));
+
+        $auditLogService->record(
+            actionKey: 'settings.updated',
+            entityType: 'FarmSetting',
+            entityId: $farm->id,
+            context: ['scope' => 'farm', 'keys' => array_keys($request->validated())],
+            tenant: $farm->tenant,
+            user: $request->user(),
+        );
 
         return (new ResolvedSettingResource($resolved))->response();
     }

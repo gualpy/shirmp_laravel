@@ -69,16 +69,23 @@
             min-width: 0;
         }
         .brand-mark {
-            width: 34px;
-            height: 34px;
-            border-radius: 11px;
-            background: linear-gradient(145deg, #12a58c, #1e88e5);
-            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.24);
-            display: grid;
-            place-items: center;
-            color: #fff;
-            font-weight: 800;
-            letter-spacing: .08em;
+            width: 42px;
+            height: 42px;
+            border-radius: 14px;
+            background: linear-gradient(180deg, rgba(255, 255, 255, 0.14), rgba(255, 255, 255, 0.06));
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.14), 0 8px 18px rgba(5, 16, 25, 0.18);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 6px;
+            flex: 0 0 auto;
+        }
+        .brand-mark img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            display: block;
         }
         .brand-copy {
             display: flex;
@@ -286,6 +293,106 @@
             box-shadow: var(--shadow-soft);
         }
         .muted { color: var(--muted); }
+        .metric-label {
+            color: var(--muted);
+            font-size: .76rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: .08em;
+            margin-bottom: 8px;
+        }
+        .metric-value {
+            font-size: 1.5rem;
+            font-weight: 800;
+            letter-spacing: -.04em;
+        }
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 5px 10px;
+            border-radius: 999px;
+            font-size: .74rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: .06em;
+            border: 1px solid var(--border);
+            background: #eef5fb;
+            color: #2d4257;
+        }
+        .status-active { background: #e8f7f0; color: #176448; border-color: #b9e2cf; }
+        .status-paid, .status-completed { background: #e8f7f0; color: #176448; border-color: #b9e2cf; }
+        .status-trial, .status-warning, .status-yearly, .status-monthly, .status-lifetime { background: #fff4dd; color: #8a5c17; border-color: #f1d59a; }
+        .status-pending { background: #fff4dd; color: #8a5c17; border-color: #f1d59a; }
+        .status-suspended, .status-expired, .status-onprem { background: #ffe9e5; color: #9a3626; border-color: #f2c0b7; }
+        .status-overdue, .status-void, .status-failed, .status-refunded { background: #ffe9e5; color: #9a3626; border-color: #f2c0b7; }
+        .status-na { background: #eef3f8; color: #647485; border-color: #d3deea; }
+        .input {
+            width: 100%;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 10px 12px;
+            background: #fff;
+            color: var(--text);
+            font: inherit;
+        }
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: .92rem;
+        }
+        .data-table th,
+        .data-table td {
+            padding: 12px 10px;
+            border-bottom: 1px solid var(--border);
+            text-align: left;
+            vertical-align: top;
+        }
+        .data-table th {
+            color: var(--muted);
+            font-size: .76rem;
+            text-transform: uppercase;
+            letter-spacing: .08em;
+        }
+        .animate-enter-down {
+            opacity: 0;
+            transform: translateY(-8px);
+            animation: enterDown .24s ease-out forwards;
+            will-change: opacity, transform;
+        }
+        .animate-enter-down-delay-1 { animation-delay: .05s; }
+        .animate-enter-down-delay-2 { animation-delay: .1s; }
+        .animate-enter-down-delay-3 { animation-delay: .15s; }
+        @keyframes enterDown {
+            from {
+                opacity: 0;
+                transform: translateY(-8px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        @media (prefers-reduced-motion: reduce) {
+            .animate-enter-down,
+            .animate-enter-down-delay-1,
+            .animate-enter-down-delay-2,
+            .animate-enter-down-delay-3 {
+                opacity: 1;
+                transform: none;
+                animation: none;
+            }
+        }
+        @media print {
+            .animate-enter-down,
+            .animate-enter-down-delay-1,
+            .animate-enter-down-delay-2,
+            .animate-enter-down-delay-3 {
+                opacity: 1;
+                transform: none;
+                animation: none;
+            }
+        }
         @media (max-width: 980px) {
             .masthead { padding: 8px 10px 0; }
             .masthead-inner { width: calc(100vw - 20px); }
@@ -309,7 +416,9 @@
         <div class="masthead-inner">
             <div class="nav-row">
                 <div class="brand-wrap">
-                    <div class="brand-mark">GA</div>
+                    <div class="brand-mark">
+                        <img src="{{ asset('assets/img/logo.png') }}" alt="ShrimpApp">
+                    </div>
                     <div class="brand-copy">
                         <div class="brand">GAMBA BACKOFFICE</div>
                         <div class="brand-subtitle">Control operativo y gerencial acuícola</div>

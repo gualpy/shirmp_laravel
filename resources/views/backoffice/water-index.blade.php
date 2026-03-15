@@ -191,9 +191,10 @@
 @endpush
 
 @section('content')
+    @php($canManageWater = ($shell['permissions']['water.manage'] ?? false) && ! $vm['read_only_mode'])
     <div class="water-shell">
         <div class="water-grid">
-            <div class="card card-soft" id="register-water">
+            <div class="card card-soft animate-enter-down" id="register-water">
                 <h1 class="section-heading" style="font-size:1.28rem;margin-bottom:4px;">Registrar calidad de agua</h1>
                 <div class="section-subtitle" style="font-size:.92rem;margin-bottom:14px;">Captura rápida para técnico de campo. Un registro, una piscina, sin navegar entre módulos.</div>
 
@@ -235,13 +236,13 @@
                         </div>
                     @endif
                     <div class="form-actions">
-                        <button type="submit" class="primary-btn" {{ $vm['read_only_mode'] ? 'disabled' : '' }} title="{{ $vm['read_only_mode'] ? $shell['write_block_tooltip'] : 'Guardar registro de campo' }}">Guardar registro</button>
+                        <button type="submit" class="primary-btn" {{ $canManageWater ? '' : 'disabled' }} title="{{ $canManageWater ? 'Guardar registro de campo' : (($shell['permissions']['water.manage'] ?? false) ? $shell['write_block_tooltip'] : $shell['permission_block_tooltip']) }}">Guardar registro</button>
                         <a href="/backoffice/water" class="secondary-btn">Limpiar</a>
                     </div>
                 </form>
             </div>
 
-            <div class="card filters-card">
+            <div class="card filters-card animate-enter-down animate-enter-down-delay-1">
                 <h2 class="section-heading" style="font-size:1.2rem;margin-bottom:4px;">Registros recientes</h2>
                 <div class="section-subtitle" style="font-size:.92rem;margin-bottom:14px;">Monitorea rápidamente eventos fuera de rango por fecha, finca, piscina o ciclo.</div>
                 <form method="GET" action="/backoffice/water" class="filters-grid">
@@ -288,7 +289,7 @@
             </div>
         </div>
 
-        <div class="card">
+        <div class="card animate-enter-down animate-enter-down-delay-2">
             @if($vm['rows'] === [])
                 <div class="empty-state">No hay registros de calidad de agua.</div>
             @else

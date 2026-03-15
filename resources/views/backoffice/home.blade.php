@@ -104,7 +104,7 @@
 @endpush
 
 @section('content')
-    <div class="card card-soft hero-card">
+    <div class="card card-soft hero-card animate-enter-down">
         <div class="hero-card__row">
             <div>
                 <h1 class="section-heading">Resumen Ejecutivo</h1>
@@ -118,26 +118,26 @@
 
     @if($vm['dashboard_enabled'] && $vm['kpis'] !== null)
         <div class="kpi-grid">
-            <div class="kpi-panel">
+            <div class="kpi-panel animate-enter-down animate-enter-down-delay-1">
                 <div class="kpi-panel__label">Ciclos activos</div>
                 <div class="kpi-panel__value">{{ $vm['kpis']['active_cycles'] }}</div>
             </div>
-            <div class="kpi-panel">
+            <div class="kpi-panel animate-enter-down animate-enter-down-delay-1">
                 <div class="kpi-panel__label">Biomasa total</div>
                 <div class="kpi-panel__value">{{ number_format($vm['kpis']['total_biomass_kg'], 2) }} <span style="font-size:.54em;font-weight:700;">kg</span></div>
             </div>
-            <div class="kpi-panel">
+            <div class="kpi-panel animate-enter-down animate-enter-down-delay-2">
                 <div class="kpi-panel__label">FCR promedio</div>
                 <div class="kpi-panel__value">{{ $vm['kpis']['average_fcr'] !== null ? number_format($vm['kpis']['average_fcr'],3) : 'N/D' }}</div>
             </div>
-            <div class="kpi-panel">
+            <div class="kpi-panel animate-enter-down animate-enter-down-delay-2">
                 <div class="kpi-panel__label">Alertas críticas</div>
                 <div class="kpi-panel__value" style="color:#c63636;">{{ $vm['kpis']['critical_alerts'] }}</div>
             </div>
         </div>
     @endif
 
-    <div class="card farms-card">
+    <div class="card farms-card animate-enter-down animate-enter-down-delay-2">
         <div class="farms-card__header">
             <div>
                 <h2 style="margin:0 0 4px;font-size:1.04rem;">Fincas con ciclos activos</h2>
@@ -150,7 +150,7 @@
         @else
             <div class="farm-list">
                 @foreach($vm['farms'] as $farm)
-                    <div class="farm-item">
+                    <div class="farm-item animate-enter-down animate-enter-down-delay-3">
                         <div>
                             <div class="farm-item__title">{{ $farm['farm_name'] }}</div>
                             <div class="farm-item__meta">{{ $farm['active_cycles'] }} ciclo(s) activo(s) con seguimiento operativo.</div>

@@ -20,6 +20,8 @@ class Farm extends Model
     protected $fillable = [
         'tenant_id',
         'name',
+        'company_display_name',
+        'logo_path',
         'location',
         'notes',
     ];

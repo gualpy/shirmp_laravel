@@ -2,6 +2,7 @@
 
 namespace App\Modules\Production\Application\Actions;
 
+use App\Modules\Audit\Application\Services\AuditLogService;
 use App\Modules\Alerts\Application\Services\AlertEngineService;
 use App\Modules\Production\Application\DTO\DailyMortalityDTO;
 use App\Modules\Production\Application\Services\DailyMortalityDomainService;
@@ -15,6 +16,7 @@ final class CreateDailyMortalityAction
     public function __construct(
         private readonly DailyMortalityDomainService $domainService,
         private readonly AlertEngineService $alertEngineService,
+        private readonly AuditLogService $auditLogService,
     ) {
     }
 
@@ -34,6 +36,18 @@ final class CreateDailyMortalityAction
                 ->where('cycle_id', $cycle->id)
                 ->whereDate('recorded_at', $dto->recordedAt)
                 ->sum('mortality_count'),
+        );
+
+        $this->auditLogService->record(
+            actionKey: 'mortality.created',
+            entityType: 'DailyMortality',
+            entityId: $entry->id,
+            context: [
+                'cycle_id' => $cycle->id,
+                'pond_id' => $pond->id,
+                'recorded_at' => $dto->recordedAt,
+                'mortality_count' => $dto->mortalityCount,
+            ],
         );
 
         return $entry;

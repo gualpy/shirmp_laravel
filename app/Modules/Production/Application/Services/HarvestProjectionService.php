@@ -84,14 +84,14 @@ final class HarvestProjectionService extends BaseService
 
         $settings = $this->settingsResolver->resolveFarmSettings($cycle->pond->farm);
         $latestSurvivalPct = $this->metricsService->latest_survival_pct($cycle);
-        $latestSurvivalRatio = $latestSurvivalPct !== null ? $latestSurvivalPct / 100 : null;
         $currentHarvestKg = $this->metricsService->total_harvest_kg($cycle);
         $currentFcr = $currentHarvestKg > 0 ? round($this->metricsService->fcr($cycle), 4) : null;
+        $resolvedSurvivalRatio = $latestSurvivalPct !== null ? $latestSurvivalPct / 100 : null;
 
         return [
             'latest_pp_grams' => $this->metricsService->latest_pp_grams($cycle),
             'latest_survival_pct' => $latestSurvivalPct,
-            'current_biomass_kg' => $this->metricsService->biomass_kg($cycle, $latestSurvivalRatio),
+            'current_biomass_kg' => $this->metricsService->biomass_kg($cycle, $resolvedSurvivalRatio),
             'growth_g_per_week' => $this->metricsService->growth_g_per_week($cycle),
             'current_fcr' => $currentFcr,
             'current_total_cost' => round($this->costingService->totalCost($cycle), 2),

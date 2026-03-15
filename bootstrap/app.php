@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Middleware\EnsureFeatureEnabled;
+use App\Http\Middleware\EnsureRoleModuleAccess;
 use App\Http\Middleware\EnsureSuperAdmin;
 use App\Http\Middleware\EnsureTenantSubscriptionActive;
 use App\Http\Middleware\EnsureWriteAllowed;
@@ -29,6 +30,7 @@ return Application::configure(basePath: dirname(__DIR__))
             'subscription.active' => EnsureTenantSubscriptionActive::class,
             'write.allowed' => EnsureWriteAllowed::class,
             'feature' => EnsureFeatureEnabled::class,
+            'role.module' => EnsureRoleModuleAccess::class,
             'superadmin' => EnsureSuperAdmin::class,
             'tenant.backoffice' => ResolveTenantForBackoffice::class,
         ]);

@@ -1,0 +1,38 @@
+Sí, en producción también necesitas permisos correctos para Laravel.
+
+No necesariamente exactamente esos mismos comandos, pero sí el mismo principio:
+
+Directorios que deben poder escribirse:
+- `storage/`
+- `bootstrap/cache/`
+
+Y ahora además, para exportes Excel:
+- `storage/framework/cache/laravel-excel/`
+
+Regla práctica en producción:
+- el usuario del proceso web y del worker debe poder escribir ahí
+- normalmente será algo como `www-data`, `nginx`, `apache` o el usuario del contenedor
+
+Lo correcto en producción:
+- definir bien propietario/grupo
+- dar escritura solo donde hace falta
+- no abrir permisos globales tipo `777`
+
+Ejemplo típico:
+```bash
+chown -R www-data:www-data storage bootstrap/cache
+find storage bootstrap/cache -type d -exec chmod 775 {} \;
+find storage bootstrap/cache -type f -exec chmod 664 {} \;
+```
+
+Y asegurar que exista:
+```bash
+mkdir -p storage/framework/cache/laravel-excel
+chown -R www-data:www-data storage/framework/cache/laravel-excel
+chmod -R 775 storage/framework/cache/laravel-excel
+```
+
+Conclusión:
+- Sí, en producción debes contemplarlo.
+- Es parte normal del deploy Laravel.
+- De hecho conviene dejarlo en tu checklist de despliegue.

@@ -8,6 +8,7 @@ enum AlertCode: string
     case HIGH_FCR = 'HIGH_FCR';
     case FEED_DEVIATION = 'FEED_DEVIATION';
     case HIGH_BIOMASS = 'HIGH_BIOMASS';
+    case HIGH_DAILY_MORTALITY = 'HIGH_DAILY_MORTALITY';
     case DO_LOW = 'DO_LOW';
     case PH_OUT_OF_RANGE = 'PH_OUT_OF_RANGE';
 }

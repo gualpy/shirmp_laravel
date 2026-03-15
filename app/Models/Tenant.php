@@ -21,6 +21,13 @@ class Tenant extends Model
     protected $fillable = [
         'slug',
         'name',
+        'company_display_name',
+        'company_legal_name',
+        'logo_path',
+        'company_address',
+        'company_phone',
+        'company_email',
+        'report_footer_text',
         'is_active',
     ];
 

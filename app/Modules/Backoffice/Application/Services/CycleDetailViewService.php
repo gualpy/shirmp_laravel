@@ -40,7 +40,7 @@ final class CycleDetailViewService
         }
 
         $biomassSeries = $this->biomassSeries($cycle);
-        $fcrSeries = $this->fcrWeeklySeries($cycle);
+        $feedSeries = $this->feedWeeklySeries($cycle);
         $costs = $this->costingService->summarizeCycleCosts($cycle);
         $alerts = $this->alertsTimeline($cycle);
         $water = $this->latestWaterPanel($cycle);
@@ -64,7 +64,7 @@ final class CycleDetailViewService
             ],
             'charts' => [
                 'biomass_vs_time' => $biomassSeries,
-                'fcr_weekly' => $fcrSeries,
+                'feed_weekly' => $feedSeries,
                 'cost_distribution' => [
                     ['label' => 'Alimento', 'value' => (float) $costs['totals']['feed_cost']],
                     ['label' => 'Operación', 'value' => (float) $costs['totals']['operational_cost']],
@@ -85,7 +85,7 @@ final class CycleDetailViewService
     }
 
     /**
-     * @return array<int, array{date:string, biomass_kg:float}>
+     * @return array<int, array{date:string, biomass_kg:float, pp_grams:float}>
      */
     private function biomassSeries(Cycle $cycle): array
     {
@@ -97,6 +97,7 @@ final class CycleDetailViewService
             ->map(fn ($sampling): array => [
                 'date' => $sampling->sampled_at->format('Y-m-d'),
                 'biomass_kg' => round(($plQty * ((float) $sampling->pp_grams)) / 1000, 2),
+                'pp_grams' => round((float) $sampling->pp_grams, 2),
             ])
             ->values()
             ->all();
@@ -105,6 +106,7 @@ final class CycleDetailViewService
             return [[
                 'date' => $cycle->started_at?->format('Y-m-d') ?? now()->format('Y-m-d'),
                 'biomass_kg' => 0.0,
+                'pp_grams' => 0.0,
             ]];
         }
 
@@ -112,35 +114,21 @@ final class CycleDetailViewService
     }
 
     /**
-     * @return array<int, array{week:string, fcr:float|null}>
+     * @return array<int, array{week:string, feed_kg:float}>
      */
-    private function fcrWeeklySeries(Cycle $cycle): array
+    private function feedWeeklySeries(Cycle $cycle): array
     {
-        $feedWeeks = $cycle->feedEntries()
+        return $cycle->feedEntries()
             ->selectRaw("strftime('%Y-W%W', fed_at) as yweek, SUM(amount_kg) as feed_kg")
             ->groupBy('yweek')
-            ->pluck('feed_kg', 'yweek');
-
-        $harvestWeeks = $cycle->harvests()
-            ->selectRaw("strftime('%Y-W%W', harvested_at) as yweek, SUM(total_lbs * 0.45359237) as harvest_kg")
-            ->groupBy('yweek')
-            ->pluck('harvest_kg', 'yweek');
-
-        $weeks = collect(array_unique(array_merge(
-            array_keys($feedWeeks->all()),
-            array_keys($harvestWeeks->all()),
-        )))->sort()->values();
-
-        return $weeks->map(function (string $week) use ($feedWeeks, $harvestWeeks): array {
-            $feed = (float) ($feedWeeks[$week] ?? 0);
-            $harvestKg = (float) ($harvestWeeks[$week] ?? 0);
-            $fcr = $harvestKg > 0 ? round($feed / $harvestKg, 3) : null;
-
-            return [
-                'week' => $week,
-                'fcr' => $fcr,
-            ];
-        })->all();
+            ->orderBy('yweek')
+            ->get()
+            ->map(fn ($row): array => [
+                'week' => (string) $row->yweek,
+                'feed_kg' => round((float) $row->feed_kg, 2),
+            ])
+            ->values()
+            ->all();
     }
 
     /**

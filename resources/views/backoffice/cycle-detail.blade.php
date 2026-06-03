@@ -109,17 +109,21 @@
     .chart-grid {
         display: grid;
         gap: 14px;
-        grid-template-columns: minmax(0, 1.6fr) minmax(320px, 1fr);
+        grid-template-columns: minmax(0, 1.22fr) minmax(320px, 1fr);
+        align-items: stretch;
     }
     .chart-stack {
         display: grid;
         gap: 14px;
+        min-width: 0;
     }
     .chart-card {
         padding: 18px;
+        min-width: 0;
+        overflow: hidden;
     }
     .chart-card--hero {
-        min-height: 380px;
+        min-height: 340px;
     }
     .chart-header {
         display: flex;
@@ -140,18 +144,25 @@
     }
     .chart-box {
         position: relative;
+        width: 100%;
         height: 100%;
         min-height: 230px;
         overflow: hidden;
     }
-    .chart-card--hero .chart-box { min-height: 290px; }
+    .chart-card--hero .chart-box {
+        min-height: 0;
+        height: auto;
+        aspect-ratio: 16 / 8.8;
+        max-height: 360px;
+    }
     .chart-box--compact {
         height: 220px;
         min-height: 220px;
     }
     canvas {
-        width: 100%;
-        height: 100%;
+        width: 100% !important;
+        max-width: 100%;
+        height: 100% !important;
         display: block;
     }
     .support-grid {
@@ -326,6 +337,10 @@
         content: "›";
         font-size: 1rem;
     }
+    .legend--growth {
+        margin-top: 10px;
+        justify-content: flex-start;
+    }
     @media (max-width: 980px) {
         .chart-grid,
         .support-grid,
@@ -336,6 +351,8 @@
             min-height: auto;
         }
         .chart-card--hero .chart-box {
+            aspect-ratio: 16 / 10;
+            max-height: none;
             min-height: 240px;
         }
     }
@@ -422,22 +439,26 @@
             <div class="card chart-card chart-card--hero animate-enter-down animate-enter-down-delay-2">
                 <div class="chart-header">
                     <div>
-                        <h3 class="chart-title">Biomasa vs Tiempo</h3>
-                        <div class="chart-subtitle">Curva principal de crecimiento para lectura biológica y decisiones de alimentación.</div>
+                        <h3 class="chart-title">Crecimiento del Ciclo</h3>
+                        <div class="chart-subtitle">Biomasa estimada y peso promedio en una sola lectura para entender avance biológico real.</div>
                     </div>
                 </div>
                 <div class="chart-box animate-enter-down animate-enter-down-delay-3"><canvas id="biomassChart"></canvas></div>
+                <div class="legend legend--growth">
+                    <span><span class="dot" style="background:#0c7a6a;"></span>Biomasa estimada</span>
+                    <span><span class="dot" style="background:#2f8fff;"></span>Peso promedio</span>
+                </div>
             </div>
 
             <div class="chart-stack">
                 <div class="card chart-card animate-enter-down animate-enter-down-delay-2">
                     <div class="chart-header">
                         <div>
-                            <h3 class="chart-title">FCR Semanal</h3>
-                            <div class="chart-subtitle">Seguimiento de eficiencia operativa por semana.</div>
+                            <h3 class="chart-title">Alimentación Semanal</h3>
+                            <div class="chart-subtitle">Carga de alimento por semana para conectar consumo, biomasa y costo operativo.</div>
                         </div>
                     </div>
-                    <div class="chart-box animate-enter-down animate-enter-down-delay-3"><canvas id="fcrChart"></canvas></div>
+                    <div class="chart-box animate-enter-down animate-enter-down-delay-3"><canvas id="feedChart"></canvas></div>
                 </div>
 
                 <div class="card chart-card animate-enter-down animate-enter-down-delay-3">
@@ -543,7 +564,7 @@
 
     <script>
         const biomassData = @json($vm['charts']['biomass_vs_time']);
-        const fcrData = @json($vm['charts']['fcr_weekly']);
+        const feedData = @json($vm['charts']['feed_weekly']);
         const costData = @json($vm['charts']['cost_distribution']);
 
         function setupCanvas(id) {
@@ -577,6 +598,105 @@
             ctx.stroke();
         }
 
+        function drawGrowthChart(id, points) {
+            const { c, ctx } = setupCanvas(id);
+            const w = c.clientWidth;
+            const h = c.clientHeight;
+            const padTop = 18;
+            const padRight = 54;
+            const padBottom = 38;
+            const padLeft = 52;
+            const iw = w - padLeft - padRight;
+            const ih = h - padTop - padBottom;
+
+            ctx.clearRect(0, 0, w, h);
+
+            if (points.length < 2) {
+                return;
+            }
+
+            const biomass = points.map(point => Number(point.biomass_kg) || 0);
+            const pp = points.map(point => Number(point.pp_grams) || 0);
+            const maxBiomass = Math.max(...biomass, 1);
+            const maxPp = Math.max(...pp, 1);
+            const gridLines = 4;
+
+            ctx.strokeStyle = '#dce7f1';
+            ctx.fillStyle = '#70859a';
+            ctx.font = '12px "IBM Plex Sans", sans-serif';
+
+            for (let i = 0; i <= gridLines; i++) {
+                const ratio = i / gridLines;
+                const y = padTop + ih - (ih * ratio);
+                ctx.beginPath();
+                ctx.moveTo(padLeft, y);
+                ctx.lineTo(w - padRight, y);
+                ctx.stroke();
+
+                const leftLabel = Math.round((maxBiomass * ratio) / 250) * 250;
+                const rightLabel = ((maxPp * ratio)).toFixed(1);
+                ctx.fillText(String(leftLabel), 8, y + 4);
+                ctx.fillText(rightLabel, w - padRight + 10, y + 4);
+            }
+
+            const xStep = iw / (points.length - 1);
+            const coords = points.map((point, index) => ({
+                x: padLeft + (xStep * index),
+                biomassY: padTop + ih - ((Number(point.biomass_kg) || 0) / maxBiomass) * ih,
+                ppY: padTop + ih - ((Number(point.pp_grams) || 0) / maxPp) * ih,
+                label: point.date.slice(5),
+            }));
+
+            ctx.strokeStyle = '#0c7a6a';
+            ctx.lineWidth = 2.5;
+            ctx.beginPath();
+            coords.forEach((point, index) => {
+                if (index === 0) {
+                    ctx.moveTo(point.x, point.biomassY);
+                } else {
+                    ctx.lineTo(point.x, point.biomassY);
+                }
+            });
+            ctx.stroke();
+
+            ctx.fillStyle = '#0c7a6a';
+            coords.forEach(point => {
+                ctx.beginPath();
+                ctx.arc(point.x, point.biomassY, 3.5, 0, Math.PI * 2);
+                ctx.fill();
+            });
+
+            ctx.strokeStyle = '#2f8fff';
+            ctx.lineWidth = 2;
+            ctx.setLineDash([6, 4]);
+            ctx.beginPath();
+            coords.forEach((point, index) => {
+                if (index === 0) {
+                    ctx.moveTo(point.x, point.ppY);
+                } else {
+                    ctx.lineTo(point.x, point.ppY);
+                }
+            });
+            ctx.stroke();
+            ctx.setLineDash([]);
+
+            ctx.fillStyle = '#2f8fff';
+            coords.forEach(point => {
+                ctx.beginPath();
+                ctx.arc(point.x, point.ppY, 3, 0, Math.PI * 2);
+                ctx.fill();
+            });
+
+            ctx.fillStyle = '#70859a';
+            ctx.textAlign = 'center';
+            coords.forEach((point, index) => {
+                if (index === 0 || index === coords.length - 1 || index % 2 === 1) {
+                    ctx.fillText(point.label, point.x, h - 12);
+                }
+            });
+            ctx.textAlign = 'start';
+        }
+
         function drawDonut(id, parts) {
             const { c, ctx } = setupCanvas(id);
             const w = c.clientWidth, h = c.clientHeight;
@@ -594,8 +714,59 @@
             ctx.beginPath(); ctx.fillStyle = '#fff'; ctx.arc(cx, cy, r * .55, 0, Math.PI * 2); ctx.fill();
         }
 
-        drawLine('biomassChart', biomassData, 'biomass_kg', '#0c7a6a');
-        drawLine('fcrChart', fcrData.filter(r => r.fcr !== null), 'fcr', '#2f8fff');
+        function drawBars(id, points, key, color) {
+            const { c, ctx } = setupCanvas(id);
+            const w = c.clientWidth;
+            const h = c.clientHeight;
+            const padTop = 18;
+            const padRight = 18;
+            const padBottom = 34;
+            const padLeft = 42;
+            const iw = w - padLeft - padRight;
+            const ih = h - padTop - padBottom;
+            const values = points.map(point => Number(point[key]) || 0);
+            const max = Math.max(...values, 1);
+
+            ctx.clearRect(0, 0, w, h);
+            ctx.strokeStyle = '#dce7f1';
+            ctx.fillStyle = '#70859a';
+            ctx.font = '12px "IBM Plex Sans", sans-serif';
+
+            for (let i = 0; i < 4; i++) {
+                const ratio = i / 3;
+                const y = padTop + ih - (ih * ratio);
+                ctx.beginPath();
+                ctx.moveTo(padLeft, y);
+                ctx.lineTo(w - padRight, y);
+                ctx.stroke();
+                ctx.fillText(String(Math.round(max * ratio)), 8, y + 4);
+            }
+
+            if (points.length === 0) {
+                return;
+            }
+
+            const slot = iw / points.length;
+            const barWidth = Math.min(34, slot * 0.58);
+
+            points.forEach((point, index) => {
+                const value = Number(point[key]) || 0;
+                const barHeight = (value / max) * ih;
+                const x = padLeft + (slot * index) + ((slot - barWidth) / 2);
+                const y = padTop + ih - barHeight;
+
+                ctx.fillStyle = color;
+                ctx.fillRect(x, y, barWidth, barHeight);
+
+                ctx.fillStyle = '#70859a';
+                ctx.textAlign = 'center';
+                ctx.fillText(point.week.slice(-3), x + (barWidth / 2), h - 10);
+                ctx.textAlign = 'start';
+            });
+        }
+
+        drawGrowthChart('biomassChart', biomassData);
+        drawBars('feedChart', feedData, 'feed_kg', '#2f8fff');
         drawDonut('costChart', costData);
     </script>
 @endsection

@@ -7,6 +7,7 @@ use App\Models\User;
 use App\Modules\Auth\Domain\Enums\UserRole;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Str;
 use Tests\TestCase;
 
 final class BackofficeWebAuthFlowTest extends TestCase
@@ -35,7 +36,11 @@ final class BackofficeWebAuthFlowTest extends TestCase
         [$tenant, $user] = $this->tenantUser('tenant-a', 'owner@a.local');
         $this->activeSubscription($tenant);
 
+        $response = $this->get('/login');
+        preg_match('/name=\"_token\" value=\"([^\"]+)\"/', $response->getContent(), $matches);
+
         $this->post('/login', [
+            '_token' => $matches[1] ?? Str::random(40),
             'tenant' => $tenant->slug,
             'email' => $user->email,
             'password' => 'password123',

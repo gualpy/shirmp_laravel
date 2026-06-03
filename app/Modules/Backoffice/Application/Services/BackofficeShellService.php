@@ -53,7 +53,19 @@ final class BackofficeShellService
             'features' => $features,
             'menu' => [
                 ['key' => 'dashboard', 'label' => 'Dashboard', 'href' => '/backoffice', 'visible' => $permissions['dashboard.view'], 'enabled' => true],
-                ['key' => 'cycles', 'label' => 'Cycles', 'href' => '/backoffice/cycles', 'visible' => $permissions['production.view'], 'enabled' => true],
+                [
+                    'key' => 'production',
+                    'label' => 'Production',
+                    'href' => '/backoffice/cycles',
+                    'visible' => $permissions['production.view'],
+                    'enabled' => true,
+                    'children' => [
+                        ['key' => 'cycles', 'label' => 'Cycles', 'href' => '/backoffice/cycles', 'visible' => $permissions['production.view'], 'enabled' => true],
+                        ['key' => 'farms', 'label' => 'Farms', 'href' => '/backoffice/farms', 'visible' => $permissions['production.view'], 'enabled' => true],
+                        ['key' => 'ponds', 'label' => 'Ponds', 'href' => '/backoffice/ponds', 'visible' => $permissions['production.view'], 'enabled' => true],
+                        ['key' => 'stocking', 'label' => 'New Stocking', 'href' => '/backoffice/stocking/create', 'visible' => $permissions['production.view'], 'enabled' => true],
+                    ],
+                ],
                 ['key' => 'alerts', 'label' => 'Alerts', 'href' => '/backoffice/alerts', 'visible' => $features['alerts'] && $permissions['alerts.view'], 'enabled' => true],
                 ['key' => 'audit', 'label' => 'Audit', 'href' => '/backoffice/audit', 'visible' => $permissions['audit.view'], 'enabled' => true],
                 ['key' => 'billing', 'label' => 'Billing', 'href' => '/backoffice/billing', 'visible' => $permissions['billing.view'], 'enabled' => true],

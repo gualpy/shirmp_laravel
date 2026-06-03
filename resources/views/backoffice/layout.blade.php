@@ -25,11 +25,35 @@
                 <nav class="nav-links" aria-label="Navegación principal">
                     @foreach($shell['menu'] as $item)
                         @if($item['visible'])
-                            <a href="{{ $item['href'] }}"
-                               class="{{ $activeMenu === $item['key'] ? 'active' : '' }} {{ !$item['enabled'] ? 'disabled' : '' }}"
-                               title="{{ !$item['enabled'] ? ($shell['menu_disabled_tooltip'] ?? 'No disponible.') : '' }}">
-                                {{ $item['label'] }}
-                            </a>
+                            @php($children = collect($item['children'] ?? [])->filter(fn ($child) => $child['visible'] ?? false)->values())
+                            @php($parentActive = $activeMenu === $item['key'] || $children->contains(fn ($child) => $activeMenu === $child['key']))
+                            @if($children->isNotEmpty())
+                                <div class="nav-group {{ $parentActive ? 'is-active' : '' }}">
+                                    <button
+                                       type="button"
+                                       class="nav-group-trigger {{ $parentActive ? 'active' : '' }} {{ !$item['enabled'] ? 'disabled' : '' }}"
+                                       title="{{ !$item['enabled'] ? ($shell['menu_disabled_tooltip'] ?? 'No disponible.') : '' }}"
+                                       aria-expanded="{{ $parentActive ? 'true' : 'false' }}"
+                                       data-nav-group-trigger>
+                                        {{ $item['label'] }}
+                                    </button>
+                                    <div class="nav-group-menu">
+                                        @foreach($children as $child)
+                                            <a href="{{ $child['href'] }}"
+                                               class="{{ $activeMenu === $child['key'] ? 'active' : '' }} {{ !$child['enabled'] ? 'disabled' : '' }}"
+                                               title="{{ !$child['enabled'] ? ($shell['menu_disabled_tooltip'] ?? 'No disponible.') : '' }}">
+                                                {{ $child['label'] }}
+                                            </a>
+                                        @endforeach
+                                    </div>
+                                </div>
+                            @else
+                                <a href="{{ $item['href'] }}"
+                                   class="{{ $activeMenu === $item['key'] ? 'active' : '' }} {{ !$item['enabled'] ? 'disabled' : '' }}"
+                                   title="{{ !$item['enabled'] ? ($shell['menu_disabled_tooltip'] ?? 'No disponible.') : '' }}">
+                                    {{ $item['label'] }}
+                                </a>
+                            @endif
                         @endif
                     @endforeach
                 </nav>
@@ -73,12 +97,30 @@
                 <nav class="mobile-links" aria-label="Navegación móvil">
                     @foreach($shell['menu'] as $item)
                         @if($item['visible'])
-                            <a href="{{ $item['href'] }}"
-                               class="{{ $activeMenu === $item['key'] ? 'active' : '' }} {{ !$item['enabled'] ? 'disabled' : '' }}"
-                               title="{{ !$item['enabled'] ? ($shell['menu_disabled_tooltip'] ?? 'No disponible.') : '' }}">
-                                <span>{{ $item['label'] }}</span>
-                                <span>{{ $activeMenu === $item['key'] ? '•' : '›' }}</span>
-                            </a>
+                            @php($children = collect($item['children'] ?? [])->filter(fn ($child) => $child['visible'] ?? false)->values())
+                            @php($parentActive = $activeMenu === $item['key'] || $children->contains(fn ($child) => $activeMenu === $child['key']))
+                            @if($children->isNotEmpty())
+                                <div class="mobile-group {{ $parentActive ? 'is-active' : '' }}">
+                                    <div class="mobile-group-title">{{ $item['label'] }}</div>
+                                    <div class="mobile-group-links">
+                                        @foreach($children as $child)
+                                            <a href="{{ $child['href'] }}"
+                                               class="{{ $activeMenu === $child['key'] ? 'active' : '' }} {{ !$child['enabled'] ? 'disabled' : '' }}"
+                                               title="{{ !$child['enabled'] ? ($shell['menu_disabled_tooltip'] ?? 'No disponible.') : '' }}">
+                                                <span>{{ $child['label'] }}</span>
+                                                <span>{{ $activeMenu === $child['key'] ? '•' : '›' }}</span>
+                                            </a>
+                                        @endforeach
+                                    </div>
+                                </div>
+                            @else
+                                <a href="{{ $item['href'] }}"
+                                   class="{{ $activeMenu === $item['key'] ? 'active' : '' }} {{ !$item['enabled'] ? 'disabled' : '' }}"
+                                   title="{{ !$item['enabled'] ? ($shell['menu_disabled_tooltip'] ?? 'No disponible.') : '' }}">
+                                    <span>{{ $item['label'] }}</span>
+                                    <span>{{ $activeMenu === $item['key'] ? '•' : '›' }}</span>
+                                </a>
+                            @endif
                         @endif
                     @endforeach
                 </nav>
@@ -104,6 +146,7 @@
         const masthead = document.getElementById('backofficeMasthead');
         const toggle = document.querySelector('[data-mobile-nav-toggle]');
         const panel = document.getElementById('mobileNavPanel');
+        const navGroupTriggers = document.querySelectorAll('[data-nav-group-trigger]');
 
         function syncScrolledState() {
             if (!masthead) {
@@ -119,6 +162,46 @@
                 toggle.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
             });
         }
+
+        navGroupTriggers.forEach(function (trigger) {
+            trigger.addEventListener('click', function (event) {
+                const group = trigger.closest('.nav-group');
+
+                if (!group || trigger.classList.contains('disabled')) {
+                    return;
+                }
+
+                event.preventDefault();
+                const willOpen = !group.classList.contains('is-open');
+
+                document.querySelectorAll('.nav-group.is-open').forEach(function (openGroup) {
+                    openGroup.classList.remove('is-open');
+                    const openTrigger = openGroup.querySelector('[data-nav-group-trigger]');
+                    if (openTrigger) {
+                        openTrigger.setAttribute('aria-expanded', 'false');
+                    }
+                });
+
+                if (willOpen) {
+                    group.classList.add('is-open');
+                    trigger.setAttribute('aria-expanded', 'true');
+                }
+            });
+        });
+
+        document.addEventListener('click', function (event) {
+            if (event.target.closest('.nav-group')) {
+                return;
+            }
+
+            document.querySelectorAll('.nav-group.is-open').forEach(function (openGroup) {
+                openGroup.classList.remove('is-open');
+                const openTrigger = openGroup.querySelector('[data-nav-group-trigger]');
+                if (openTrigger) {
+                    openTrigger.setAttribute('aria-expanded', 'false');
+                }
+            });
+        });
 
         window.addEventListener('scroll', syncScrolledState, { passive: true });
         syncScrolledState();

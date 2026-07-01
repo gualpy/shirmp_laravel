@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="en">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>@yield('title', 'Backoffice Acuícola')</title>
+    <title>@yield('title', 'Aquaculture Backoffice')</title>
     <link rel="stylesheet" href="{{ asset('assets/css/backoffice.css') }}">
     @stack('head')
 </head>
@@ -18,11 +18,11 @@
                     </div>
                     <div class="brand-copy">
                         <div class="brand">GAMBA BACKOFFICE</div>
-                        <div class="brand-subtitle">Control operativo y gerencial acuícola</div>
+                        <div class="brand-subtitle">Operational and management control for aquaculture</div>
                     </div>
                 </div>
 
-                <nav class="nav-links" aria-label="Navegación principal">
+                <nav class="nav-links" aria-label="Primary navigation">
                     @foreach($shell['menu'] as $item)
                         @if($item['visible'])
                             @php($children = collect($item['children'] ?? [])->filter(fn ($child) => $child['visible'] ?? false)->values())
@@ -32,7 +32,7 @@
                                     <button
                                        type="button"
                                        class="nav-group-trigger {{ $parentActive ? 'active' : '' }} {{ !$item['enabled'] ? 'disabled' : '' }}"
-                                       title="{{ !$item['enabled'] ? ($shell['menu_disabled_tooltip'] ?? 'No disponible.') : '' }}"
+                                       title="{{ !$item['enabled'] ? ($shell['menu_disabled_tooltip'] ?? 'Not available.') : '' }}"
                                        aria-expanded="{{ $parentActive ? 'true' : 'false' }}"
                                        data-nav-group-trigger>
                                         {{ $item['label'] }}
@@ -41,7 +41,7 @@
                                         @foreach($children as $child)
                                             <a href="{{ $child['href'] }}"
                                                class="{{ $activeMenu === $child['key'] ? 'active' : '' }} {{ !$child['enabled'] ? 'disabled' : '' }}"
-                                               title="{{ !$child['enabled'] ? ($shell['menu_disabled_tooltip'] ?? 'No disponible.') : '' }}">
+                                               title="{{ !$child['enabled'] ? ($shell['menu_disabled_tooltip'] ?? 'Not available.') : '' }}">
                                                 {{ $child['label'] }}
                                             </a>
                                         @endforeach
@@ -50,7 +50,7 @@
                             @else
                                 <a href="{{ $item['href'] }}"
                                    class="{{ $activeMenu === $item['key'] ? 'active' : '' }} {{ !$item['enabled'] ? 'disabled' : '' }}"
-                                   title="{{ !$item['enabled'] ? ($shell['menu_disabled_tooltip'] ?? 'No disponible.') : '' }}">
+                                   title="{{ !$item['enabled'] ? ($shell['menu_disabled_tooltip'] ?? 'Not available.') : '' }}">
                                     {{ $item['label'] }}
                                 </a>
                             @endif
@@ -69,14 +69,14 @@
                     </div>
                     <form method="POST" action="{{ route('logout') }}">
                         @csrf
-                        <button class="logout-btn" type="submit">Cerrar sesión</button>
+                        <button class="logout-btn" type="submit">Sign out</button>
                     </form>
                 </div>
 
                 <button
                     class="mobile-toggle"
                     type="button"
-                    aria-label="Abrir navegación"
+                    aria-label="Open navigation"
                     aria-expanded="false"
                     aria-controls="mobileNavPanel"
                     data-mobile-nav-toggle
@@ -94,7 +94,7 @@
                         <span class="chip read-only-badge">READ-ONLY</span>
                     @endif
                 </div>
-                <nav class="mobile-links" aria-label="Navegación móvil">
+                <nav class="mobile-links" aria-label="Mobile navigation">
                     @foreach($shell['menu'] as $item)
                         @if($item['visible'])
                             @php($children = collect($item['children'] ?? [])->filter(fn ($child) => $child['visible'] ?? false)->values())
@@ -106,7 +106,7 @@
                                         @foreach($children as $child)
                                             <a href="{{ $child['href'] }}"
                                                class="{{ $activeMenu === $child['key'] ? 'active' : '' }} {{ !$child['enabled'] ? 'disabled' : '' }}"
-                                               title="{{ !$child['enabled'] ? ($shell['menu_disabled_tooltip'] ?? 'No disponible.') : '' }}">
+                                               title="{{ !$child['enabled'] ? ($shell['menu_disabled_tooltip'] ?? 'Not available.') : '' }}">
                                                 <span>{{ $child['label'] }}</span>
                                                 <span>{{ $activeMenu === $child['key'] ? '•' : '›' }}</span>
                                             </a>
@@ -116,7 +116,7 @@
                             @else
                                 <a href="{{ $item['href'] }}"
                                    class="{{ $activeMenu === $item['key'] ? 'active' : '' }} {{ !$item['enabled'] ? 'disabled' : '' }}"
-                                   title="{{ !$item['enabled'] ? ($shell['menu_disabled_tooltip'] ?? 'No disponible.') : '' }}">
+                                   title="{{ !$item['enabled'] ? ($shell['menu_disabled_tooltip'] ?? 'Not available.') : '' }}">
                                     <span>{{ $item['label'] }}</span>
                                     <span>{{ $activeMenu === $item['key'] ? '•' : '›' }}</span>
                                 </a>
@@ -126,7 +126,7 @@
                 </nav>
                 <form method="POST" action="{{ route('logout') }}" style="margin-top:14px;">
                     @csrf
-                    <button class="logout-btn" type="submit" style="width:100%;">Cerrar sesión</button>
+                    <button class="logout-btn" type="submit" style="width:100%;">Sign out</button>
                 </form>
             </div>
         </div>
@@ -135,7 +135,7 @@
     <main class="main">
 
         <div class="read-only-banner">
-            Modo solo lectura activo. No se permiten registros ni cambios hasta verificar licencia/conectividad.
+            Read-only mode is active. Records and changes are blocked until license/connectivity is verified.
         </div>
 
         @yield('content')

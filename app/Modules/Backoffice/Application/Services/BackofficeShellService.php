@@ -42,14 +42,14 @@ final class BackofficeShellService
         return [
             'tenant_name' => $tenant?->name ?? ($isSuperAdmin ? 'Global' : 'Tenant'),
             'tenant_slug' => $tenant?->slug ?? '',
-            'user_name' => $user?->name ?? 'Usuario',
+            'user_name' => $user?->name ?? 'User',
             'plan_code' => $subscription?->plan?->code,
             'is_superadmin' => $isSuperAdmin,
             'read_only_mode' => $readOnlyMode,
             'permissions' => $permissions,
-            'write_block_tooltip' => 'Deshabilitado: tenant en modo solo lectura.',
-            'permission_block_tooltip' => 'No autorizado para tu rol actual.',
-            'menu_disabled_tooltip' => 'Disponible pronto en Backoffice web. Actualmente solo via API.',
+            'write_block_tooltip' => 'Disabled: tenant is in read-only mode.',
+            'permission_block_tooltip' => 'Not authorized for your current role.',
+            'menu_disabled_tooltip' => 'Coming soon in Backoffice web. Currently available only via API.',
             'features' => $features,
             'menu' => [
                 ['key' => 'dashboard', 'label' => 'Dashboard', 'href' => '/backoffice', 'visible' => $permissions['dashboard.view'], 'enabled' => true],

@@ -1,6 +1,6 @@
 @extends('backoffice.layout')
 
-@section('title', 'Backoffice · Ciclos activos')
+@section('title', 'Backoffice · Active Cycles')
 
 @push('head')
 <style>
@@ -167,8 +167,8 @@
         <div class="card card-soft filter-card animate-enter-down">
             <div class="filter-head">
                 <div>
-                    <h1 class="section-heading" style="font-size:1.34rem;margin-bottom:4px;">Ciclos Activos</h1>
-                    <div class="section-subtitle" style="font-size:.92rem;">Vista operativa para identificar rápidamente biomasa, peso promedio y alertas por piscina.</div>
+                    <h1 class="section-heading" style="font-size:1.34rem;margin-bottom:4px;">Active Cycles</h1>
+                    <div class="section-subtitle" style="font-size:.92rem;">Operational view to quickly identify biomass, average weight and alerts per pond.</div>
                 </div>
             </div>
 
@@ -176,7 +176,7 @@
                 <label>
                     <span class="field-label">Farm</span>
                     <select name="farm" class="field-control">
-                        <option value="">Todas</option>
+                        <option value="">All</option>
                         @foreach($vm['options']['farms'] as $farm)
                             <option value="{{ $farm['id'] }}" {{ $vm['filters']['farm'] === $farm['id'] ? 'selected' : '' }}>
                                 {{ $farm['name'] }}
@@ -187,7 +187,7 @@
                 <label>
                     <span class="field-label">Pond</span>
                     <select name="pond" class="field-control">
-                        <option value="">Todas</option>
+                        <option value="">All</option>
                         @foreach($vm['options']['ponds'] as $pond)
                             <option value="{{ $pond['id'] }}" {{ $vm['filters']['pond'] === $pond['id'] ? 'selected' : '' }}>
                                 {{ $pond['code'] }}
@@ -195,8 +195,8 @@
                         @endforeach
                     </select>
                 </label>
-                <button type="submit" class="filter-btn filter-btn--primary">Filtrar</button>
-                <a href="/backoffice/cycles" class="filter-btn" style="text-decoration:none;display:inline-flex;align-items:center;justify-content:center;">Limpiar</a>
+                <button type="submit" class="filter-btn filter-btn--primary">Filter</button>
+                <a href="/backoffice/cycles" class="filter-btn" style="text-decoration:none;display:inline-flex;align-items:center;justify-content:center;">Reset</a>
             </form>
         </div>
 
@@ -207,23 +207,23 @@
                         <div>
                             <div class="cycle-card__title">{{ $row['pond_code'] }} · {{ $row['farm'] }}</div>
                             <div class="cycle-card__meta">
-                                <span>Inicio {{ $row['started_at'] }}</span>
-                                <span class="status-pill">Activo</span>
+                                <span>Started {{ $row['started_at'] }}</span>
+                                <span class="status-pill">Active</span>
                             </div>
                         </div>
                         <div class="cycle-card__right">
                             <div class="badge-stack">
-                                <span class="cycle-badge cycle-badge--bio">Biomasa {{ number_format($row['biomass_kg'],2) }} kg</span>
-                                <span class="cycle-badge cycle-badge--pp">PP {{ $row['latest_pp'] !== null ? number_format($row['latest_pp'],2).' g' : 'N/D' }}</span>
+                                <span class="cycle-badge cycle-badge--bio">Biomass {{ number_format($row['biomass_kg'],2) }} kg</span>
+                                <span class="cycle-badge cycle-badge--pp">PP {{ $row['latest_pp'] !== null ? number_format($row['latest_pp'],2).' g' : 'N/A' }}</span>
                                 <span class="cycle-badge cycle-badge--critical">Critical {{ $row['alerts_critical'] }}</span>
                                 <span class="cycle-badge cycle-badge--warning">Warning {{ $row['alerts_warning'] }}</span>
                             </div>
-                            <span class="detail-cta">Ver detalle</span>
+                            <span class="detail-cta">View detail</span>
                         </div>
                     </div>
                 </a>
             @empty
-                <div class="empty-state animate-enter-down animate-enter-down-delay-1">No hay ciclos activos para los filtros seleccionados.</div>
+                <div class="empty-state animate-enter-down animate-enter-down-delay-1">There are no active cycles for the selected filters.</div>
             @endforelse
         </div>
     </div>

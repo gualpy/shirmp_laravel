@@ -60,7 +60,7 @@ final class BackofficeHomeService
             'kpis' => $kpis,
             'farms' => $farmRows,
             'cta' => [
-                'label' => 'Ver ciclos activos',
+                'label' => 'View active cycles',
                 'href' => '/backoffice/cycles',
             ],
         ];

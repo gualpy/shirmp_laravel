@@ -1,17 +1,17 @@
 @extends('backoffice.layout')
 
-@section('title', 'Backoffice · Piscinas')
+@section('title', 'Backoffice · Ponds')
 
 @section('content')
 @php($canManageProduction = ($shell['permissions']['production.manage'] ?? false) && ! $vm['read_only_mode'])
 <div class="card card-soft animate-enter-down" style="margin-bottom:16px;display:flex;justify-content:space-between;align-items:flex-start;gap:14px;flex-wrap:wrap;">
     <div>
-        <h1 class="section-heading">Piscinas</h1>
-        <div class="section-subtitle">Infraestructura operativa lista para abrir ciclos y sembrar. Filtra por finca para trabajar más rápido.</div>
+        <h1 class="section-heading">Ponds</h1>
+        <div class="section-subtitle">Operational infrastructure ready to open cycles and stock. Filter by farm to work faster.</div>
     </div>
     <div style="display:flex;gap:10px;flex-wrap:wrap;">
-        <a class="cta-secondary" href="/backoffice/farms">Fincas</a>
-        <a class="cta-secondary" href="/backoffice/stocking/create">Nueva siembra</a>
+        <a class="cta-secondary" href="/backoffice/farms">Farms</a>
+        <a class="cta-secondary" href="/backoffice/stocking/create">New Stocking</a>
     </div>
 </div>
 
@@ -21,82 +21,82 @@
 
 <div style="display:grid;grid-template-columns:minmax(360px,440px) minmax(0,1fr);gap:16px;align-items:start;">
     <div class="card animate-enter-down animate-enter-down-delay-1">
-        <h3 class="panel-title">Nueva piscina</h3>
+        <h3 class="panel-title">New pond</h3>
         <form method="GET" action="/backoffice/ponds" style="display:flex;gap:10px;align-items:end;flex-wrap:wrap;margin-bottom:14px;">
             <label style="flex:1 1 220px;">
-                <span class="metric-label">Filtrar por finca</span>
+                <span class="metric-label">Filter by farm</span>
                 <select class="input" name="farm">
-                    <option value="">Todas las fincas</option>
+                    <option value="">All farms</option>
                     @foreach($vm['farm_options'] as $farm)
                         <option value="{{ $farm['id'] }}" @selected((string) $vm['selected_farm_id'] === (string) $farm['id'])>{{ $farm['name'] }}</option>
                     @endforeach
                 </select>
             </label>
-            <button class="cta-secondary" type="submit">Filtrar</button>
+            <button class="cta-secondary" type="submit">Filter</button>
         </form>
 
         <form method="POST" action="/backoffice/ponds" style="display:grid;gap:12px;">
             @csrf
             <label>
-                <span class="metric-label">Finca</span>
+                <span class="metric-label">Farm</span>
                 <select class="input" name="farm_id">
-                    <option value="">Selecciona una finca</option>
+                    <option value="">Select a farm</option>
                     @foreach($vm['farm_options'] as $farm)
                         <option value="{{ $farm['id'] }}" @selected((string) old('farm_id', $vm['selected_farm_id']) === (string) $farm['id'])>{{ $farm['name'] }}</option>
                     @endforeach
                 </select>
             </label>
             <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
-                <label><span class="metric-label">Código</span><input class="input" name="code" value="{{ old('code') }}" placeholder="P04"></label>
-                <label><span class="metric-label">Nombre</span><input class="input" name="name" value="{{ old('name') }}" placeholder="Piscina Este"></label>
+                <label><span class="metric-label">Code</span><input class="input" name="code" value="{{ old('code') }}" placeholder="P04"></label>
+                <label><span class="metric-label">Name</span><input class="input" name="name" value="{{ old('name') }}" placeholder="East Pond"></label>
             </div>
             <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
-                <label><span class="metric-label">Área (ha)</span><input class="input" type="number" step="0.01" min="0.01" name="area_ha" value="{{ old('area_ha') }}"></label>
-                <label><span class="metric-label">Prof. prom. (m)</span><input class="input" type="number" step="0.01" min="0.01" name="avg_depth_m" value="{{ old('avg_depth_m', '1.40') }}"></label>
+                <label><span class="metric-label">Area (ha)</span><input class="input" type="number" step="0.01" min="0.01" name="area_ha" value="{{ old('area_ha') }}"></label>
+                <label><span class="metric-label">Avg. depth (m)</span><input class="input" type="number" step="0.01" min="0.01" name="avg_depth_m" value="{{ old('avg_depth_m', '1.40') }}"></label>
             </div>
             <label style="display:inline-flex;align-items:center;gap:10px;font-size:.92rem;color:var(--muted);">
                 <input type="checkbox" name="is_active" value="1" @checked(old('is_active', true))>
-                Piscina activa y disponible para producción
+                Pond is active and available for production
             </label>
             <div style="display:flex;gap:10px;flex-wrap:wrap;">
-                <button class="cta-primary" type="submit" {{ $canManageProduction ? '' : 'disabled' }} title="{{ $canManageProduction ? 'Crear piscina' : (($shell['permissions']['production.manage'] ?? false) ? $shell['write_block_tooltip'] : $shell['permission_block_tooltip']) }}">Crear piscina</button>
-                <a class="cta-secondary" href="/backoffice/ponds">Limpiar</a>
+                <button class="cta-primary" type="submit" {{ $canManageProduction ? '' : 'disabled' }} title="{{ $canManageProduction ? 'Create pond' : (($shell['permissions']['production.manage'] ?? false) ? $shell['write_block_tooltip'] : $shell['permission_block_tooltip']) }}">Create pond</button>
+                <a class="cta-secondary" href="/backoffice/ponds">Reset</a>
             </div>
         </form>
     </div>
 
     <div class="card animate-enter-down animate-enter-down-delay-2">
-        <h3 class="panel-title">Piscinas registradas</h3>
+        <h3 class="panel-title">Ponds registradas</h3>
         @if($vm['rows'] === [])
-            <div class="section-subtitle">No hay piscinas para el filtro actual.</div>
+            <div class="section-subtitle">There are no ponds for the current filter.</div>
         @else
             <table class="data-table">
                 <thead>
-                <tr><th>Código</th><th>Finca</th><th>Área</th><th>Prof.</th><th>Estado</th><th>Operación</th></tr>
+                <tr><th>Code</th><th>Farm</th><th>Area</th><th>Depth</th><th>Status</th><th>Operation</th></tr>
                 </thead>
                 <tbody>
                 @foreach($vm['rows'] as $row)
                     <tr>
-                        <td><strong>{{ $row['code'] }}</strong><div class="section-subtitle" style="font-size:.82rem;">{{ $row['name'] ?: 'Sin nombre' }}</div></td>
+                        <td><strong>{{ $row['code'] }}</strong><div class="section-subtitle" style="font-size:.82rem;">{{ $row['name'] ?: 'Unnamed' }}</div></td>
                         <td>{{ $row['farm'] }}</td>
                         <td>{{ $row['area_ha'] }} ha</td>
                         <td>{{ $row['avg_depth_m'] ? $row['avg_depth_m'].' m' : 'N/D' }}</td>
                         <td>
                             @if(!$row['is_active'])
-                                <span class="status-badge status-na">inactiva</span>
+                                <span class="status-badge status-na">inactive</span>
                             @elseif($row['has_active_cycle'])
-                                <span class="status-badge status-warning">ciclo activo</span>
+                                <span class="status-badge status-warning">active cycle</span>
                             @else
-                                <span class="status-badge status-active">lista para siembra</span>
+                                <span class="status-badge status-active">ready for stocking</span>
                             @endif
                         </td>
                         <td>
                             @if($row['active_cycle_id'])
-                                <a class="panel-link" href="/backoffice/cycles/{{ $row['active_cycle_id'] }}">Ver ciclo</a>
+                                <a class="panel-link" href="/backoffice/cycles/{{ $row['active_cycle_id'] }}">View cycle</a>
                             @elseif($row['is_active'])
-                                <a class="panel-link" href="/backoffice/stocking/create">Abrir siembra</a>
+                                <a class="panel-link" href="/backoffice/stocking/create">Open stocking</a>
                             @else
-                                <span class="muted">No disponible</span>
+                                <span class="muted">Not available</span>
                             @endif
                         </td>
                     </tr>

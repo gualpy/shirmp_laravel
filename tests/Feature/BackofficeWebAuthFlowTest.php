@@ -52,7 +52,7 @@ final class BackofficeWebAuthFlowTest extends TestCase
 
         $this->get('/backoffice')
             ->assertOk()
-            ->assertSee('Resumen Ejecutivo');
+            ->assertSee('Executive Summary');
     }
 
     /** @return array{Tenant, User} */

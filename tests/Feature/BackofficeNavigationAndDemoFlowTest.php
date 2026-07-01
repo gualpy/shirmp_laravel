@@ -34,8 +34,8 @@ final class BackofficeNavigationAndDemoFlowTest extends TestCase
             ->withHeader('X-Tenant', $tenant->slug)
             ->get('/backoffice')
             ->assertOk()
-            ->assertSee('Resumen Ejecutivo')
-            ->assertSee('Ver ciclos activos');
+            ->assertSee('Executive Summary')
+            ->assertSee('View active cycles');
     }
 
     public function test_cycles_list_renders_and_links_to_detail(): void
@@ -48,7 +48,7 @@ final class BackofficeNavigationAndDemoFlowTest extends TestCase
             ->withHeader('X-Tenant', $tenant->slug)
             ->get('/backoffice/cycles')
             ->assertOk()
-            ->assertSee('Ciclos Activos')
+            ->assertSee('Active Cycles')
             ->assertSee((string) $cycle->pond->code)
             ->assertSee('/backoffice/cycles/'.$cycle->id, false);
 
@@ -89,7 +89,7 @@ final class BackofficeNavigationAndDemoFlowTest extends TestCase
             ->get('/backoffice')
             ->assertOk()
             ->assertHeader('X-Read-Only-Mode', '1')
-            ->assertSee('Modo solo lectura activo');
+            ->assertSee('Read-only mode is active');
     }
 
     public function test_backoffice_cycle_detail_renders_projection_block(): void

@@ -32,8 +32,8 @@ final class BackofficeProductionSetupViewsTest extends TestCase
             ->withSession(['backoffice_tenant_slug' => $tenant->slug])
             ->get('/backoffice/farms')
             ->assertOk()
-            ->assertSee('Fincas')
-            ->assertSee('Nueva finca');
+            ->assertSee('Farms')
+            ->assertSee('New farm');
     }
 
     public function test_ponds_page_loads(): void
@@ -46,8 +46,8 @@ final class BackofficeProductionSetupViewsTest extends TestCase
             ->withSession(['backoffice_tenant_slug' => $tenant->slug])
             ->get('/backoffice/ponds?farm='.$farm->id)
             ->assertOk()
-            ->assertSee('Piscinas')
-            ->assertSee('Nueva piscina');
+            ->assertSee('Ponds')
+            ->assertSee('New pond');
     }
 
     public function test_stocking_page_loads(): void
@@ -69,8 +69,8 @@ final class BackofficeProductionSetupViewsTest extends TestCase
             ->withSession(['backoffice_tenant_slug' => $tenant->slug])
             ->get('/backoffice/stocking/create')
             ->assertOk()
-            ->assertSee('Nueva siembra')
-            ->assertSee('Abrir ciclo y sembrar');
+            ->assertSee('New Stocking')
+            ->assertSee('Open cycle and stock');
     }
 
     public function test_farm_can_be_created_from_backoffice(): void
@@ -83,15 +83,15 @@ final class BackofficeProductionSetupViewsTest extends TestCase
             ->withSession(['backoffice_tenant_slug' => $tenant->slug])
             ->post('/backoffice/farms', [
                 '_token' => $token,
-                'name' => 'Finca Oriente',
+                'name' => 'East Farm',
                 'location' => 'El Oro',
-                'notes' => 'Creada desde backoffice.',
+                'notes' => 'Created from backoffice.',
             ])
             ->assertRedirect('/backoffice/farms');
 
         $this->assertDatabaseHas('farms', [
             'tenant_id' => $tenant->id,
-            'name' => 'Finca Oriente',
+            'name' => 'East Farm',
             'location' => 'El Oro',
         ]);
     }
@@ -109,7 +109,7 @@ final class BackofficeProductionSetupViewsTest extends TestCase
                 '_token' => $pondToken,
                 'farm_id' => $farm->id,
                 'code' => 'P09',
-                'name' => 'Piscina Nueve',
+                'name' => 'Pond Nine',
                 'area_ha' => 3.8,
                 'avg_depth_m' => 1.4,
                 'is_active' => '1',
@@ -130,7 +130,7 @@ final class BackofficeProductionSetupViewsTest extends TestCase
                 'hatchery_code' => 'BC',
                 'batch_code' => 'P09-001',
                 'initial_pp_grams' => '0.05',
-                'cycle_notes' => 'Ciclo abierto desde nueva siembra.',
+                'cycle_notes' => 'Cycle opened from new stocking.',
             ]);
 
         $cycle = Cycle::withoutGlobalScopes()->where('tenant_id', $tenant->id)->where('pond_id', $pond->id)->firstOrFail();

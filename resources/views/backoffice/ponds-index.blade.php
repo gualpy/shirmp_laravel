@@ -6,12 +6,12 @@
 @php($canManageProduction = ($shell['permissions']['production.manage'] ?? false) && ! $vm['read_only_mode'])
 <div class="card card-soft animate-enter-down" style="margin-bottom:16px;display:flex;justify-content:space-between;align-items:flex-start;gap:14px;flex-wrap:wrap;">
     <div>
-        <h1 class="section-heading">Ponds</h1>
-        <div class="section-subtitle">Operational infrastructure ready to open cycles and stock. Filter by farm to work faster.</div>
+        <h1 class="section-heading">{{ __('farms.ponds_title') }}</h1>
+        <div class="section-subtitle">{{ __('farms.ponds_subtitle') }}</div>
     </div>
     <div style="display:flex;gap:10px;flex-wrap:wrap;">
-        <a class="cta-secondary" href="/backoffice/farms">Farms</a>
-        <a class="cta-secondary" href="/backoffice/stocking/create">New Stocking</a>
+        <a class="cta-secondary" href="/backoffice/farms">{{ __('farms.farms_link') }}</a>
+        <a class="cta-secondary" href="/backoffice/stocking/create">{{ __('farms.new_stocking') }}</a>
     </div>
 </div>
 
@@ -24,15 +24,15 @@
         <h3 class="panel-title">New pond</h3>
         <form method="GET" action="/backoffice/ponds" style="display:flex;gap:10px;align-items:end;flex-wrap:wrap;margin-bottom:14px;">
             <label style="flex:1 1 220px;">
-                <span class="metric-label">Filter by farm</span>
+                <span class="metric-label">{{ __('farms.filter_by_farm') }}</span>
                 <select class="input" name="farm">
-                    <option value="">All farms</option>
+                    <option value="">{{ __('farms.all_farms') }}</option>
                     @foreach($vm['farm_options'] as $farm)
                         <option value="{{ $farm['id'] }}" @selected((string) $vm['selected_farm_id'] === (string) $farm['id'])>{{ $farm['name'] }}</option>
                     @endforeach
                 </select>
             </label>
-            <button class="cta-secondary" type="submit">Filter</button>
+            <button class="cta-secondary" type="submit">{{ __('cycles.filter') }}</button>
         </form>
 
         <form method="POST" action="/backoffice/ponds" style="display:grid;gap:12px;">
@@ -40,63 +40,63 @@
             <label>
                 <span class="metric-label">Farm</span>
                 <select class="input" name="farm_id">
-                    <option value="">Select a farm</option>
+                    <option value="">{{ __('farms.select_farm') }}</option>
                     @foreach($vm['farm_options'] as $farm)
                         <option value="{{ $farm['id'] }}" @selected((string) old('farm_id', $vm['selected_farm_id']) === (string) $farm['id'])>{{ $farm['name'] }}</option>
                     @endforeach
                 </select>
             </label>
             <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
-                <label><span class="metric-label">Code</span><input class="input" name="code" value="{{ old('code') }}" placeholder="P04"></label>
-                <label><span class="metric-label">Name</span><input class="input" name="name" value="{{ old('name') }}" placeholder="East Pond"></label>
+                <label><span class="metric-label">{{ __('farms.code') }}</span><input class="input" name="code" value="{{ old('code') }}" placeholder="P04"></label>
+                <label><span class="metric-label">{{ __('farms.name') }}</span><input class="input" name="name" value="{{ old('name') }}" placeholder="East Pond"></label>
             </div>
             <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
-                <label><span class="metric-label">Area (ha)</span><input class="input" type="number" step="0.01" min="0.01" name="area_ha" value="{{ old('area_ha') }}"></label>
-                <label><span class="metric-label">Avg. depth (m)</span><input class="input" type="number" step="0.01" min="0.01" name="avg_depth_m" value="{{ old('avg_depth_m', '1.40') }}"></label>
+                <label><span class="metric-label">{{ __('farms.area_ha') }}</span><input class="input" type="number" step="0.01" min="0.01" name="area_ha" value="{{ old('area_ha') }}"></label>
+                <label><span class="metric-label">{{ __('farms.depth_m') }}</span><input class="input" type="number" step="0.01" min="0.01" name="avg_depth_m" value="{{ old('avg_depth_m', '1.40') }}"></label>
             </div>
             <label style="display:inline-flex;align-items:center;gap:10px;font-size:.92rem;color:var(--muted);">
                 <input type="checkbox" name="is_active" value="1" @checked(old('is_active', true))>
-                Pond is active and available for production
+                {{ __('farms.pond_active') }}
             </label>
             <div style="display:flex;gap:10px;flex-wrap:wrap;">
-                <button class="cta-primary" type="submit" {{ $canManageProduction ? '' : 'disabled' }} title="{{ $canManageProduction ? 'Create pond' : (($shell['permissions']['production.manage'] ?? false) ? $shell['write_block_tooltip'] : $shell['permission_block_tooltip']) }}">Create pond</button>
-                <a class="cta-secondary" href="/backoffice/ponds">Reset</a>
+                <button class="cta-primary" type="submit" {{ $canManageProduction ? '' : 'disabled' }} title="{{ $canManageProduction ? 'Create pond' : (($shell['permissions']['production.manage'] ?? false) ? $shell['write_block_tooltip'] : $shell['permission_block_tooltip']) }}">{{ __('farms.create_pond') }}</button>
+                <a class="cta-secondary" href="/backoffice/ponds">{{ __('cycles.reset') }}</a>
             </div>
         </form>
     </div>
 
     <div class="card animate-enter-down animate-enter-down-delay-2">
-        <h3 class="panel-title">Ponds registradas</h3>
+        <h3 class="panel-title">{{ __('farms.ponds_registered') }}</h3>
         @if($vm['rows'] === [])
-            <div class="section-subtitle">There are no ponds for the current filter.</div>
+            <div class="section-subtitle">{{ __('farms.no_ponds') }}</div>
         @else
             <table class="data-table">
                 <thead>
-                <tr><th>Code</th><th>Farm</th><th>Area</th><th>Depth</th><th>Status</th><th>Operation</th></tr>
+                <tr><th>{{ __('farms.code') }}</th><th>{{ __('farms.farm') }}</th><th>{{ __('farms.area_ha') }}</th><th>{{ __('farms.depth_m') }}</th><th>{{ __('farms.status') }}</th><th>{{ __('farms.operation') }}</th></tr>
                 </thead>
                 <tbody>
                 @foreach($vm['rows'] as $row)
                     <tr>
-                        <td><strong>{{ $row['code'] }}</strong><div class="section-subtitle" style="font-size:.82rem;">{{ $row['name'] ?: 'Unnamed' }}</div></td>
+                        <td><strong>{{ $row['code'] }}</strong><div class="section-subtitle" style="font-size:.82rem;">{{ $row['name'] ?: __('farms.unnamed') }}</div></td>
                         <td>{{ $row['farm'] }}</td>
                         <td>{{ $row['area_ha'] }} ha</td>
                         <td>{{ $row['avg_depth_m'] ? $row['avg_depth_m'].' m' : 'N/D' }}</td>
                         <td>
                             @if(!$row['is_active'])
-                                <span class="status-badge status-na">inactive</span>
+                                <span class="status-badge status-na">{{ __('farms.inactive') }}</span>
                             @elseif($row['has_active_cycle'])
-                                <span class="status-badge status-warning">active cycle</span>
+                                <span class="status-badge status-warning">{{ __('farms.active_cycle') }}</span>
                             @else
-                                <span class="status-badge status-active">ready for stocking</span>
+                                <span class="status-badge status-active">{{ __('farms.ready_stocking') }}</span>
                             @endif
                         </td>
                         <td>
                             @if($row['active_cycle_id'])
-                                <a class="panel-link" href="/backoffice/cycles/{{ $row['active_cycle_id'] }}">View cycle</a>
+                                <a class="panel-link" href="/backoffice/cycles/{{ $row['active_cycle_id'] }}">{{ __('farms.view_cycle') }}</a>
                             @elseif($row['is_active'])
-                                <a class="panel-link" href="/backoffice/stocking/create">Open stocking</a>
+                                <a class="panel-link" href="/backoffice/stocking/create">{{ __('farms.open_stocking') }}</a>
                             @else
-                                <span class="muted">Not available</span>
+                                <span class="muted">{{ __('farms.not_available') }}</span>
                             @endif
                         </td>
                     </tr>

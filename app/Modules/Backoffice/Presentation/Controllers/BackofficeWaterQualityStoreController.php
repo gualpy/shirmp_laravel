@@ -25,8 +25,8 @@ final class BackofficeWaterQualityStoreController extends Controller
     ): RedirectResponse {
         $tenant = $tenantContext->currentTenant();
         abort_if($tenant === null, 400, 'Tenant could not be resolved.');
-        abort_unless($saasService->checkFeature($tenant, 'water_quality'), 403, 'Water Quality no disponible en el plan actual.');
-        abort_if((bool) $licenseService->requireActiveOrGrace($tenant)['read_only_mode'], 403, 'La suscripción actual está en modo solo lectura.');
+        abort_unless($saasService->checkFeature($tenant, 'water_quality'), 403, 'Water Quality is not available in the current plan.');
+        abort_if((bool) $licenseService->requireActiveOrGrace($tenant)['read_only_mode'], 403, 'The current subscription is in read-only mode.');
 
         $payload = $request->normalized();
         $pond = Pond::query()->findOrFail($payload['pond_id']);
@@ -37,7 +37,7 @@ final class BackofficeWaterQualityStoreController extends Controller
 
         if ($cycle === null) {
             throw ValidationException::withMessages([
-                'pond' => ['La piscina seleccionada no tiene un ciclo activo disponible.'],
+                'pond' => ['The selected pond does not have an active cycle available.'],
             ]);
         }
 
@@ -45,6 +45,6 @@ final class BackofficeWaterQualityStoreController extends Controller
             'measured_by_user_id' => $request->user()?->id,
         ])));
 
-        return redirect('/backoffice/water?cycle='.$cycle->id)->with('status', 'Registro de calidad de agua guardado.');
+        return redirect('/backoffice/water?cycle='.$cycle->id)->with('status', 'Water quality entry saved.');
     }
 }

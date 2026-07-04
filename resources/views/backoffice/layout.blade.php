@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -17,8 +17,8 @@
                         <img src="{{ asset('assets/img/logo.png') }}" alt="ShrimpApp">
                     </div>
                     <div class="brand-copy">
-                        <div class="brand">GAMBA BACKOFFICE</div>
-                        <div class="brand-subtitle">Operational and management control for aquaculture</div>
+                        <div class="brand">{{ __('layout.brand') }}</div>
+                        <div class="brand-subtitle">{{ __('layout.brand_subtitle') }}</div>
                     </div>
                 </div>
 
@@ -64,19 +64,19 @@
                         <span class="chip">{{ $shell['user_name'] }}</span>
                         <span class="chip">Plan: {{ $shell['plan_code'] ?? 'N/A' }}</span>
                         @if($shell['read_only_mode'])
-                            <span class="chip read-only-badge">READ-ONLY</span>
+                            <span class="chip read-only-badge">{{ __('layout.read_only') }}</span>
                         @endif
                     </div>
                     <form method="POST" action="{{ route('logout') }}">
                         @csrf
-                        <button class="logout-btn" type="submit">Sign out</button>
+                        <button class="logout-btn" type="submit">{{ __('layout.sign_out') }}</button>
                     </form>
                 </div>
 
                 <button
                     class="mobile-toggle"
                     type="button"
-                    aria-label="Open navigation"
+                    aria-label="{{ __('layout.open_navigation') }}"
                     aria-expanded="false"
                     aria-controls="mobileNavPanel"
                     data-mobile-nav-toggle
@@ -91,7 +91,7 @@
                     <span class="chip">{{ $shell['user_name'] }}</span>
                     <span class="chip">Plan: {{ $shell['plan_code'] ?? 'N/A' }}</span>
                     @if($shell['read_only_mode'])
-                        <span class="chip read-only-badge">READ-ONLY</span>
+                        <span class="chip read-only-badge">{{ __('layout.read_only') }}</span>
                     @endif
                 </div>
                 <nav class="mobile-links" aria-label="Mobile navigation">
@@ -126,7 +126,7 @@
                 </nav>
                 <form method="POST" action="{{ route('logout') }}" style="margin-top:14px;">
                     @csrf
-                    <button class="logout-btn" type="submit" style="width:100%;">Sign out</button>
+                    <button class="logout-btn" type="submit" style="width:100%;">{{ __('layout.sign_out') }}</button>
                 </form>
             </div>
         </div>
@@ -135,7 +135,7 @@
     <main class="main">
 
         <div class="read-only-banner">
-            Read-only mode is active. Records and changes are blocked until license/connectivity is verified.
+            {{ __('layout.read_only_banner') }}
         </div>
 
         @yield('content')

@@ -184,16 +184,16 @@ final class CycleDetailViewService
         $waterEnabled = $tenant ? $this->saasService->checkFeature($tenant, 'water_quality') : true;
 
         $actions = [
-            ['key' => 'sampling', 'label' => 'Registrar Muestreo', 'href' => '/api/v1/cycles/'.$cycle->id.'/samplings', 'method' => 'POST', 'requires_feature' => 'water_quality', 'feature_enabled' => $waterEnabled],
-            ['key' => 'feeding', 'label' => 'Registrar Alimentación', 'href' => '/api/v1/cycles/'.$cycle->id.'/feed-entries', 'method' => 'POST', 'requires_feature' => null, 'feature_enabled' => true],
-            ['key' => 'harvest', 'label' => 'Registrar Cosecha', 'href' => '/api/v1/cycles/'.$cycle->id.'/harvests', 'method' => 'POST', 'requires_feature' => null, 'feature_enabled' => true],
+            ['key' => 'sampling', 'label' => 'Record Sampling', 'href' => '/api/v1/cycles/'.$cycle->id.'/samplings', 'method' => 'POST', 'requires_feature' => 'water_quality', 'feature_enabled' => $waterEnabled],
+            ['key' => 'feeding', 'label' => 'Record Feeding', 'href' => '/api/v1/cycles/'.$cycle->id.'/feed-entries', 'method' => 'POST', 'requires_feature' => null, 'feature_enabled' => true],
+            ['key' => 'harvest', 'label' => 'Record Harvest', 'href' => '/api/v1/cycles/'.$cycle->id.'/harvests', 'method' => 'POST', 'requires_feature' => null, 'feature_enabled' => true],
         ];
 
         return collect($actions)->map(function (array $action) use ($readOnlyMode): array {
             $disabled = $readOnlyMode || ! $action['feature_enabled'];
             $reason = $readOnlyMode
-                ? 'Deshabilitado por modo solo lectura.'
-                : (! $action['feature_enabled'] ? 'No disponible en el plan actual.' : '');
+                ? 'Disabled in read-only mode.'
+                : (! $action['feature_enabled'] ? 'Not available in the current plan.' : '');
 
             $action['disabled'] = $disabled;
             $action['disabled_reason'] = $reason;

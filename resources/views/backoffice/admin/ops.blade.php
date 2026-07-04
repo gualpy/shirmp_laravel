@@ -9,16 +9,16 @@
 </div>
 
 <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;margin-bottom:16px;">
-    <div class="card"><div class="metric-label">App Env</div><div class="metric-value">{{ $vm['app_env'] }}</div></div>
-    <div class="card"><div class="metric-label">App Debug</div><div class="metric-value">{{ $vm['app_debug'] ? 'true' : 'false' }}</div></div>
-    <div class="card"><div class="metric-label">Queue</div><div class="metric-value">{{ $vm['queue_connection'] }}</div></div>
-    <div class="card"><div class="metric-label">Cache</div><div class="metric-value">{{ $vm['cache_store'] }}</div></div>
-    <div class="card"><div class="metric-label">DB Driver</div><div class="metric-value">{{ $vm['db_driver'] }}</div></div>
-    <div class="card"><div class="metric-label">Ready</div><div class="metric-value">{{ $vm['readiness']['status'] }}</div></div>
+    <div class="card"><div class="metric-label">{{ __('admin.app_env') }}</div><div class="metric-value">{{ $vm['app_env'] }}</div></div>
+    <div class="card"><div class="metric-label">{{ __('admin.app_debug') }}</div><div class="metric-value">{{ $vm['app_debug'] ? 'true' : 'false' }}</div></div>
+    <div class="card"><div class="metric-label">{{ __('admin.queue') }}</div><div class="metric-value">{{ $vm['queue_connection'] }}</div></div>
+    <div class="card"><div class="metric-label">{{ __('admin.cache') }}</div><div class="metric-value">{{ $vm['cache_store'] }}</div></div>
+    <div class="card"><div class="metric-label">{{ __('admin.db_driver') }}</div><div class="metric-value">{{ $vm['db_driver'] }}</div></div>
+    <div class="card"><div class="metric-label">{{ __('admin.ready') }}</div><div class="metric-value">{{ $vm['readiness']['status'] }}</div></div>
 </div>
 
 <div class="card" style="margin-bottom:16px;">
-    <div class="section-heading" style="font-size:1.1rem;">Readiness</div>
+    <div class="section-heading" style="font-size:1.1rem;">{{ __('admin.readiness') }}</div>
     <div class="section-subtitle" style="margin-bottom:14px;">Chequeo simple de `app key`, base de datos y cache. No expone secretos.</div>
     <div style="display:flex;gap:10px;flex-wrap:wrap;">
         @foreach ($vm['readiness']['checks'] as $check => $ok)
@@ -31,7 +31,7 @@
 </div>
 
 <div class="card" style="margin-bottom:16px;">
-    <div class="section-heading" style="font-size:1.1rem;">Backups</div>
+    <div class="section-heading" style="font-size:1.1rem;">{{ __('admin.backups') }}</div>
     <div class="section-subtitle" style="margin-bottom:14px;">Ultimos backups detectados en almacenamiento no publico de Laravel.</div>
     <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px;">
         <span class="chip">DB backups: {{ $vm['backup_counts']['database'] }}</span>
@@ -41,24 +41,24 @@
     </div>
     <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:12px;">
         <div style="padding:12px 14px;border:1px solid var(--border);border-radius:14px;background:rgba(255,255,255,.78);">
-            <strong>Database</strong>
+            <strong>{{ __('admin.database_backup') }}</strong>
             <div class="muted" style="margin-top:8px;">
                 @if($vm['backups']['database'])
                     {{ $vm['backups']['database']['name'] }}<br>
                     {{ $vm['backups']['database']['modified_at'] }}
                 @else
-                    No detectado
+                    {{ __('admin.not_detected') }}
                 @endif
             </div>
         </div>
         <div style="padding:12px 14px;border:1px solid var(--border);border-radius:14px;background:rgba(255,255,255,.78);">
-            <strong>Files</strong>
+            <strong>{{ __('admin.files_backup') }}</strong>
             <div class="muted" style="margin-top:8px;">
                 @if($vm['backups']['files'])
                     {{ $vm['backups']['files']['name'] }}<br>
                     {{ $vm['backups']['files']['modified_at'] }}
                 @else
-                    No detectado
+                    {{ __('admin.not_detected') }}
                 @endif
             </div>
         </div>
@@ -66,7 +66,7 @@
 </div>
 
 <div class="card">
-    <div class="section-heading" style="font-size:1.1rem;">Deployment Docs</div>
+    <div class="section-heading" style="font-size:1.1rem;">{{ __('admin.deployment_docs') }}</div>
     <div class="section-subtitle" style="margin-bottom:14px;">Guías operativas para `.env`, logs, queues, optimize, permisos y backup.</div>
     <div style="display:grid;gap:10px;">
         @foreach ($vm['docs'] as $doc)

@@ -23,7 +23,7 @@ final class BackofficeDailyMortalityStoreController extends Controller
     ): RedirectResponse {
         $tenant = $tenantContext->currentTenant();
         abort_if($tenant === null, 400, 'Tenant could not be resolved.');
-        abort_if((bool) $licenseService->requireActiveOrGrace($tenant)['read_only_mode'], 403, 'La suscripción actual está en modo solo lectura.');
+        abort_if((bool) $licenseService->requireActiveOrGrace($tenant)['read_only_mode'], 403, 'The current subscription is in read-only mode.');
 
         $cycle = Cycle::query()->findOrFail($cycleId);
         $pond = Pond::query()->findOrFail((int) $request->validated()['pond_id']);
@@ -35,6 +35,6 @@ final class BackofficeDailyMortalityStoreController extends Controller
             ['created_by' => $request->user()?->id],
         )));
 
-        return redirect('/backoffice/cycles/'.$cycleId.'/mortalities')->with('status', 'Mortalidad diaria registrada.');
+        return redirect('/backoffice/cycles/'.$cycleId.'/mortalities')->with('status', 'Daily mortality recorded.');
     }
 }

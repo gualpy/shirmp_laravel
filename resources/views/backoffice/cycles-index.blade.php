@@ -167,16 +167,16 @@
         <div class="card card-soft filter-card animate-enter-down">
             <div class="filter-head">
                 <div>
-                    <h1 class="section-heading" style="font-size:1.34rem;margin-bottom:4px;">Active Cycles</h1>
-                    <div class="section-subtitle" style="font-size:.92rem;">Operational view to quickly identify biomass, average weight and alerts per pond.</div>
+                    <h1 class="section-heading" style="font-size:1.34rem;margin-bottom:4px;">{{ __('cycles.title') }}</h1>
+                    <div class="section-subtitle" style="font-size:.92rem;">{{ __('cycles.subtitle') }}</div>
                 </div>
             </div>
 
             <form method="GET" action="/backoffice/cycles" class="filter-grid">
                 <label>
-                    <span class="field-label">Farm</span>
+                    <span class="field-label">{{ __('cycles.farm') }}</span>
                     <select name="farm" class="field-control">
-                        <option value="">All</option>
+                        <option value="">{{ __('cycles.all') }}</option>
                         @foreach($vm['options']['farms'] as $farm)
                             <option value="{{ $farm['id'] }}" {{ $vm['filters']['farm'] === $farm['id'] ? 'selected' : '' }}>
                                 {{ $farm['name'] }}
@@ -185,9 +185,9 @@
                     </select>
                 </label>
                 <label>
-                    <span class="field-label">Pond</span>
+                    <span class="field-label">{{ __('cycles.pond') }}</span>
                     <select name="pond" class="field-control">
-                        <option value="">All</option>
+                        <option value="">{{ __('cycles.all') }}</option>
                         @foreach($vm['options']['ponds'] as $pond)
                             <option value="{{ $pond['id'] }}" {{ $vm['filters']['pond'] === $pond['id'] ? 'selected' : '' }}>
                                 {{ $pond['code'] }}
@@ -195,8 +195,8 @@
                         @endforeach
                     </select>
                 </label>
-                <button type="submit" class="filter-btn filter-btn--primary">Filter</button>
-                <a href="/backoffice/cycles" class="filter-btn" style="text-decoration:none;display:inline-flex;align-items:center;justify-content:center;">Reset</a>
+                <button type="submit" class="filter-btn filter-btn--primary">{{ __('cycles.filter') }}</button>
+                <a href="/backoffice/cycles" class="filter-btn" style="text-decoration:none;display:inline-flex;align-items:center;justify-content:center;">{{ __('cycles.reset') }}</a>
             </form>
         </div>
 
@@ -207,23 +207,23 @@
                         <div>
                             <div class="cycle-card__title">{{ $row['pond_code'] }} · {{ $row['farm'] }}</div>
                             <div class="cycle-card__meta">
-                                <span>Started {{ $row['started_at'] }}</span>
-                                <span class="status-pill">Active</span>
+                                <span>{{ __('cycles.started') }} {{ $row['started_at'] }}</span>
+                                <span class="status-pill">{{ __('cycles.active') }}</span>
                             </div>
                         </div>
                         <div class="cycle-card__right">
                             <div class="badge-stack">
-                                <span class="cycle-badge cycle-badge--bio">Biomass {{ number_format($row['biomass_kg'],2) }} kg</span>
-                                <span class="cycle-badge cycle-badge--pp">PP {{ $row['latest_pp'] !== null ? number_format($row['latest_pp'],2).' g' : 'N/A' }}</span>
-                                <span class="cycle-badge cycle-badge--critical">Critical {{ $row['alerts_critical'] }}</span>
-                                <span class="cycle-badge cycle-badge--warning">Warning {{ $row['alerts_warning'] }}</span>
+                                <span class="cycle-badge cycle-badge--bio">{{ __('cycles.biomass') }} {{ number_format($row['biomass_kg'],2) }} kg</span>
+                                <span class="cycle-badge cycle-badge--pp">{{ __('cycles.avg_weight') }} {{ $row['latest_pp'] !== null ? number_format($row['latest_pp'],2).' g' : 'N/A' }}</span>
+                                <span class="cycle-badge cycle-badge--critical">{{ __('cycles.critical') }} {{ $row['alerts_critical'] }}</span>
+                                <span class="cycle-badge cycle-badge--warning">{{ __('cycles.warning') }} {{ $row['alerts_warning'] }}</span>
                             </div>
-                            <span class="detail-cta">View detail</span>
+                            <span class="detail-cta">{{ __('cycles.view_detail') }}</span>
                         </div>
                     </div>
                 </a>
             @empty
-                <div class="empty-state animate-enter-down animate-enter-down-delay-1">There are no active cycles for the selected filters.</div>
+                <div class="empty-state animate-enter-down animate-enter-down-delay-1">{{ __('cycles.no_cycles') }}</div>
             @endforelse
         </div>
     </div>

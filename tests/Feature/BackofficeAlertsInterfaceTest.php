@@ -17,6 +17,7 @@ use App\Modules\SaaS\Domain\Models\Plan;
 use App\Modules\SaaS\Domain\Models\TenantSubscription;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Str;
 use Tests\TestCase;
 
 final class BackofficeAlertsInterfaceTest extends TestCase
@@ -33,7 +34,7 @@ final class BackofficeAlertsInterfaceTest extends TestCase
             ->withHeader('X-Tenant', $tenant->slug)
             ->get('/backoffice/alerts')
             ->assertOk()
-            ->assertSee('Alertas Operativas')
+            ->assertSee('Operational Alerts')
             ->assertSee($alert->message);
     }
 
@@ -63,9 +64,11 @@ final class BackofficeAlertsInterfaceTest extends TestCase
         $this->activeSubscription($tenant);
         $alert = $this->makeAlert($tenant, 'warning', 'LOW_GROWTH', 'Revisar crecimiento.');
 
+        $token = $this->csrfTokenFor($user, $tenant, '/backoffice/alerts');
+
         $this->actingAs($user)
             ->withHeader('X-Tenant', $tenant->slug)
-            ->post('/backoffice/alerts/'.$alert->id.'/acknowledge')
+            ->post('/backoffice/alerts/'.$alert->id.'/acknowledge', ['_token' => $token])
             ->assertRedirect();
 
         $this->assertDatabaseHas('alert_events', [
@@ -80,9 +83,11 @@ final class BackofficeAlertsInterfaceTest extends TestCase
         $this->activeSubscription($tenant);
         $alert = $this->makeAlert($tenant, 'critical', 'HIGH_BIOMASS', 'Resolver biomasa elevada.');
 
+        $token = $this->csrfTokenFor($user, $tenant, '/backoffice/alerts');
+
         $this->actingAs($user)
             ->withHeader('X-Tenant', $tenant->slug)
-            ->post('/backoffice/alerts/'.$alert->id.'/resolve')
+            ->post('/backoffice/alerts/'.$alert->id.'/resolve', ['_token' => $token])
             ->assertRedirect();
 
         $this->assertDatabaseHas('alert_events', [
@@ -107,9 +112,11 @@ final class BackofficeAlertsInterfaceTest extends TestCase
             ->assertOk()
             ->assertDontSee($alertA->message);
 
+        $token = $this->csrfTokenFor($userB, $tenantB, '/backoffice/alerts');
+
         $this->actingAs($userB)
             ->withHeader('X-Tenant', $tenantB->slug)
-            ->post('/backoffice/alerts/'.$alertA->id.'/acknowledge')
+            ->post('/backoffice/alerts/'.$alertA->id.'/acknowledge', ['_token' => $token])
             ->assertNotFound();
     }
 
@@ -187,6 +194,17 @@ final class BackofficeAlertsInterfaceTest extends TestCase
         ]);
 
         return $cycle;
+    }
+
+    private function csrfTokenFor(User $user, Tenant $tenant, string $url): string
+    {
+        $response = $this->actingAs($user)
+            ->withSession(['backoffice_tenant_slug' => $tenant->slug])
+            ->get($url);
+
+        preg_match('/name="_token" value="([^"]+)"/', $response->getContent(), $matches);
+
+        return $matches[1] ?? Str::random(40);
     }
 
     private function seedAlert(Tenant $tenant, Farm $farm, Cycle $cycle, string $severity, string $ruleCode, string $message): AlertEvent

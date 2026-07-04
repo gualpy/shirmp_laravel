@@ -20,6 +20,7 @@ use App\Modules\SaaS\Domain\Models\Plan;
 use App\Modules\SaaS\Domain\Models\TenantSubscription;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Str;
 use Tests\TestCase;
 
 final class BackofficeCycleCostsInterfaceTest extends TestCase
@@ -36,7 +37,7 @@ final class BackofficeCycleCostsInterfaceTest extends TestCase
             ->withHeader('X-Tenant', $tenant->slug)
             ->get('/backoffice/cycles/'.$cycle->id.'/costs')
             ->assertOk()
-            ->assertSee('Costos del Ciclo #'.$cycle->id);
+            ->assertSee('Cycle Costs #'.$cycle->id);
     }
 
     public function test_cycle_costs_page_shows_summary(): void
@@ -91,9 +92,12 @@ final class BackofficeCycleCostsInterfaceTest extends TestCase
         $this->activeSubscription($tenant, true);
         $cycle = $this->makeCycle($tenant, 'CO-3');
 
+        $token = $this->csrfTokenFor($user, $tenant, '/backoffice/cycles/'.$cycle->id.'/costs');
+
         $this->actingAs($user)
             ->withHeader('X-Tenant', $tenant->slug)
             ->post('/backoffice/cycles/'.$cycle->id.'/costs', [
+                '_token' => $token,
                 'cost_type' => 'fuel',
                 'amount' => 42.25,
                 'occurred_at' => '2026-03-12',
@@ -115,9 +119,12 @@ final class BackofficeCycleCostsInterfaceTest extends TestCase
         $this->activeReadOnlySubscription($tenant, true);
         $cycle = $this->makeCycle($tenant, 'CO-4');
 
+        $token = $this->csrfTokenFor($user, $tenant, '/backoffice/cycles/'.$cycle->id.'/costs');
+
         $this->actingAs($user)
             ->withHeader('X-Tenant', $tenant->slug)
             ->post('/backoffice/cycles/'.$cycle->id.'/costs', [
+                '_token' => $token,
                 'cost_type' => 'labor',
                 'amount' => 35,
                 'occurred_at' => '2026-03-12',
@@ -214,6 +221,17 @@ final class BackofficeCycleCostsInterfaceTest extends TestCase
             'last_verified_at' => now()->subDay(),
             'verification_source' => 'cloud',
         ]);
+    }
+
+    private function csrfTokenFor(User $user, Tenant $tenant, string $url): string
+    {
+        $response = $this->actingAs($user)
+            ->withSession(['backoffice_tenant_slug' => $tenant->slug])
+            ->get($url);
+
+        preg_match('/name="_token" value="([^"]+)"/', $response->getContent(), $matches);
+
+        return $matches[1] ?? Str::random(40);
     }
 
     private function makeCycle(Tenant $tenant, string $pondCode): Cycle

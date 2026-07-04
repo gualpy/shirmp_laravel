@@ -1,6 +1,6 @@
 @extends('backoffice.layout')
 
-@section('title', 'Backoffice · Alertas')
+@section('title', 'Backoffice · Alerts')
 
 @push('head')
 <style>
@@ -196,10 +196,10 @@
         <div class="card card-soft alerts-filter-card animate-enter-down">
             <div style="display:flex;justify-content:space-between;align-items:flex-end;gap:12px;flex-wrap:wrap;margin-bottom:14px;">
                 <div>
-                    <h1 class="section-heading" style="font-size:1.34rem;margin-bottom:4px;">Alertas Operativas</h1>
-                    <div class="section-subtitle" style="font-size:.92rem;">Vista central para priorizar problemas por finca, piscina y ciclo sin perder contexto operativo.</div>
+                    <h1 class="section-heading" style="font-size:1.34rem;margin-bottom:4px;">{{ __('alerts.title') }}</h1>
+                    <div class="section-subtitle" style="font-size:.92rem;">{{ __('alerts.subtitle') }}</div>
                 </div>
-                <a href="/backoffice/alerts/export.xlsx" class="filter-btn">Exportar Excel</a>
+                <a href="/backoffice/alerts/export.xlsx" class="filter-btn">{{ __('alerts.export_excel') }}</a>
             </div>
 
             @if(session('status'))
@@ -208,82 +208,82 @@
 
             <form method="GET" action="/backoffice/alerts" class="alerts-filter-grid" style="margin-top:14px;">
                 <label>
-                    <span class="field-label">Farm</span>
+                    <span class="field-label">{{ __('alerts.farm') }}</span>
                     <select name="farm" class="field-control">
-                        <option value="">Todas</option>
+                        <option value="">{{ __('alerts.all') }}</option>
                         @foreach($vm['options']['farms'] as $farm)
                             <option value="{{ $farm['id'] }}" {{ $vm['filters']['farm'] === $farm['id'] ? 'selected' : '' }}>{{ $farm['name'] }}</option>
                         @endforeach
                     </select>
                 </label>
                 <label>
-                    <span class="field-label">Pond</span>
+                    <span class="field-label">{{ __('alerts.pond') }}</span>
                     <select name="pond" class="field-control">
-                        <option value="">Todas</option>
+                        <option value="">{{ __('alerts.all') }}</option>
                         @foreach($vm['options']['ponds'] as $pond)
                             <option value="{{ $pond['id'] }}" {{ $vm['filters']['pond'] === $pond['id'] ? 'selected' : '' }}>{{ $pond['code'] }}</option>
                         @endforeach
                     </select>
                 </label>
                 <label>
-                    <span class="field-label">Cycle</span>
+                    <span class="field-label">{{ __('alerts.cycle') }}</span>
                     <select name="cycle" class="field-control">
-                        <option value="">Todos</option>
+                        <option value="">{{ __('alerts.all') }}</option>
                         @foreach($vm['options']['cycles'] as $cycle)
                             <option value="{{ $cycle['id'] }}" {{ $vm['filters']['cycle'] === $cycle['id'] ? 'selected' : '' }}>{{ $cycle['label'] }}</option>
                         @endforeach
                     </select>
                 </label>
                 <label>
-                    <span class="field-label">Severidad</span>
+                    <span class="field-label">{{ __('alerts.severity') }}</span>
                     <select name="severity" class="field-control">
-                        <option value="">Todas</option>
+                        <option value="">{{ __('alerts.all') }}</option>
                         @foreach($vm['options']['severities'] as $severity)
                             <option value="{{ $severity }}" {{ $vm['filters']['severity'] === $severity ? 'selected' : '' }}>{{ ucfirst($severity) }}</option>
                         @endforeach
                     </select>
                 </label>
                 <label>
-                    <span class="field-label">Estado</span>
+                    <span class="field-label">{{ __('alerts.state') }}</span>
                     <select name="state" class="field-control">
-                        <option value="">Todos</option>
+                        <option value="">{{ __('alerts.all') }}</option>
                         @foreach($vm['options']['states'] as $state)
                             <option value="{{ $state }}" {{ $vm['filters']['state'] === $state ? 'selected' : '' }}>{{ ucfirst($state) }}</option>
                         @endforeach
                     </select>
                 </label>
                 <label>
-                    <span class="field-label">Fecha desde</span>
+                    <span class="field-label">{{ __('alerts.date_from') }}</span>
                     <input type="date" name="date_from" value="{{ $vm['filters']['date_from'] }}" class="field-control">
                 </label>
                 <label>
-                    <span class="field-label">Fecha hasta</span>
+                    <span class="field-label">{{ __('alerts.date_to') }}</span>
                     <input type="date" name="date_to" value="{{ $vm['filters']['date_to'] }}" class="field-control">
                 </label>
                 <div class="filter-actions">
-                    <button type="submit" class="filter-btn filter-btn--primary">Filtrar</button>
-                    <a href="/backoffice/alerts" class="filter-btn">Limpiar</a>
+                    <button type="submit" class="filter-btn filter-btn--primary">{{ __('alerts.filter') }}</button>
+                    <a href="/backoffice/alerts" class="filter-btn">{{ __('alerts.reset') }}</a>
                 </div>
             </form>
         </div>
 
         <div class="card animate-enter-down animate-enter-down-delay-1">
             @if($vm['rows'] === [])
-                <div class="empty-state">No hay alertas activas para los filtros seleccionados.</div>
+                <div class="empty-state">{{ __('alerts.no_alerts') }}</div>
             @else
                 <div class="alerts-table-wrap">
                     <table class="alerts-table">
                         <thead>
                             <tr>
-                                <th>Fecha</th>
-                                <th>Farm</th>
-                                <th>Pond</th>
-                                <th>Cycle</th>
-                                <th>Tipo</th>
-                                <th>Severidad</th>
-                                <th>Mensaje</th>
-                                <th>Estado</th>
-                                <th>Acciones</th>
+                                <th>{{ __('alerts.date') }}</th>
+                                <th>{{ __('alerts.farm') }}</th>
+                                <th>{{ __('alerts.pond') }}</th>
+                                <th>{{ __('alerts.cycle') }}</th>
+                                <th>{{ __('alerts.type') }}</th>
+                                <th>{{ __('alerts.severity') }}</th>
+                                <th>{{ __('alerts.message') }}</th>
+                                <th>{{ __('alerts.state') }}</th>
+                                <th>{{ __('alerts.actions') }}</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -303,17 +303,17 @@
                                                 <form method="POST" action="/backoffice/alerts/{{ $row['id'] }}/acknowledge">
                                                     @csrf
                                                     <button type="submit" class="action-btn action-btn--ack" {{ $row['can_acknowledge'] ? '' : 'disabled' }}>
-                                                        Reconocer
+                                                        {{ __('alerts.acknowledge') }}
                                                     </button>
                                                 </form>
                                                 <form method="POST" action="/backoffice/alerts/{{ $row['id'] }}/resolve">
                                                     @csrf
                                                     <button type="submit" class="action-btn action-btn--resolve" {{ $row['can_resolve'] ? '' : 'disabled' }}>
-                                                        Resolver
+                                                        {{ __('alerts.resolve') }}
                                                     </button>
                                                 </form>
                                             @else
-                                                <span class="muted">Solo lectura</span>
+                                                <span class="muted">{{ __('alerts.read_only') }}</span>
                                             @endif
                                         </div>
                                     </td>
@@ -325,7 +325,7 @@
 
                 <div class="pager">
                     <div>
-                        Mostrando {{ $vm['pagination']->firstItem() ?? 0 }}-{{ $vm['pagination']->lastItem() ?? 0 }} de {{ $vm['pagination']->total() }} alertas
+                        {{ __('alerts.showing') }} {{ $vm['pagination']->firstItem() ?? 0 }}-{{ $vm['pagination']->lastItem() ?? 0 }} {{ __('alerts.of') }} {{ $vm['pagination']->total() }} {{ __('alerts.alerts') }}
                     </div>
                     <div class="pager-links">
                         {{ $vm['pagination']->onEachSide(1)->links() }}

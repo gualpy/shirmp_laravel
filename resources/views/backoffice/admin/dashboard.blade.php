@@ -12,12 +12,12 @@
 </div>
 
 <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;">
-    <div class="card"><div class="metric-label">Total Tenants</div><div class="metric-value">{{ $vm['total_tenants'] }}</div></div>
-    <div class="card"><div class="metric-label">Active</div><div class="metric-value">{{ $vm['active_subscriptions'] }}</div></div>
-    <div class="card"><div class="metric-label">Trial</div><div class="metric-value">{{ $vm['trial_subscriptions'] }}</div></div>
-    <div class="card"><div class="metric-label">Suspended</div><div class="metric-value">{{ $vm['suspended_subscriptions'] }}</div></div>
-    <div class="card"><div class="metric-label">Expired</div><div class="metric-value">{{ $vm['expired_subscriptions'] }}</div></div>
-    <div class="card"><div class="metric-label">OnPrem</div><div class="metric-value">{{ $vm['onprem_tenants'] }}</div></div>
-    <div class="card"><div class="metric-label">Read-only</div><div class="metric-value">{{ $vm['read_only_tenants'] }}</div></div>
+    <div class="card"><div class="metric-label">{{ __('admin.total_tenants') }}</div><div class="metric-value">{{ $vm['total_tenants'] }}</div></div>
+    <div class="card"><div class="metric-label">{{ __('admin.active') }}</div><div class="metric-value">{{ $vm['active_subscriptions'] }}</div></div>
+    <div class="card"><div class="metric-label">{{ __('admin.trial') }}</div><div class="metric-value">{{ $vm['trial_subscriptions'] }}</div></div>
+    <div class="card"><div class="metric-label">{{ __('admin.suspended') }}</div><div class="metric-value">{{ $vm['suspended_subscriptions'] }}</div></div>
+    <div class="card"><div class="metric-label">{{ __('admin.expired') }}</div><div class="metric-value">{{ $vm['expired_subscriptions'] }}</div></div>
+    <div class="card"><div class="metric-label">{{ __('admin.onprem') }}</div><div class="metric-value">{{ $vm['onprem_tenants'] }}</div></div>
+    <div class="card"><div class="metric-label">{{ __('admin.read_only') }}</div><div class="metric-value">{{ $vm['read_only_tenants'] }}</div></div>
 </div>
 @endsection

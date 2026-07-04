@@ -6,31 +6,31 @@
 <div class="card card-soft animate-enter-down" style="margin-bottom:16px;">
     <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:14px;flex-wrap:wrap;">
         <div>
-            <h1 class="section-heading">Facturación</h1>
-            <div class="section-subtitle">Historial de invoices y pagos para {{ $vm['tenant']['name'] }}.</div>
+            <h1 class="section-heading">{{ __('billing.title') }}</h1>
+            <div class="section-subtitle">{{ __('billing.subtitle', ['tenant' => $vm['tenant']['name']]) }}</div>
         </div>
-        <a class="cta-secondary" href="/backoffice/billing/export.xlsx">Exportar Excel</a>
+        <a class="cta-secondary" href="/backoffice/billing/export.xlsx">{{ __('billing.export_excel') }}</a>
     </div>
 </div>
 
 <div class="card animate-enter-down animate-enter-down-delay-1" style="margin-bottom:16px;">
     <div class="panel-head" style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;">
-        <h3 class="panel-title">Invoices</h3>
-        <span class="status-badge status-na">Solo lectura</span>
+        <h3 class="panel-title">{{ __('billing.invoices') }}</h3>
+        <span class="status-badge status-na">{{ __('billing.read_only') }}</span>
     </div>
     @if($vm['invoices'] === [])
-        <div class="section-subtitle">No hay invoices registradas para este tenant.</div>
+        <div class="section-subtitle">{{ __('billing.no_invoices') }}</div>
     @else
         <div style="overflow:auto;">
             <table class="data-table">
                 <thead>
                     <tr>
-                        <th>Invoice</th>
-                        <th>Periodo</th>
-                        <th>Monto</th>
-                        <th>Status</th>
-                        <th>Due date</th>
-                        <th>Paid at</th>
+                        <th>{{ __('billing.invoice') }}</th>
+                        <th>{{ __('billing.period') }}</th>
+                        <th>{{ __('billing.amount') }}</th>
+                        <th>{{ __('billing.status') }}</th>
+                        <th>{{ __('billing.due_date') }}</th>
+                        <th>{{ __('billing.paid_at') }}</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -51,20 +51,20 @@
 </div>
 
 <div class="card animate-enter-down animate-enter-down-delay-2">
-    <h3 class="panel-title">Payments</h3>
+    <h3 class="panel-title">{{ __('billing.payments') }}</h3>
     @if($vm['payments'] === [])
-        <div class="section-subtitle">No hay pagos registrados todavía.</div>
+        <div class="section-subtitle">{{ __('billing.no_payments') }}</div>
     @else
         <div style="overflow:auto;">
             <table class="data-table">
                 <thead>
                     <tr>
-                        <th>Fecha</th>
-                        <th>Invoice</th>
-                        <th>Monto</th>
-                        <th>Provider</th>
-                        <th>Status</th>
-                        <th>Referencia</th>
+                        <th>{{ __('billing.date') }}</th>
+                        <th>{{ __('billing.invoice') }}</th>
+                        <th>{{ __('billing.amount') }}</th>
+                        <th>{{ __('billing.provider') }}</th>
+                        <th>{{ __('billing.status') }}</th>
+                        <th>{{ __('billing.reference') }}</th>
                     </tr>
                 </thead>
                 <tbody>

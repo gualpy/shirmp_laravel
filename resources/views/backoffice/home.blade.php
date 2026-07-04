@@ -107,8 +107,8 @@
     <div class="card card-soft hero-card animate-enter-down">
         <div class="hero-card__row">
             <div>
-                <h1 class="section-heading">Executive Summary</h1>
-                <div class="section-subtitle">A fast operational read for field and management teams in under 30 seconds.</div>
+                <h1 class="section-heading">{{ __('dashboard.title') }}</h1>
+                <div class="section-subtitle">{{ __('dashboard.subtitle') }}</div>
             </div>
             <a href="{{ $vm['cta']['href'] }}" class="cta-primary">
                 {{ $vm['cta']['label'] }}
@@ -119,19 +119,19 @@
     @if($vm['dashboard_enabled'] && $vm['kpis'] !== null)
         <div class="kpi-grid">
             <div class="kpi-panel animate-enter-down animate-enter-down-delay-1">
-                <div class="kpi-panel__label">Active cycles</div>
+                <div class="kpi-panel__label">{{ __('dashboard.active_cycles') }}</div>
                 <div class="kpi-panel__value">{{ $vm['kpis']['active_cycles'] }}</div>
             </div>
             <div class="kpi-panel animate-enter-down animate-enter-down-delay-1">
-                <div class="kpi-panel__label">Total biomass</div>
+                <div class="kpi-panel__label">{{ __('dashboard.total_biomass') }}</div>
                 <div class="kpi-panel__value">{{ number_format($vm['kpis']['total_biomass_kg'], 2) }} <span style="font-size:.54em;font-weight:700;">kg</span></div>
             </div>
             <div class="kpi-panel animate-enter-down animate-enter-down-delay-2">
-                <div class="kpi-panel__label">Average FCR</div>
+                <div class="kpi-panel__label">{{ __('dashboard.average_fcr') }}</div>
                 <div class="kpi-panel__value">{{ $vm['kpis']['average_fcr'] !== null ? number_format($vm['kpis']['average_fcr'],3) : 'N/D' }}</div>
             </div>
             <div class="kpi-panel animate-enter-down animate-enter-down-delay-2">
-                <div class="kpi-panel__label">Critical alerts</div>
+                <div class="kpi-panel__label">{{ __('dashboard.critical_alerts') }}</div>
                 <div class="kpi-panel__value" style="color:#c63636;">{{ $vm['kpis']['critical_alerts'] }}</div>
             </div>
         </div>
@@ -140,23 +140,23 @@
     <div class="card farms-card animate-enter-down animate-enter-down-delay-2">
         <div class="farms-card__header">
             <div>
-                <h2 style="margin:0 0 4px;font-size:1.04rem;">Farms with active cycles</h2>
-                <div class="muted" style="font-size:.88rem;">Direct access to the operating fronts that require follow-up today.</div>
+                <h2 style="margin:0 0 4px;font-size:1.04rem;">{{ __('dashboard.farms_with_cycles') }}</h2>
+                <div class="muted" style="font-size:.88rem;">{{ __('dashboard.farms_subtitle') }}</div>
             </div>
-            <a href="/backoffice/cycles" class="cta-secondary">View all cycles</a>
+            <a href="/backoffice/cycles" class="cta-secondary">{{ __('dashboard.view_all_cycles') }}</a>
         </div>
         @if(count($vm['farms']) === 0)
-            <div class="empty-state">There are no active cycles in this tenant.</div>
+            <div class="empty-state">{{ __('dashboard.no_active_cycles') }}</div>
         @else
             <div class="farm-list">
                 @foreach($vm['farms'] as $farm)
                     <div class="farm-item animate-enter-down animate-enter-down-delay-3">
                         <div>
                             <div class="farm-item__title">{{ $farm['farm_name'] }}</div>
-                            <div class="farm-item__meta">{{ $farm['active_cycles'] }} active cycle(s) under operational follow-up.</div>
+                            <div class="farm-item__meta">{{ $farm['active_cycles'] }} {{ __('dashboard.active_cycle_meta') }}</div>
                         </div>
                         <a href="/backoffice/cycles?farm={{ $farm['farm_id'] }}" class="farm-item__cta">
-                            View cycles
+                            {{ __('dashboard.view_cycles') }}
                         </a>
                     </div>
                 @endforeach

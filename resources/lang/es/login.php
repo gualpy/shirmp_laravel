@@ -1,0 +1,27 @@
+<?php
+
+return [
+    'title'                  => 'Iniciar sesión | ShrimpApp',
+    'brand_subtitle'         => 'Control operacional y de gestión para acuicultura',
+    'tagline'                => 'Control total de la producción camaronera.',
+    'description'            => 'Métricas, alertas, costos, inventario y proyección de cosecha en una plataforma para equipos de campo, gestión y finanzas.',
+    'point_1_title'          => 'Operaciones con contexto',
+    'point_1_body'           => 'Rastrea cada ciclo desde la siembra hasta la cosecha con indicadores centralizados y eventos críticos.',
+    'point_2_title'          => 'Decisiones más rápidas',
+    'point_2_body'           => 'Convierte datos de agua, alimentación, mortalidad y costos en una vista ejecutiva lista para actuar.',
+    'eyebrow_backoffice'     => 'Acceso Backoffice',
+    'aquaculture_backoffice' => 'Backoffice de acuicultura',
+    'sign_in'                => 'Iniciar sesión',
+    'access_platform'        => 'Accede a tu plataforma de gestión acuícola.',
+    'sign_in_error'          => 'No se pudo iniciar sesión con las credenciales proporcionadas.',
+    'tenant_label'           => 'Tenant',
+    'email_label'            => 'Correo electrónico',
+    'password_label'         => 'Contraseña',
+    'password_placeholder'   => 'Tu contraseña',
+    'remember_device'        => 'Recordar este dispositivo',
+    'access_note'            => 'Acceso para operaciones y gestión.',
+    'enter_backoffice'       => 'Ingresar al Backoffice',
+    'back_to_main'           => 'Volver a la página principal de operaciones',
+    'show_password'          => 'Mostrar',
+    'hide_password'          => 'Ocultar',
+];

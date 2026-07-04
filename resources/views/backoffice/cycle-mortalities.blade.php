@@ -1,6 +1,6 @@
 @extends('backoffice.layout')
 
-@section('title', 'Backoffice · Mortalidad ciclo #'.$vm['header']['cycle_id'])
+@section('title', 'Backoffice · Cycle mortality #'.$vm['header']['cycle_id'])
 
 @push('head')
 <style>
@@ -126,15 +126,15 @@
         <div class="card card-soft">
             <div style="display:flex;justify-content:space-between;align-items:flex-end;gap:14px;flex-wrap:wrap;">
                 <div>
-                    <h1 class="section-heading" style="margin-bottom:4px;">Mortalidad diaria · Ciclo #{{ $vm['header']['cycle_id'] }}</h1>
-                    <div class="section-subtitle">Registro operativo clave para seguimiento biológico, supervivencia y alertas tempranas.</div>
+                    <h1 class="section-heading" style="margin-bottom:4px;">{{ __('cycle.mortality_title') }} · {{ __('cycles.cycle') }} #{{ $vm['header']['cycle_id'] }}</h1>
+                    <div class="section-subtitle">{{ __('cycle.mortality_subtitle') }}</div>
                     <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:8px;color:var(--muted);font-size:.9rem;">
-                        <span>Finca {{ $vm['header']['farm_name'] }}</span>
-                        <span>Piscina {{ $vm['header']['pond_code'] }}</span>
-                        <span>Inicio {{ $vm['header']['started_at'] }}</span>
+                        <span>{{ __('cycle.farm') }} {{ $vm['header']['farm_name'] }}</span>
+                        <span>{{ __('cycle.pond') }} {{ $vm['header']['pond_code'] }}</span>
+                        <span>{{ __('cycle.started') }} {{ $vm['header']['started_at'] }}</span>
                     </div>
                 </div>
-                <a href="/backoffice/cycles/{{ $vm['header']['cycle_id'] }}" class="inline-link">Volver al ciclo</a>
+                <a href="/backoffice/cycles/{{ $vm['header']['cycle_id'] }}" class="inline-link">{{ __('cycle.back_to_cycle') }}</a>
             </div>
         </div>
 
@@ -143,34 +143,34 @@
         @endif
 
         <div class="mini-kpis">
-            <div class="mini-kpi"><div class="mini-kpi__label">Mortalidad acumulada</div><div class="mini-kpi__value">{{ number_format($vm['summary']['total_mortality']) }}</div></div>
-            <div class="mini-kpi"><div class="mini-kpi__label">Vivos estimados</div><div class="mini-kpi__value">{{ $vm['summary']['estimated_alive_count'] !== null ? number_format($vm['summary']['estimated_alive_count']) : 'N/D' }}</div></div>
-            <div class="mini-kpi"><div class="mini-kpi__label">Supervivencia derivada</div><div class="mini-kpi__value">{{ $vm['summary']['derived_survival_pct'] !== null ? number_format($vm['summary']['derived_survival_pct'],2).'%' : 'N/D' }}</div></div>
+            <div class="mini-kpi"><div class="mini-kpi__label">{{ __('cycle.accumulated_mortality') }}</div><div class="mini-kpi__value">{{ number_format($vm['summary']['total_mortality']) }}</div></div>
+            <div class="mini-kpi"><div class="mini-kpi__label">{{ __('cycle.estimated_alive') }}</div><div class="mini-kpi__value">{{ $vm['summary']['estimated_alive_count'] !== null ? number_format($vm['summary']['estimated_alive_count']) : 'N/A' }}</div></div>
+            <div class="mini-kpi"><div class="mini-kpi__label">{{ __('cycle.derived_survival') }}</div><div class="mini-kpi__value">{{ $vm['summary']['derived_survival_pct'] !== null ? number_format($vm['summary']['derived_survival_pct'],2).'%' : 'N/A' }}</div></div>
         </div>
 
         <div class="mortality-grid">
             <div class="card">
-                <h2 class="section-heading" style="font-size:1.18rem;margin-bottom:4px;">Registrar mortalidad diaria</h2>
-                <div class="section-subtitle" style="font-size:.9rem;margin-bottom:14px;">Captura simple para campo. Un registro por fecha con contexto claro de piscina y ciclo.</div>
+                <h2 class="section-heading" style="font-size:1.18rem;margin-bottom:4px;">{{ __('cycle.record_mortality') }}</h2>
+                <div class="section-subtitle" style="font-size:.9rem;margin-bottom:14px;">{{ __('cycle.record_mortality_sub') }}</div>
 
                 <form method="POST" action="/backoffice/cycles/{{ $vm['header']['cycle_id'] }}/mortalities" class="entry-form">
                     @csrf
                     <label>
-                        <span class="field-label">Piscina</span>
+                        <span class="field-label">{{ __('cycle.pond') }}</span>
                         <select name="pond_id" class="field-control">
                             <option value="{{ $vm['defaults']['pond_id'] }}">{{ $vm['header']['pond_code'] }}</option>
                         </select>
                     </label>
                     <label>
-                        <span class="field-label">Fecha</span>
+                        <span class="field-label">{{ __('cycle.date') }}</span>
                         <input type="date" name="recorded_at" value="{{ old('recorded_at', $vm['defaults']['recorded_at']) }}" class="field-control">
                     </label>
                     <label>
-                        <span class="field-label">Mortalidad</span>
+                        <span class="field-label">{{ __('cycle.mortality_count') }}</span>
                         <input type="number" min="1" step="1" name="mortality_count" value="{{ old('mortality_count') }}" class="field-control">
                     </label>
                     <label>
-                        <span class="field-label">Notas</span>
+                        <span class="field-label">{{ __('cycle.notes') }}</span>
                         <textarea name="notes" class="field-control">{{ old('notes') }}</textarea>
                     </label>
                     @if($errors->any())
@@ -179,25 +179,25 @@
                         </div>
                     @endif
                     <div class="form-actions">
-                        <button type="submit" class="primary-btn" {{ $canManageMortality ? '' : 'disabled' }} title="{{ $canManageMortality ? 'Registrar mortalidad diaria' : (($shell['permissions']['mortality.manage'] ?? false) ? $shell['write_block_tooltip'] : $shell['permission_block_tooltip']) }}">Guardar mortalidad</button>
+                        <button type="submit" class="primary-btn" {{ $canManageMortality ? '' : 'disabled' }} title="{{ $canManageMortality ? __('cycle.record_mortality') : (($shell['permissions']['mortality.manage'] ?? false) ? $shell['write_block_tooltip'] : $shell['permission_block_tooltip']) }}">{{ __('cycle.save_mortality') }}</button>
                     </div>
                 </form>
             </div>
 
             <div class="card">
-                <h2 class="section-heading" style="font-size:1.18rem;margin-bottom:4px;">Historial de mortalidad</h2>
-                <div class="section-subtitle" style="font-size:.9rem;margin-bottom:14px;">Registros ordenados por fecha para análisis rápido y trazabilidad operativa.</div>
+                <h2 class="section-heading" style="font-size:1.18rem;margin-bottom:4px;">{{ __('cycle.mortality_history') }}</h2>
+                <div class="section-subtitle" style="font-size:.9rem;margin-bottom:14px;">{{ __('cycle.mortality_history_sub') }}</div>
                 @if($vm['rows'] === [])
-                    <div class="empty-state">Aún no hay registros de mortalidad para este ciclo.</div>
+                    <div class="empty-state">{{ __('cycle.no_mortalities') }}</div>
                 @else
                     <div class="table-wrap">
                         <table class="mortality-table">
                             <thead>
                                 <tr>
-                                    <th>Fecha</th>
-                                    <th>Pond</th>
-                                    <th>Mortalidad</th>
-                                    <th>Notas</th>
+                                    <th>{{ __('cycle.date') }}</th>
+                                    <th>{{ __('cycle.pond') }}</th>
+                                    <th>{{ __('cycle.mortality_count') }}</th>
+                                    <th>{{ __('cycle.notes') }}</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -206,7 +206,7 @@
                                         <td>{{ $row['recorded_at'] }}</td>
                                         <td>{{ $row['pond'] }}</td>
                                         <td>{{ number_format($row['mortality_count']) }}</td>
-                                        <td>{{ $row['notes'] ?: 'Sin notas' }}</td>
+                                        <td>{{ $row['notes'] ?: __('cycle.no_notes') }}</td>
                                     </tr>
                                 @endforeach
                             </tbody>

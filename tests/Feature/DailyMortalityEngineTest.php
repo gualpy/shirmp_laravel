@@ -69,7 +69,7 @@ final class DailyMortalityEngineTest extends TestCase
             ->withHeader('X-Tenant', $tenant->slug)
             ->get('/backoffice/cycles/'.$cycle->id.'/mortalities')
             ->assertOk()
-            ->assertSee('Mortalidad diaria')
+            ->assertSee('Daily Mortality')
             ->assertSee('450')
             ->assertSee('mortalidad normal diaria');
     }

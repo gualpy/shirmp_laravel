@@ -1,6 +1,6 @@
 @extends('backoffice.layout')
 
-@section('title', 'Backoffice · Costos ciclo #'.$vm['header']['cycle_id'])
+@section('title', 'Backoffice · Cycle costs #'.$vm['header']['cycle_id'])
 
 @push('head')
 <style>
@@ -170,17 +170,17 @@
         <div class="card card-soft">
             <div class="costs-hero">
                 <div>
-                    <h1 class="section-heading" style="margin-bottom:4px;">Costos del Ciclo #{{ $vm['header']['cycle_id'] }}</h1>
-                    <div class="section-subtitle">Visión financiera clara para controlar costo acumulado, rentabilidad y registro operativo del ciclo.</div>
+                    <h1 class="section-heading" style="margin-bottom:4px;">{{ __('cycle.costs_title') }} #{{ $vm['header']['cycle_id'] }}</h1>
+                    <div class="section-subtitle">{{ __('cycle.costs_subtitle') }}</div>
                     <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:8px;color:var(--muted);font-size:.9rem;">
-                        <span>Finca {{ $vm['header']['farm_name'] }}</span>
-                        <span>Piscina {{ $vm['header']['pond_code'] }}</span>
-                        <span>Inicio {{ $vm['header']['started_at'] }}</span>
+                        <span>{{ __('cycle.farm') }} {{ $vm['header']['farm_name'] }}</span>
+                        <span>{{ __('cycle.pond') }} {{ $vm['header']['pond_code'] }}</span>
+                        <span>{{ __('cycle.started') }} {{ $vm['header']['started_at'] }}</span>
                     </div>
                 </div>
                 <div style="display:flex;gap:10px;flex-wrap:wrap;">
-                    <a href="/backoffice/cycles/{{ $vm['header']['cycle_id'] }}/exports/costs.xlsx" class="inline-link">Exportar Excel</a>
-                    <a href="/backoffice/cycles/{{ $vm['header']['cycle_id'] }}" class="inline-link">Volver al ciclo</a>
+                    <a href="/backoffice/cycles/{{ $vm['header']['cycle_id'] }}/exports/costs.xlsx" class="inline-link">{{ __('cycle.export_excel') }}</a>
+                    <a href="/backoffice/cycles/{{ $vm['header']['cycle_id'] }}" class="inline-link">{{ __('cycle.back_to_cycle') }}</a>
                 </div>
             </div>
         </div>
@@ -190,30 +190,30 @@
         @endif
 
         <div class="kpi-grid">
-            <div class="kpi-card"><div class="kpi-card__label">Feed cost</div><div class="kpi-card__value">${{ number_format($vm['summary']['totals']['feed_cost'], 2) }}</div></div>
-            <div class="kpi-card"><div class="kpi-card__label">Operational cost</div><div class="kpi-card__value">${{ number_format($vm['summary']['totals']['operational_cost'], 2) }}</div></div>
-            <div class="kpi-card"><div class="kpi-card__label">Total cost</div><div class="kpi-card__value">${{ number_format($vm['summary']['totals']['total_cost'], 2) }}</div></div>
-            <div class="kpi-card"><div class="kpi-card__label">Cost per lb</div><div class="kpi-card__value">${{ number_format($vm['summary']['metrics']['cost_per_lb'], 4) }}</div></div>
-            <div class="kpi-card"><div class="kpi-card__label">Cost per ha</div><div class="kpi-card__value">${{ number_format($vm['summary']['metrics']['cost_per_ha'], 4) }}</div></div>
+            <div class="kpi-card"><div class="kpi-card__label">{{ __('cycle.feed_cost') }}</div><div class="kpi-card__value">${{ number_format($vm['summary']['totals']['feed_cost'], 2) }}</div></div>
+            <div class="kpi-card"><div class="kpi-card__label">{{ __('cycle.operational_cost') }}</div><div class="kpi-card__value">${{ number_format($vm['summary']['totals']['operational_cost'], 2) }}</div></div>
+            <div class="kpi-card"><div class="kpi-card__label">{{ __('cycle.total_cost') }}</div><div class="kpi-card__value">${{ number_format($vm['summary']['totals']['total_cost'], 2) }}</div></div>
+            <div class="kpi-card"><div class="kpi-card__label">{{ __('cycle.cost_per_lb') }}</div><div class="kpi-card__value">${{ number_format($vm['summary']['metrics']['cost_per_lb'], 4) }}</div></div>
+            <div class="kpi-card"><div class="kpi-card__label">{{ __('cycle.cost_per_ha') }}</div><div class="kpi-card__value">${{ number_format($vm['summary']['metrics']['cost_per_ha'], 4) }}</div></div>
         </div>
 
         @if($vm['summary']['missing_cost_inputs'] !== [])
             <div class="warning-list">
                 @foreach($vm['summary']['missing_cost_inputs'] as $warning)
-                    <div class="warning-card">Falta `cost_per_kg` para el alimento <strong>{{ $warning['name'] }}</strong>. El costo total puede estar subestimado.</div>
+                    <div class="warning-card">{{ __('cycle.missing_cost', ['name' => $warning['name']]) }}</div>
                 @endforeach
             </div>
         @endif
 
         <div class="costs-grid">
             <div class="card">
-                <h2 class="section-heading" style="font-size:1.18rem;margin-bottom:4px;">Registrar costo operativo</h2>
-                <div class="section-subtitle" style="font-size:.9rem;margin-bottom:14px;">Captura rápida para administración y control económico del ciclo.</div>
+                <h2 class="section-heading" style="font-size:1.18rem;margin-bottom:4px;">{{ __('cycle.record_cost') }}</h2>
+                <div class="section-subtitle" style="font-size:.9rem;margin-bottom:14px;">{{ __('cycle.record_cost_subtitle') }}</div>
 
                 <form method="POST" action="/backoffice/cycles/{{ $vm['header']['cycle_id'] }}/costs" class="entry-form">
                     @csrf
                     <label>
-                        <span class="field-label">Tipo de costo</span>
+                        <span class="field-label">{{ __('cycle.cost_type') }}</span>
                         <select name="cost_type" class="field-control">
                             @foreach($vm['cost_type_options'] as $option)
                                 <option value="{{ $option['value'] }}" {{ old('cost_type') === $option['value'] ? 'selected' : '' }}>{{ $option['label'] }}</option>
@@ -221,15 +221,15 @@
                         </select>
                     </label>
                     <label>
-                        <span class="field-label">Monto</span>
+                        <span class="field-label">{{ __('cycle.amount') }}</span>
                         <input type="number" step="0.01" name="amount" value="{{ old('amount') }}" class="field-control">
                     </label>
                     <label>
-                        <span class="field-label">Fecha</span>
+                        <span class="field-label">{{ __('cycle.date') }}</span>
                         <input type="date" name="occurred_at" value="{{ old('occurred_at', now()->format('Y-m-d')) }}" class="field-control">
                     </label>
                     <label>
-                        <span class="field-label">Notas</span>
+                        <span class="field-label">{{ __('cycle.notes') }}</span>
                         <textarea name="notes" class="field-control">{{ old('notes') }}</textarea>
                     </label>
                     @if($errors->any())
@@ -238,26 +238,26 @@
                         </div>
                     @endif
                     <div class="form-actions">
-                        <button type="submit" class="primary-btn" {{ $canManageCosts ? '' : 'disabled' }} title="{{ $canManageCosts ? 'Registrar costo operativo' : (($shell['permissions']['costs.manage'] ?? false) ? $shell['write_block_tooltip'] : $shell['permission_block_tooltip']) }}">Guardar costo</button>
+                        <button type="submit" class="primary-btn" {{ $canManageCosts ? '' : 'disabled' }} title="{{ $canManageCosts ? __('cycle.record_cost') : (($shell['permissions']['costs.manage'] ?? false) ? $shell['write_block_tooltip'] : $shell['permission_block_tooltip']) }}">{{ __('cycle.save_cost') }}</button>
                     </div>
                 </form>
             </div>
 
             <div class="card">
-                <h2 class="section-heading" style="font-size:1.18rem;margin-bottom:4px;">Costos operativos registrados</h2>
-                <div class="section-subtitle" style="font-size:.9rem;margin-bottom:14px;">Detalle cronológico para revisión gerencial y soporte administrativo.</div>
+                <h2 class="section-heading" style="font-size:1.18rem;margin-bottom:4px;">{{ __('cycle.recorded_costs') }}</h2>
+                <div class="section-subtitle" style="font-size:.9rem;margin-bottom:14px;">{{ __('cycle.recorded_costs_sub') }}</div>
 
                 @if($vm['rows'] === [])
-                    <div class="empty-state">Aún no se han cargado costos operativos.</div>
+                    <div class="empty-state">{{ __('cycle.no_costs') }}</div>
                 @else
                     <div class="table-wrap">
                         <table class="costs-table">
                             <thead>
                                 <tr>
-                                    <th>Fecha</th>
-                                    <th>Tipo</th>
-                                    <th>Monto</th>
-                                    <th>Notas</th>
+                                    <th>{{ __('cycle.date') }}</th>
+                                    <th>{{ __('cycle.type') }}</th>
+                                    <th>{{ __('cycle.amount') }}</th>
+                                    <th>{{ __('cycle.notes') }}</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -266,7 +266,7 @@
                                         <td>{{ $row['occurred_at'] }}</td>
                                         <td><span class="type-chip">{{ $row['cost_type'] }}</span></td>
                                         <td>${{ number_format($row['amount'], 2) }}</td>
-                                        <td>{{ $row['notes'] ?: 'Sin notas' }}</td>
+                                        <td>{{ $row['notes'] ?: __('cycle.no_notes') }}</td>
                                     </tr>
                                 @endforeach
                             </tbody>

@@ -23,12 +23,12 @@ final class BackofficeAlertAcknowledgeController extends Controller
     ): RedirectResponse {
         $tenant = $tenantContext->currentTenant();
         abort_if($tenant === null, 400, 'Tenant could not be resolved.');
-        abort_unless($saasService->checkFeature($tenant, 'alerts'), 403, 'Alerts no disponible en el plan actual.');
-        abort_if((bool) $licenseService->requireActiveOrGrace($tenant)['read_only_mode'], 403, 'La suscripción actual está en modo solo lectura.');
+        abort_unless($saasService->checkFeature($tenant, 'alerts'), 403, 'Alerts are not available in the current plan.');
+        abort_if((bool) $licenseService->requireActiveOrGrace($tenant)['read_only_mode'], 403, 'The current subscription is in read-only mode.');
         $alert = AlertEvent::query()->findOrFail($alertId);
 
         $action->execute($alert, $request->user());
 
-        return back()->with('status', 'Alerta reconocida.');
+        return back()->with('status', 'Alert acknowledged.');
     }
 }

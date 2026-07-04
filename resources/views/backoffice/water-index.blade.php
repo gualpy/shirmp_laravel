@@ -1,6 +1,6 @@
 @extends('backoffice.layout')
 
-@section('title', 'Backoffice · Calidad de agua')
+@section('title', 'Backoffice · Water Quality')
 
 @push('head')
 <style>
@@ -195,8 +195,8 @@
     <div class="water-shell">
         <div class="water-grid">
             <div class="card card-soft animate-enter-down" id="register-water">
-                <h1 class="section-heading" style="font-size:1.28rem;margin-bottom:4px;">Registrar calidad de agua</h1>
-                <div class="section-subtitle" style="font-size:.92rem;margin-bottom:14px;">Captura rápida para técnico de campo. Un registro, una piscina, sin navegar entre módulos.</div>
+                <h1 class="section-heading" style="font-size:1.28rem;margin-bottom:4px;">{{ __('water.title') }}</h1>
+                <div class="section-subtitle" style="font-size:.92rem;margin-bottom:14px;">{{ __('water.subtitle') }}</div>
 
                 @if(session('status'))
                     <div class="status-flash">{{ session('status') }}</div>
@@ -205,29 +205,29 @@
                 <form method="POST" action="/backoffice/water" class="entry-form">
                     @csrf
                     <label>
-                        <span class="field-label">Piscina</span>
+                        <span class="field-label">{{ __('water.pond') }}</span>
                         <select name="pond" class="field-control">
-                            <option value="">Selecciona una piscina</option>
+                            <option value="">{{ __('water.select_pond') }}</option>
                             @foreach($vm['options']['form_ponds'] as $pond)
                                 <option value="{{ $pond['id'] }}" {{ old('pond', $vm['defaults']['pond']) == $pond['id'] ? 'selected' : '' }}>{{ $pond['label'] }}</option>
                             @endforeach
                         </select>
                     </label>
                     <label>
-                        <span class="field-label">Fecha y hora</span>
+                        <span class="field-label">{{ __('water.date_time') }}</span>
                         <input type="datetime-local" name="measured_at" value="{{ old('measured_at', $vm['defaults']['measured_at']) }}" class="field-control">
                     </label>
                     <div class="entry-grid">
-                        <label><span class="field-label">DO</span><input type="number" step="0.01" name="do" value="{{ old('do') }}" class="field-control"></label>
-                        <label><span class="field-label">pH</span><input type="number" step="0.01" name="ph" value="{{ old('ph') }}" class="field-control"></label>
-                        <label><span class="field-label">Temp</span><input type="number" step="0.01" name="temperature" value="{{ old('temperature') }}" class="field-control"></label>
-                        <label><span class="field-label">Salinidad</span><input type="number" step="0.01" name="salinity" value="{{ old('salinity') }}" class="field-control"></label>
-                        <label><span class="field-label">Alcalinidad</span><input type="number" step="0.01" name="alkalinity" value="{{ old('alkalinity') }}" class="field-control"></label>
-                        <label><span class="field-label">Amonio</span><input type="number" step="0.001" name="ammonia" value="{{ old('ammonia') }}" class="field-control"></label>
-                        <label><span class="field-label">Nitrito</span><input type="number" step="0.001" name="nitrite" value="{{ old('nitrite') }}" class="field-control"></label>
+                        <label><span class="field-label">{{ __('water.do') }}</span><input type="number" step="0.01" name="do" value="{{ old('do') }}" class="field-control"></label>
+                        <label><span class="field-label">{{ __('water.ph') }}</span><input type="number" step="0.01" name="ph" value="{{ old('ph') }}" class="field-control"></label>
+                        <label><span class="field-label">{{ __('water.temp') }}</span><input type="number" step="0.01" name="temperature" value="{{ old('temperature') }}" class="field-control"></label>
+                        <label><span class="field-label">{{ __('water.salinity') }}</span><input type="number" step="0.01" name="salinity" value="{{ old('salinity') }}" class="field-control"></label>
+                        <label><span class="field-label">{{ __('water.alkalinity') }}</span><input type="number" step="0.01" name="alkalinity" value="{{ old('alkalinity') }}" class="field-control"></label>
+                        <label><span class="field-label">{{ __('water.ammonia') }}</span><input type="number" step="0.001" name="ammonia" value="{{ old('ammonia') }}" class="field-control"></label>
+                        <label><span class="field-label">{{ __('water.nitrite') }}</span><input type="number" step="0.001" name="nitrite" value="{{ old('nitrite') }}" class="field-control"></label>
                     </div>
                     <label>
-                        <span class="field-label">Notas</span>
+                        <span class="field-label">{{ __('water.notes') }}</span>
                         <textarea name="notes" class="field-control">{{ old('notes') }}</textarea>
                     </label>
                     @if($errors->any())
@@ -236,54 +236,54 @@
                         </div>
                     @endif
                     <div class="form-actions">
-                        <button type="submit" class="primary-btn" {{ $canManageWater ? '' : 'disabled' }} title="{{ $canManageWater ? 'Guardar registro de campo' : (($shell['permissions']['water.manage'] ?? false) ? $shell['write_block_tooltip'] : $shell['permission_block_tooltip']) }}">Guardar registro</button>
-                        <a href="/backoffice/water" class="secondary-btn">Limpiar</a>
+                        <button type="submit" class="primary-btn" {{ $canManageWater ? '' : 'disabled' }} title="{{ $canManageWater ? 'Save field record' : (($shell['permissions']['water.manage'] ?? false) ? $shell['write_block_tooltip'] : $shell['permission_block_tooltip']) }}">{{ __('water.save_record') }}</button>
+                        <a href="/backoffice/water" class="secondary-btn">{{ __('water.reset') }}</a>
                     </div>
                 </form>
             </div>
 
             <div class="card filters-card animate-enter-down animate-enter-down-delay-1">
-                <h2 class="section-heading" style="font-size:1.2rem;margin-bottom:4px;">Registros recientes</h2>
-                <div class="section-subtitle" style="font-size:.92rem;margin-bottom:14px;">Monitorea rápidamente eventos fuera de rango por fecha, finca, piscina o ciclo.</div>
+                <h2 class="section-heading" style="font-size:1.2rem;margin-bottom:4px;">{{ __('water.recent_records') }}</h2>
+                <div class="section-subtitle" style="font-size:.92rem;margin-bottom:14px;">{{ __('water.recent_subtitle') }}</div>
                 <form method="GET" action="/backoffice/water" class="filters-grid">
                     <label>
-                        <span class="field-label">Farm</span>
+                        <span class="field-label">{{ __('water.farm') }}</span>
                         <select name="farm" class="field-control">
-                            <option value="">Todas</option>
+                            <option value="">{{ __('water.all') }}</option>
                             @foreach($vm['options']['farms'] as $farm)
                                 <option value="{{ $farm['id'] }}" {{ $vm['filters']['farm'] === $farm['id'] ? 'selected' : '' }}>{{ $farm['name'] }}</option>
                             @endforeach
                         </select>
                     </label>
                     <label>
-                        <span class="field-label">Pond</span>
+                        <span class="field-label">{{ __('water.pond') }}</span>
                         <select name="pond" class="field-control">
-                            <option value="">Todas</option>
+                            <option value="">{{ __('water.all') }}</option>
                             @foreach($vm['options']['ponds'] as $pond)
                                 <option value="{{ $pond['id'] }}" {{ $vm['filters']['pond'] === $pond['id'] ? 'selected' : '' }}>{{ $pond['code'] }}</option>
                             @endforeach
                         </select>
                     </label>
                     <label>
-                        <span class="field-label">Cycle</span>
+                        <span class="field-label">{{ __('water.cycle') }}</span>
                         <select name="cycle" class="field-control">
-                            <option value="">Todos</option>
+                            <option value="">{{ __('water.all') }}</option>
                             @foreach($vm['options']['cycles'] as $cycle)
                                 <option value="{{ $cycle['id'] }}" {{ $vm['filters']['cycle'] === $cycle['id'] ? 'selected' : '' }}>{{ $cycle['label'] }}</option>
                             @endforeach
                         </select>
                     </label>
                     <label>
-                        <span class="field-label">Fecha desde</span>
+                        <span class="field-label">{{ __('water.date_from') }}</span>
                         <input type="date" name="date_from" value="{{ $vm['filters']['date_from'] }}" class="field-control">
                     </label>
                     <label>
-                        <span class="field-label">Fecha hasta</span>
+                        <span class="field-label">{{ __('water.date_to') }}</span>
                         <input type="date" name="date_to" value="{{ $vm['filters']['date_to'] }}" class="field-control">
                     </label>
                     <div class="form-actions" style="grid-column:1 / -1;">
-                        <button type="submit" class="primary-btn">Filtrar</button>
-                        <a href="/backoffice/water" class="secondary-btn">Limpiar</a>
+                        <button type="submit" class="primary-btn">{{ __('water.filter') }}</button>
+                        <a href="/backoffice/water" class="secondary-btn">{{ __('water.reset') }}</a>
                     </div>
                 </form>
             </div>
@@ -291,22 +291,22 @@
 
         <div class="card animate-enter-down animate-enter-down-delay-2">
             @if($vm['rows'] === [])
-                <div class="empty-state">No hay registros de calidad de agua.</div>
+                <div class="empty-state">{{ __('water.no_records') }}</div>
             @else
                 <div class="table-wrap">
                     <table class="water-table">
                         <thead>
                             <tr>
-                                <th>Fecha</th>
-                                <th>Farm</th>
-                                <th>Pond</th>
-                                <th>Cycle</th>
-                                <th>DO</th>
-                                <th>pH</th>
-                                <th>Temp</th>
-                                <th>Salinidad</th>
-                                <th>Amonio</th>
-                                <th>Nitrito</th>
+                                <th>{{ __('water.date') }}</th>
+                                <th>{{ __('water.farm') }}</th>
+                                <th>{{ __('water.pond') }}</th>
+                                <th>{{ __('water.cycle') }}</th>
+                                <th>{{ __('water.do') }}</th>
+                                <th>{{ __('water.ph') }}</th>
+                                <th>{{ __('water.temp') }}</th>
+                                <th>{{ __('water.salinity') }}</th>
+                                <th>{{ __('water.ammonia') }}</th>
+                                <th>{{ __('water.nitrite') }}</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -323,7 +323,7 @@
                                                 @if($row['do_low']) <span class="metric-flag metric-flag--danger">!</span> @endif
                                             </span>
                                         @else
-                                            N/D
+                                            N/A
                                         @endif
                                     </td>
                                     <td>
@@ -333,13 +333,13 @@
                                                 @if($row['ph_out']) <span class="metric-flag metric-flag--warn">!</span> @endif
                                             </span>
                                         @else
-                                            N/D
+                                            N/A
                                         @endif
                                     </td>
-                                    <td>{{ $row['temp_c'] !== null ? number_format($row['temp_c'], 2) : 'N/D' }}</td>
-                                    <td>{{ $row['salinity_ppt'] !== null ? number_format($row['salinity_ppt'], 2) : 'N/D' }}</td>
-                                    <td>{{ $row['ammonia_mg_l'] !== null ? number_format($row['ammonia_mg_l'], 3) : 'N/D' }}</td>
-                                    <td>{{ $row['nitrite_mg_l'] !== null ? number_format($row['nitrite_mg_l'], 3) : 'N/D' }}</td>
+                                    <td>{{ $row['temp_c'] !== null ? number_format($row['temp_c'], 2) : 'N/A' }}</td>
+                                    <td>{{ $row['salinity_ppt'] !== null ? number_format($row['salinity_ppt'], 2) : 'N/A' }}</td>
+                                    <td>{{ $row['ammonia_mg_l'] !== null ? number_format($row['ammonia_mg_l'], 3) : 'N/A' }}</td>
+                                    <td>{{ $row['nitrite_mg_l'] !== null ? number_format($row['nitrite_mg_l'], 3) : 'N/A' }}</td>
                                 </tr>
                             @endforeach
                         </tbody>
@@ -347,7 +347,7 @@
                 </div>
                 <div class="pager">
                     <div>
-                        Mostrando {{ $vm['pagination']->firstItem() ?? 0 }}-{{ $vm['pagination']->lastItem() ?? 0 }} de {{ $vm['pagination']->total() }} registros
+                        {{ __('water.showing') }} {{ $vm['pagination']->firstItem() ?? 0 }}-{{ $vm['pagination']->lastItem() ?? 0 }} {{ __('water.of') }} {{ $vm['pagination']->total() }} {{ __('water.records') }}
                     </div>
                     <div class="pager-links">
                         {{ $vm['pagination']->onEachSide(1)->links() }}

@@ -24,12 +24,12 @@ final class BackofficeOperationalCostStoreController extends Controller
     ): RedirectResponse {
         $tenant = $tenantContext->currentTenant();
         abort_if($tenant === null, 400, 'Tenant could not be resolved.');
-        abort_unless($saasService->checkFeature($tenant, 'cost_engine'), 403, 'Cost Engine no disponible en el plan actual.');
-        abort_if((bool) $licenseService->requireActiveOrGrace($tenant)['read_only_mode'], 403, 'La suscripción actual está en modo solo lectura.');
+        abort_unless($saasService->checkFeature($tenant, 'cost_engine'), 403, 'Cost Engine is not available in the current plan.');
+        abort_if((bool) $licenseService->requireActiveOrGrace($tenant)['read_only_mode'], 403, 'The current subscription is in read-only mode.');
 
         $cycle = Cycle::query()->findOrFail($cycleId);
         $action->execute($cycle, OperationalCostEntryDTO::fromArray($request->validated()));
 
-        return redirect('/backoffice/cycles/'.$cycleId.'/costs')->with('status', 'Costo operativo registrado.');
+        return redirect('/backoffice/cycles/'.$cycleId.'/costs')->with('status', 'Operational cost recorded.');
     }
 }

@@ -56,7 +56,7 @@ final class BackofficeNavigationAndDemoFlowTest extends TestCase
             ->withHeader('X-Tenant', $tenant->slug)
             ->get('/backoffice/cycles/'.$cycle->id)
             ->assertOk()
-            ->assertSee('Detalle Operativo del Ciclo #'.$cycle->id);
+            ->assertSee('Operational Cycle Detail #'.$cycle->id);
     }
 
     public function test_read_only_shows_banner(): void
@@ -102,7 +102,7 @@ final class BackofficeNavigationAndDemoFlowTest extends TestCase
             ->withHeader('X-Tenant', $tenant->slug)
             ->get('/backoffice/cycles/'.$cycle->id)
             ->assertOk()
-            ->assertSee('Proyección de Cosecha');
+            ->assertSee('Harvest Projection');
     }
 
     /** @return array{Tenant, User} */

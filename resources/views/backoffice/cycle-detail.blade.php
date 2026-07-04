@@ -1,6 +1,6 @@
 @extends('backoffice.layout')
 
-@section('title', 'Backoffice · Ciclo #'.$vm['header']['cycle_id'])
+@section('title', 'Backoffice · Cycle #'.$vm['header']['cycle_id'])
 
 @push('head')
 <style>
@@ -368,12 +368,12 @@
         <div class="card card-soft detail-hero animate-enter-down">
             <div class="detail-hero__row">
                 <div>
-                    <h1 class="section-heading" style="margin-bottom:4px;">Detalle Operativo del Ciclo #{{ $vm['header']['cycle_id'] }}</h1>
-                    <div class="section-subtitle">Vista central para control biológico, eficiencia operativa y seguimiento diario del ciclo.</div>
+                    <h1 class="section-heading" style="margin-bottom:4px;">{{ __('cycle.detail_title') }} #{{ $vm['header']['cycle_id'] }}</h1>
+                    <div class="section-subtitle">{{ __('cycle.detail_subtitle') }}</div>
                     <div class="detail-meta">
-                        <span>Finca {{ $vm['header']['farm_name'] }}</span>
-                        <span>Piscina {{ $vm['header']['pond_code'] }}</span>
-                        <span>Inicio {{ $vm['header']['started_at'] }}</span>
+                        <span>{{ __('cycle.farm') }} {{ $vm['header']['farm_name'] }}</span>
+                        <span>{{ __('cycle.pond') }} {{ $vm['header']['pond_code'] }}</span>
+                        <span>{{ __('cycle.started') }} {{ $vm['header']['started_at'] }}</span>
                     </div>
                 </div>
                 <span class="detail-status">{{ $vm['header']['status'] }}</span>
@@ -382,24 +382,24 @@
 
         <div class="actions animate-enter-down animate-enter-down-delay-1">
             @if($shell['permissions']['mortality.view'] ?? false)
-                <a class="action-btn secondary-action" href="/backoffice/cycles/{{ $vm['header']['cycle_id'] }}/mortalities" title="{{ $canManageMortality ? 'Registrar y revisar mortalidad diaria' : 'Ver historial de mortalidad' }}">
-                    {{ $canManageMortality ? 'Registrar mortalidad' : 'Ver mortalidad' }}
+                <a class="action-btn secondary-action" href="/backoffice/cycles/{{ $vm['header']['cycle_id'] }}/mortalities" title="{{ $canManageMortality ? __('cycle.record_mortality_tooltip') : __('cycle.view_mortality_tooltip') }}">
+                    {{ $canManageMortality ? __('cycle.record_mortality_title') : __('cycle.view_mortality') }}
                 </a>
             @endif
             @if($canViewCosts)
-                <a class="action-btn secondary-action" href="/backoffice/cycles/{{ $vm['header']['cycle_id'] }}/costs" title="Ver costos del ciclo">
-                    Ver costos
+                <a class="action-btn secondary-action" href="/backoffice/cycles/{{ $vm['header']['cycle_id'] }}/costs" title="{{ __('cycle.view_costs_tooltip') }}">
+                    {{ __('cycle.view_costs') }}
                 </a>
             @endif
             @if($shell['permissions']['water.view'] ?? false)
-                <a class="action-btn secondary-action" href="/backoffice/water?cycle={{ $vm['header']['cycle_id'] }}{{ $canManageWater ? '#register-water' : '' }}" title="{{ $canManageWater ? 'Registrar calidad de agua para este ciclo' : 'Ver registros de calidad de agua' }}">
-                    {{ $canManageWater ? 'Registrar calidad de agua' : 'Ver calidad de agua' }}
+                <a class="action-btn secondary-action" href="/backoffice/water?cycle={{ $vm['header']['cycle_id'] }}{{ $canManageWater ? '#register-water' : '' }}" title="{{ $canManageWater ? __('cycle.record_water_tooltip') : __('cycle.view_water_tooltip') }}">
+                    {{ $canManageWater ? __('cycle.record_water') : __('cycle.view_water') }}
                 </a>
             @endif
             @foreach($vm['actions'] as $action)
                 <a class="action-btn {{ $action['disabled'] ? 'disabled' : '' }}"
                    href="{{ $action['disabled'] ? '#' : $action['href'] }}"
-                   title="{{ $action['disabled'] ? $action['disabled_reason'] : 'Acción rápida operativa' }}">
+                   title="{{ $action['disabled'] ? $action['disabled_reason'] : __('cycle.quick_action_tooltip') }}">
                     {{ $action['label'] }}
                 </a>
             @endforeach
@@ -408,45 +408,45 @@
         @if($canViewReports)
             <div class="card exports-panel animate-enter-down animate-enter-down-delay-1">
                 <div>
-                    <h3 class="panel-title" style="margin-bottom:4px;">Reportes y Exportes</h3>
-                    <div class="section-subtitle" style="font-size:.88rem;">Datasets listos para Excel o CSV, más acceso directo al reporte ejecutivo.</div>
+                    <h3 class="panel-title" style="margin-bottom:4px;">{{ __('cycle.reports_title') }}</h3>
+                    <div class="section-subtitle" style="font-size:.88rem;">{{ __('cycle.reports_subtitle') }}</div>
                 </div>
                 <div class="exports-actions">
-                    <a class="export-btn" href="/backoffice/cycles/{{ $vm['header']['cycle_id'] }}/exports/samplings.csv">Muestreos CSV</a>
-                    <a class="export-btn" href="/backoffice/cycles/{{ $vm['header']['cycle_id'] }}/exports/samplings.xlsx">Muestreos Excel</a>
-                    <a class="export-btn" href="/backoffice/cycles/{{ $vm['header']['cycle_id'] }}/exports/feed.csv">Alimentación CSV</a>
-                    <a class="export-btn" href="/backoffice/cycles/{{ $vm['header']['cycle_id'] }}/exports/feed.xlsx">Alimentación Excel</a>
-                    <a class="export-btn" href="/backoffice/cycles/{{ $vm['header']['cycle_id'] }}/exports/mortalities.csv">Mortalidad CSV</a>
-                    <a class="export-btn" href="/backoffice/cycles/{{ $vm['header']['cycle_id'] }}/exports/mortalities.xlsx">Mortalidad Excel</a>
-                    <a class="export-btn" href="/backoffice/cycles/{{ $vm['header']['cycle_id'] }}/exports/water.csv">Agua CSV</a>
-                    <a class="export-btn" href="/backoffice/cycles/{{ $vm['header']['cycle_id'] }}/exports/water.xlsx">Agua Excel</a>
-                    <a class="export-btn" href="/backoffice/cycles/{{ $vm['header']['cycle_id'] }}/report">Reporte Ejecutivo</a>
-                    <a class="export-btn" href="/backoffice/cycles/{{ $vm['header']['cycle_id'] }}/report" target="_blank" rel="noopener">Imprimir</a>
+                    <a class="export-btn" href="/backoffice/cycles/{{ $vm['header']['cycle_id'] }}/exports/samplings.csv">{{ __('cycle.samplings_csv') }}</a>
+                    <a class="export-btn" href="/backoffice/cycles/{{ $vm['header']['cycle_id'] }}/exports/samplings.xlsx">{{ __('cycle.samplings_excel') }}</a>
+                    <a class="export-btn" href="/backoffice/cycles/{{ $vm['header']['cycle_id'] }}/exports/feed.csv">{{ __('cycle.feeding_csv') }}</a>
+                    <a class="export-btn" href="/backoffice/cycles/{{ $vm['header']['cycle_id'] }}/exports/feed.xlsx">{{ __('cycle.feeding_excel') }}</a>
+                    <a class="export-btn" href="/backoffice/cycles/{{ $vm['header']['cycle_id'] }}/exports/mortalities.csv">{{ __('cycle.mortality_csv') }}</a>
+                    <a class="export-btn" href="/backoffice/cycles/{{ $vm['header']['cycle_id'] }}/exports/mortalities.xlsx">{{ __('cycle.mortality_excel') }}</a>
+                    <a class="export-btn" href="/backoffice/cycles/{{ $vm['header']['cycle_id'] }}/exports/water.csv">{{ __('cycle.water_csv') }}</a>
+                    <a class="export-btn" href="/backoffice/cycles/{{ $vm['header']['cycle_id'] }}/exports/water.xlsx">{{ __('cycle.water_excel') }}</a>
+                    <a class="export-btn" href="/backoffice/cycles/{{ $vm['header']['cycle_id'] }}/report">{{ __('cycle.executive_report') }}</a>
+                    <a class="export-btn" href="/backoffice/cycles/{{ $vm['header']['cycle_id'] }}/report" target="_blank" rel="noopener">{{ __('cycle.print') }}</a>
                 </div>
             </div>
         @endif
 
         <div class="kpis animate-enter-down animate-enter-down-delay-2">
-            <div class="kpi"><div class="label">Biomasa estimada</div><div class="value">{{ number_format($vm['kpis']['biomass_kg'],2) }} kg</div></div>
-            <div class="kpi"><div class="label">Peso promedio</div><div class="value">{{ $vm['kpis']['latest_pp_grams'] !== null ? number_format($vm['kpis']['latest_pp_grams'],2).' g' : 'N/D' }}</div></div>
-            <div class="kpi"><div class="label">FCR</div><div class="value">{{ number_format($vm['kpis']['fcr'],3) }}</div></div>
-            <div class="kpi"><div class="label">Alimento acum.</div><div class="value">{{ number_format($vm['kpis']['total_feed_kg'],2) }} kg</div></div>
-            <div class="kpi"><div class="label">Costo acum.</div><div class="value">${{ number_format($vm['kpis']['total_cost_usd'],2) }}</div></div>
-            <div class="kpi"><div class="label">Alertas abiertas</div><div class="value">{{ $vm['kpis']['open_alerts'] }}</div></div>
+            <div class="kpi"><div class="label">{{ __('cycle.estimated_biomass') }}</div><div class="value">{{ number_format($vm['kpis']['biomass_kg'],2) }} kg</div></div>
+            <div class="kpi"><div class="label">{{ __('cycle.average_weight') }}</div><div class="value">{{ $vm['kpis']['latest_pp_grams'] !== null ? number_format($vm['kpis']['latest_pp_grams'],2).' g' : 'N/A' }}</div></div>
+            <div class="kpi"><div class="label">{{ __('cycle.fcr') }}</div><div class="value">{{ number_format($vm['kpis']['fcr'],3) }}</div></div>
+            <div class="kpi"><div class="label">{{ __('cycle.accum_feed') }}</div><div class="value">{{ number_format($vm['kpis']['total_feed_kg'],2) }} kg</div></div>
+            <div class="kpi"><div class="label">{{ __('cycle.accum_cost') }}</div><div class="value">${{ number_format($vm['kpis']['total_cost_usd'],2) }}</div></div>
+            <div class="kpi"><div class="label">{{ __('cycle.open_alerts') }}</div><div class="value">{{ $vm['kpis']['open_alerts'] }}</div></div>
         </div>
 
         <div class="chart-grid">
             <div class="card chart-card chart-card--hero animate-enter-down animate-enter-down-delay-2">
                 <div class="chart-header">
                     <div>
-                        <h3 class="chart-title">Crecimiento del Ciclo</h3>
-                        <div class="chart-subtitle">Biomasa estimada y peso promedio en una sola lectura para entender avance biológico real.</div>
+                        <h3 class="chart-title">{{ __('cycle.cycle_growth') }}</h3>
+                        <div class="chart-subtitle">{{ __('cycle.cycle_growth_subtitle') }}</div>
                     </div>
                 </div>
                 <div class="chart-box animate-enter-down animate-enter-down-delay-3"><canvas id="biomassChart"></canvas></div>
                 <div class="legend legend--growth">
-                    <span><span class="dot" style="background:#0c7a6a;"></span>Biomasa estimada</span>
-                    <span><span class="dot" style="background:#2f8fff;"></span>Peso promedio</span>
+                    <span><span class="dot" style="background:#0c7a6a;"></span>{{ __('cycle.estimated_biomass') }}</span>
+                    <span><span class="dot" style="background:#2f8fff;"></span>{{ __('cycle.average_weight') }}</span>
                 </div>
             </div>
 
@@ -454,8 +454,8 @@
                 <div class="card chart-card animate-enter-down animate-enter-down-delay-2">
                     <div class="chart-header">
                         <div>
-                            <h3 class="chart-title">Alimentación Semanal</h3>
-                            <div class="chart-subtitle">Carga de alimento por semana para conectar consumo, biomasa y costo operativo.</div>
+                            <h3 class="chart-title">{{ __('cycle.weekly_feeding') }}</h3>
+                            <div class="chart-subtitle">{{ __('cycle.weekly_feeding_subtitle') }}</div>
                         </div>
                     </div>
                     <div class="chart-box animate-enter-down animate-enter-down-delay-3"><canvas id="feedChart"></canvas></div>
@@ -464,14 +464,14 @@
                 <div class="card chart-card animate-enter-down animate-enter-down-delay-3">
                     <div class="chart-header">
                         <div>
-                            <h3 class="chart-title">Distribución de Costos</h3>
-                            <div class="chart-subtitle">Peso relativo entre alimento y operación acumulada.</div>
+                            <h3 class="chart-title">{{ __('cycle.cost_distribution') }}</h3>
+                            <div class="chart-subtitle">{{ __('cycle.cost_distribution_subtitle') }}</div>
                         </div>
                     </div>
                     <div class="chart-box chart-box--compact animate-enter-down animate-enter-down-delay-3"><canvas id="costChart"></canvas></div>
                     <div class="legend">
-                        <span><span class="dot" style="background:#2f8fff;"></span>Alimento</span>
-                        <span><span class="dot" style="background:#0c7a6a;"></span>Operación</span>
+                        <span><span class="dot" style="background:#2f8fff;"></span>{{ __('cycle.feed_legend') }}</span>
+                        <span><span class="dot" style="background:#0c7a6a;"></span>{{ __('cycle.operations_legend') }}</span>
                     </div>
                 </div>
             </div>
@@ -480,13 +480,13 @@
         <div class="card animate-enter-down animate-enter-down-delay-2">
             <div class="projection-summary">
                 <div>
-                    <h3 class="panel-title" style="margin-bottom:4px;">Proyección de Cosecha</h3>
-                    <div class="section-subtitle" style="font-size:.88rem;">Escenario base explicable para decisión operativa y económica con los datos actuales del ciclo.</div>
+                    <h3 class="panel-title" style="margin-bottom:4px;">{{ __('cycle.harvest_projection') }}</h3>
+                    <div class="section-subtitle" style="font-size:.88rem;">{{ __('cycle.harvest_projection_subtitle') }}</div>
                 </div>
                 <div class="projection-assumptions">
-                    <span class="chip">Meta {{ number_format($vm['projection']['projection']['target_pp_grams'], 1) }} g</span>
-                    <span class="chip">Venta ${{ number_format($vm['projection']['assumptions']['sale_price_per_lb'], 2) }}/lb</span>
-                    <span class="chip">Growth {{ $vm['projection']['assumptions']['growth_g_per_week'] !== null ? number_format($vm['projection']['assumptions']['growth_g_per_week'], 2).' g/sem' : 'N/D' }}</span>
+                    <span class="chip">{{ __('cycle.target_label') }} {{ number_format($vm['projection']['projection']['target_pp_grams'], 1) }} g</span>
+                    <span class="chip">{{ __('cycle.sale_label') }} ${{ number_format($vm['projection']['assumptions']['sale_price_per_lb'], 2) }}/lb</span>
+                    <span class="chip">{{ __('cycle.growth_label') }} {{ $vm['projection']['assumptions']['growth_g_per_week'] !== null ? number_format($vm['projection']['assumptions']['growth_g_per_week'], 2).' g/week' : 'N/A' }}</span>
                 </div>
             </div>
 
@@ -495,32 +495,32 @@
                 $vm['projection']['projection']['projected_biomass_kg'] === null &&
                 $vm['projection']['projection']['projected_profit'] === null
             )
-                <div class="empty-copy">Aún no hay datos suficientes para una proyección confiable.</div>
+                <div class="empty-copy">{{ __('cycle.no_projection') }}</div>
             @else
                 <div class="projection-grid">
                     <div class="projection-box">
-                        <div class="projection-box__label">Fecha estimada</div>
-                        <div class="projection-box__value">{{ $vm['projection']['projection']['projected_harvest_date'] ?? 'N/D' }}</div>
+                        <div class="projection-box__label">{{ __('cycle.projected_date') }}</div>
+                        <div class="projection-box__value">{{ $vm['projection']['projection']['projected_harvest_date'] ?? 'N/A' }}</div>
                     </div>
                     <div class="projection-box">
-                        <div class="projection-box__label">Biomasa proyectada</div>
-                        <div class="projection-box__value">{{ $vm['projection']['projection']['projected_biomass_kg'] !== null ? number_format($vm['projection']['projection']['projected_biomass_kg'], 2).' kg' : 'N/D' }}</div>
+                        <div class="projection-box__label">{{ __('cycle.projected_biomass') }}</div>
+                        <div class="projection-box__value">{{ $vm['projection']['projection']['projected_biomass_kg'] !== null ? number_format($vm['projection']['projection']['projected_biomass_kg'], 2).' kg' : 'N/A' }}</div>
                     </div>
                     <div class="projection-box">
-                        <div class="projection-box__label">Libras proyectadas</div>
-                        <div class="projection-box__value">{{ $vm['projection']['projection']['projected_total_lbs'] !== null ? number_format($vm['projection']['projection']['projected_total_lbs'], 2).' lb' : 'N/D' }}</div>
+                        <div class="projection-box__label">{{ __('cycle.projected_pounds') }}</div>
+                        <div class="projection-box__value">{{ $vm['projection']['projection']['projected_total_lbs'] !== null ? number_format($vm['projection']['projection']['projected_total_lbs'], 2).' lb' : 'N/A' }}</div>
                     </div>
                     <div class="projection-box">
-                        <div class="projection-box__label">Ingreso proyectado</div>
-                        <div class="projection-box__value">{{ $vm['projection']['projection']['projected_revenue'] !== null ? '$'.number_format($vm['projection']['projection']['projected_revenue'], 2) : 'N/D' }}</div>
+                        <div class="projection-box__label">{{ __('cycle.projected_revenue') }}</div>
+                        <div class="projection-box__value">{{ $vm['projection']['projection']['projected_revenue'] !== null ? '$'.number_format($vm['projection']['projection']['projected_revenue'], 2) : 'N/A' }}</div>
                     </div>
                     <div class="projection-box">
-                        <div class="projection-box__label">Costo proyectado</div>
-                        <div class="projection-box__value">{{ $vm['projection']['projection']['projected_cost'] !== null ? '$'.number_format($vm['projection']['projection']['projected_cost'], 2) : 'N/D' }}</div>
+                        <div class="projection-box__label">{{ __('cycle.projected_cost') }}</div>
+                        <div class="projection-box__value">{{ $vm['projection']['projection']['projected_cost'] !== null ? '$'.number_format($vm['projection']['projection']['projected_cost'], 2) : 'N/A' }}</div>
                     </div>
                     <div class="projection-box">
-                        <div class="projection-box__label">Utilidad proyectada</div>
-                        <div class="projection-box__value">{{ $vm['projection']['projection']['projected_profit'] !== null ? '$'.number_format($vm['projection']['projection']['projected_profit'], 2) : 'N/D' }}</div>
+                        <div class="projection-box__label">{{ __('cycle.projected_profit') }}</div>
+                        <div class="projection-box__value">{{ $vm['projection']['projection']['projected_profit'] !== null ? '$'.number_format($vm['projection']['projection']['projected_profit'], 2) : 'N/A' }}</div>
                     </div>
                 </div>
             @endif
@@ -529,8 +529,8 @@
         <div class="support-grid">
             <div class="card animate-enter-down animate-enter-down-delay-3">
                 <div class="panel-head">
-                    <h3 class="panel-title" style="margin:0;">Timeline de Alertas</h3>
-                    <a href="/backoffice/alerts?cycle={{ $vm['header']['cycle_id'] }}" class="panel-link">Ver todas las alertas</a>
+                    <h3 class="panel-title" style="margin:0;">{{ __('cycle.alert_timeline') }}</h3>
+                    <a href="/backoffice/alerts?cycle={{ $vm['header']['cycle_id'] }}" class="panel-link">{{ __('cycle.view_all_alerts') }}</a>
                 </div>
                 <div class="alert-list">
                     @forelse($vm['charts']['alerts_timeline'] as $alert)
@@ -542,20 +542,20 @@
                             <div>{{ $alert['message'] }}</div>
                         </div>
                     @empty
-                        <div class="empty-copy">No hay alertas activas para este ciclo.</div>
+                        <div class="empty-copy">{{ __('cycle.no_active_alerts') }}</div>
                     @endforelse
                 </div>
             </div>
 
             <div class="card animate-enter-down animate-enter-down-delay-3">
-                <h3 class="panel-title">Calidad de Agua Reciente</h3>
+                <h3 class="panel-title">{{ __('cycle.recent_water') }}</h3>
                 @if($vm['water_quality_latest']['avg_do'] === null && $vm['water_quality_latest']['avg_ph'] === null && $vm['water_quality_latest']['avg_temp'] === null)
-                    <div class="empty-copy">No hay registros de calidad de agua.</div>
+                    <div class="empty-copy">{{ __('cycle.no_water_records') }}</div>
                 @else
                     <div class="water-grid">
-                        <div class="water-box"><div class="mini">DO</div><div class="big">{{ $vm['water_quality_latest']['avg_do'] !== null ? number_format($vm['water_quality_latest']['avg_do'],2) : 'N/D' }}</div></div>
-                        <div class="water-box"><div class="mini">pH</div><div class="big">{{ $vm['water_quality_latest']['avg_ph'] !== null ? number_format($vm['water_quality_latest']['avg_ph'],2) : 'N/D' }}</div></div>
-                        <div class="water-box"><div class="mini">Temp °C</div><div class="big">{{ $vm['water_quality_latest']['avg_temp'] !== null ? number_format($vm['water_quality_latest']['avg_temp'],2) : 'N/D' }}</div></div>
+                        <div class="water-box"><div class="mini">DO</div><div class="big">{{ $vm['water_quality_latest']['avg_do'] !== null ? number_format($vm['water_quality_latest']['avg_do'],2) : 'N/A' }}</div></div>
+                        <div class="water-box"><div class="mini">pH</div><div class="big">{{ $vm['water_quality_latest']['avg_ph'] !== null ? number_format($vm['water_quality_latest']['avg_ph'],2) : 'N/A' }}</div></div>
+                        <div class="water-box"><div class="mini">Temp °C</div><div class="big">{{ $vm['water_quality_latest']['avg_temp'] !== null ? number_format($vm['water_quality_latest']['avg_temp'],2) : 'N/A' }}</div></div>
                     </div>
                 @endif
             </div>

@@ -16,7 +16,7 @@
                 <h3 class="panel-title" style="margin-bottom:4px;">{{ $row['name'] }}</h3>
                 <div class="section-subtitle">{{ $row['code'] }} · {{ $row['billing_type'] }} · ${{ number_format((float) $row['price_usd'], 2) }}</div>
             </div>
-            <span class="status-badge status-{{ $row['is_active'] ? 'active' : 'expired' }}">{{ $row['is_active'] ? 'active' : 'inactive' }}</span>
+            <span class="status-badge status-{{ $row['is_active'] ? 'active' : 'expired' }}">{{ $row['is_active'] ? __('app.active') : __('app.inactive') }}</span>
         </div>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
             <div>
@@ -28,7 +28,7 @@
                 </ul>
             </div>
             <div>
-                <strong>Features</strong>
+                <strong>{{ __('admin.features') }}</strong>
                 <ul>
                     @foreach($row['features'] as $feature)
                         <li>{{ $feature }}</li>

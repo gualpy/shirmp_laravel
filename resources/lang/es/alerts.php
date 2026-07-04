@@ -1,0 +1,28 @@
+<?php
+
+return [
+    'title'             => 'Alertas Operacionales',
+    'subtitle'          => 'Vista central para priorizar problemas por granja, estanque y ciclo sin perder contexto operacional.',
+    'export_excel'      => 'Exportar Excel',
+    'filter'            => 'Filtrar',
+    'reset'             => 'Limpiar',
+    'farm'              => 'Granja',
+    'pond'              => 'Estanque',
+    'cycle'             => 'Ciclo',
+    'severity'          => 'Severidad',
+    'state'             => 'Estado',
+    'date_from'         => 'Fecha desde',
+    'date_to'           => 'Fecha hasta',
+    'all'               => 'Todos',
+    'date'              => 'Fecha',
+    'type'              => 'Tipo',
+    'message'           => 'Mensaje',
+    'actions'           => 'Acciones',
+    'acknowledge'       => 'Reconocer',
+    'resolve'           => 'Resolver',
+    'read_only'         => 'Solo lectura',
+    'no_alerts'         => 'No hay alertas activas para los filtros seleccionados.',
+    'showing'           => 'Mostrando',
+    'of'                => 'de',
+    'alerts'            => 'alertas',
+];

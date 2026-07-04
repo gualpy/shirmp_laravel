@@ -17,6 +17,7 @@ use App\Modules\SaaS\Domain\Models\TenantSubscription;
 use App\Modules\WaterQuality\Domain\Models\WaterQualityEntry;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Str;
 use Tests\TestCase;
 
 final class BackofficeWaterQualityInterfaceTest extends TestCase
@@ -33,7 +34,7 @@ final class BackofficeWaterQualityInterfaceTest extends TestCase
             ->withHeader('X-Tenant', $tenant->slug)
             ->get('/backoffice/water')
             ->assertOk()
-            ->assertSee('Registrar calidad de agua')
+            ->assertSee('Record water quality')
             ->assertSee($entry->pond->code);
     }
 
@@ -43,9 +44,12 @@ final class BackofficeWaterQualityInterfaceTest extends TestCase
         $this->activeSubscription($tenant);
         $cycle = $this->makeCycle($tenant, 'WA-1');
 
+        $token = $this->csrfTokenFor($user, $tenant, '/backoffice/water');
+
         $this->actingAs($user)
             ->withHeader('X-Tenant', $tenant->slug)
             ->post('/backoffice/water', [
+                '_token' => $token,
                 'pond' => $cycle->pond_id,
                 'measured_at' => '2026-03-05T07:45',
                 'do' => 3.2,
@@ -100,18 +104,24 @@ final class BackofficeWaterQualityInterfaceTest extends TestCase
 
         $cycleB = $this->makeCycle($tenantB, 'WB-3');
 
+        $token = $this->csrfTokenFor($userB, $tenantB, '/backoffice/water');
+
         $this->actingAs($userB)
             ->withHeader('X-Tenant', $tenantB->slug)
             ->post('/backoffice/water', [
+                '_token' => $token,
                 'pond' => $entryA->pond_id,
                 'measured_at' => '2026-03-05T07:45',
                 'do' => 4.2,
             ])
             ->assertNotFound();
 
+        $token = $this->csrfTokenFor($userB, $tenantB, '/backoffice/water');
+
         $this->actingAs($userB)
             ->withHeader('X-Tenant', $tenantB->slug)
             ->post('/backoffice/water', [
+                '_token' => $token,
                 'pond' => $cycleB->pond_id,
                 'measured_at' => '2026-03-05T07:45',
                 'do' => 4.2,
@@ -156,6 +166,17 @@ final class BackofficeWaterQualityInterfaceTest extends TestCase
             'offline_grace_days' => 7,
             'verification_source' => 'cloud',
         ]);
+    }
+
+    private function csrfTokenFor(User $user, Tenant $tenant, string $url): string
+    {
+        $response = $this->actingAs($user)
+            ->withSession(['backoffice_tenant_slug' => $tenant->slug])
+            ->get($url);
+
+        preg_match('/name="_token" value="([^"]+)"/', $response->getContent(), $matches);
+
+        return $matches[1] ?? Str::random(40);
     }
 
     private function makeWaterEntry(Tenant $tenant, string $measuredAt): WaterQualityEntry

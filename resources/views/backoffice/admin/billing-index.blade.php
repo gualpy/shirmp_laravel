@@ -4,27 +4,27 @@
 
 @section('content')
 <div class="card card-soft" style="margin-bottom:16px;">
-    <h1 class="section-heading">Billing global</h1>
-    <div class="section-subtitle">Vista consolidada de invoices y pagos del SaaS.</div>
+    <h1 class="section-heading">{{ __('admin.billing_title') }}</h1>
+    <div class="section-subtitle">{{ __('admin.billing_subtitle') }}</div>
 </div>
 
 <div class="card" style="margin-bottom:16px;">
-    <h3 class="panel-title">Invoices</h3>
+    <h3 class="panel-title">{{ __('admin.invoices') }}</h3>
     @if($vm['invoices'] === [])
-        <div class="section-subtitle">No hay invoices registradas.</div>
+        <div class="section-subtitle">{{ __('admin.no_invoices') }}</div>
     @else
         <div style="overflow:auto;">
             <table class="data-table">
                 <thead>
                     <tr>
-                        <th>Invoice</th>
-                        <th>Tenant</th>
+                        <th>{{ __('admin.invoice') }}</th>
+                        <th>{{ __('admin.tenant') }}</th>
                         <th>Periodo</th>
                         <th>Monto</th>
-                        <th>Status</th>
-                        <th>Due at</th>
-                        <th>Paid at</th>
-                        <th>Provider</th>
+                        <th>{{ __('admin.status') }}</th>
+                        <th>{{ __('admin.due_at') }}</th>
+                        <th>{{ __('admin.paid_at') }}</th>
+                        <th>{{ __('admin.provider') }}</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -54,20 +54,20 @@
 </div>
 
 <div class="card">
-    <h3 class="panel-title">Payments</h3>
+    <h3 class="panel-title">{{ __('admin.payments') }}</h3>
     @if($vm['payments'] === [])
-        <div class="section-subtitle">No hay pagos registrados.</div>
+        <div class="section-subtitle">{{ __('admin.no_payments') }}</div>
     @else
         <div style="overflow:auto;">
             <table class="data-table">
                 <thead>
                     <tr>
                         <th>Fecha</th>
-                        <th>Tenant</th>
-                        <th>Invoice</th>
+                        <th>{{ __('admin.tenant') }}</th>
+                        <th>{{ __('admin.invoice') }}</th>
                         <th>Monto</th>
-                        <th>Provider</th>
-                        <th>Status</th>
+                        <th>{{ __('admin.provider') }}</th>
+                        <th>{{ __('admin.status') }}</th>
                         <th>Referencia</th>
                     </tr>
                 </thead>

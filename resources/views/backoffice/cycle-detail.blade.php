@@ -160,9 +160,6 @@
         min-height: 220px;
     }
     canvas {
-        width: 100% !important;
-        max-width: 100%;
-        height: 100% !important;
         display: block;
     }
     .support-grid {
@@ -357,6 +354,7 @@
         }
     }
 </style>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
 @endpush
 
 @section('content')
@@ -564,209 +562,118 @@
 
     <script>
         const biomassData = @json($vm['charts']['biomass_vs_time']);
-        const feedData = @json($vm['charts']['feed_weekly']);
-        const costData = @json($vm['charts']['cost_distribution']);
+        const feedData    = @json($vm['charts']['feed_weekly']);
+        const costData    = @json($vm['charts']['cost_distribution']);
 
-        function setupCanvas(id) {
-            const c = document.getElementById(id);
-            const ctx = c.getContext('2d');
-            c.width = c.clientWidth * devicePixelRatio;
-            c.height = c.clientHeight * devicePixelRatio;
-            ctx.scale(devicePixelRatio, devicePixelRatio);
-            return { c, ctx };
-        }
+        Chart.defaults.font.family = '"IBM Plex Sans", sans-serif';
+        Chart.defaults.font.size   = 12;
+        Chart.defaults.color       = '#70859a';
 
-        function drawLine(id, points, key, color) {
-            const { c, ctx } = setupCanvas(id);
-            const w = c.clientWidth, h = c.clientHeight, pad = 24;
-            const vals = points.map(p => Number(p[key]) || 0);
-            const max = Math.max(...vals, 1), min = Math.min(...vals, 0);
-            const iw = w - pad * 2, ih = h - pad * 2;
-            ctx.clearRect(0, 0, w, h);
-            ctx.strokeStyle = '#dce7f1';
-            for (let i = 0; i < 4; i++) {
-                const y = pad + (ih / 3) * i;
-                ctx.beginPath(); ctx.moveTo(pad, y); ctx.lineTo(w - pad, y); ctx.stroke();
-            }
-            if (points.length < 2) return;
-            ctx.strokeStyle = color; ctx.lineWidth = 2.5; ctx.beginPath();
-            points.forEach((p, i) => {
-                const x = pad + (iw / (points.length - 1)) * i;
-                const y = h - pad - (((Number(p[key]) || 0) - min) / (max - min || 1)) * ih;
-                if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
-            });
-            ctx.stroke();
-        }
+        // Crecimiento del ciclo — dual Y-axis line chart
+        new Chart(document.getElementById('biomassChart'), {
+            type: 'line',
+            data: {
+                labels: biomassData.map(p => p.date ? p.date.slice(5) : ''),
+                datasets: [
+                    {
+                        label: '{{ __("cycle.estimated_biomass") }}',
+                        data: biomassData.map(p => Number(p.biomass_kg) || 0),
+                        borderColor: '#0c7a6a',
+                        backgroundColor: 'rgba(12,122,106,0.07)',
+                        borderWidth: 2.5,
+                        pointRadius: 3.5,
+                        pointBackgroundColor: '#0c7a6a',
+                        tension: 0.3,
+                        fill: true,
+                        yAxisID: 'y',
+                    },
+                    {
+                        label: '{{ __("cycle.average_weight") }}',
+                        data: biomassData.map(p => Number(p.pp_grams) || 0),
+                        borderColor: '#2f8fff',
+                        backgroundColor: 'transparent',
+                        borderWidth: 2,
+                        borderDash: [6, 4],
+                        pointRadius: 3,
+                        pointBackgroundColor: '#2f8fff',
+                        tension: 0.3,
+                        yAxisID: 'y1',
+                    },
+                ],
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                interaction: { mode: 'index', intersect: false },
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        callbacks: {
+                            label: ctx => ctx.datasetIndex === 0
+                                ? `{{ __("cycle.estimated_biomass") }}: ${ctx.parsed.y.toFixed(2)} kg`
+                                : `{{ __("cycle.average_weight") }}: ${ctx.parsed.y.toFixed(2)} g`,
+                        },
+                    },
+                },
+                scales: {
+                    x:  { grid: { color: '#dce7f1' }, ticks: { maxTicksLimit: 10 } },
+                    y:  { position: 'left',  grid: { color: '#dce7f1' }, ticks: { callback: v => v + ' kg' } },
+                    y1: { position: 'right', grid: { drawOnChartArea: false }, ticks: { callback: v => v + ' g' } },
+                },
+            },
+        });
 
-        function drawGrowthChart(id, points) {
-            const { c, ctx } = setupCanvas(id);
-            const w = c.clientWidth;
-            const h = c.clientHeight;
-            const padTop = 18;
-            const padRight = 54;
-            const padBottom = 38;
-            const padLeft = 52;
-            const iw = w - padLeft - padRight;
-            const ih = h - padTop - padBottom;
+        // Alimentación semanal — bar chart
+        new Chart(document.getElementById('feedChart'), {
+            type: 'bar',
+            data: {
+                labels: feedData.map(p => p.week ? p.week.slice(-3) : ''),
+                datasets: [{
+                    label: '{{ __("cycle.accum_feed") }}',
+                    data: feedData.map(p => Number(p.feed_kg) || 0),
+                    backgroundColor: 'rgba(47,143,255,0.72)',
+                    borderColor: '#2f8fff',
+                    borderWidth: 1,
+                    borderRadius: 6,
+                }],
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { display: false } },
+                scales: {
+                    x: { grid: { color: '#dce7f1' } },
+                    y: { grid: { color: '#dce7f1' }, ticks: { callback: v => v + ' kg' } },
+                },
+            },
+        });
 
-            ctx.clearRect(0, 0, w, h);
-
-            if (points.length < 2) {
-                return;
-            }
-
-            const biomass = points.map(point => Number(point.biomass_kg) || 0);
-            const pp = points.map(point => Number(point.pp_grams) || 0);
-            const maxBiomass = Math.max(...biomass, 1);
-            const maxPp = Math.max(...pp, 1);
-            const gridLines = 4;
-
-            ctx.strokeStyle = '#dce7f1';
-            ctx.fillStyle = '#70859a';
-            ctx.font = '12px "IBM Plex Sans", sans-serif';
-
-            for (let i = 0; i <= gridLines; i++) {
-                const ratio = i / gridLines;
-                const y = padTop + ih - (ih * ratio);
-                ctx.beginPath();
-                ctx.moveTo(padLeft, y);
-                ctx.lineTo(w - padRight, y);
-                ctx.stroke();
-
-                const leftLabel = Math.round((maxBiomass * ratio) / 250) * 250;
-                const rightLabel = ((maxPp * ratio)).toFixed(1);
-                ctx.fillText(String(leftLabel), 8, y + 4);
-                ctx.fillText(rightLabel, w - padRight + 10, y + 4);
-            }
-
-            const xStep = iw / (points.length - 1);
-            const coords = points.map((point, index) => ({
-                x: padLeft + (xStep * index),
-                biomassY: padTop + ih - ((Number(point.biomass_kg) || 0) / maxBiomass) * ih,
-                ppY: padTop + ih - ((Number(point.pp_grams) || 0) / maxPp) * ih,
-                label: point.date.slice(5),
-            }));
-
-            ctx.strokeStyle = '#0c7a6a';
-            ctx.lineWidth = 2.5;
-            ctx.beginPath();
-            coords.forEach((point, index) => {
-                if (index === 0) {
-                    ctx.moveTo(point.x, point.biomassY);
-                } else {
-                    ctx.lineTo(point.x, point.biomassY);
-                }
-            });
-            ctx.stroke();
-
-            ctx.fillStyle = '#0c7a6a';
-            coords.forEach(point => {
-                ctx.beginPath();
-                ctx.arc(point.x, point.biomassY, 3.5, 0, Math.PI * 2);
-                ctx.fill();
-            });
-
-            ctx.strokeStyle = '#2f8fff';
-            ctx.lineWidth = 2;
-            ctx.setLineDash([6, 4]);
-            ctx.beginPath();
-            coords.forEach((point, index) => {
-                if (index === 0) {
-                    ctx.moveTo(point.x, point.ppY);
-                } else {
-                    ctx.lineTo(point.x, point.ppY);
-                }
-            });
-            ctx.stroke();
-            ctx.setLineDash([]);
-
-            ctx.fillStyle = '#2f8fff';
-            coords.forEach(point => {
-                ctx.beginPath();
-                ctx.arc(point.x, point.ppY, 3, 0, Math.PI * 2);
-                ctx.fill();
-            });
-
-            ctx.fillStyle = '#70859a';
-            ctx.textAlign = 'center';
-            coords.forEach((point, index) => {
-                if (index === 0 || index === coords.length - 1 || index % 2 === 1) {
-                    ctx.fillText(point.label, point.x, h - 12);
-                }
-            });
-            ctx.textAlign = 'start';
-        }
-
-        function drawDonut(id, parts) {
-            const { c, ctx } = setupCanvas(id);
-            const w = c.clientWidth, h = c.clientHeight;
-            const total = parts.reduce((a, p) => a + Number(p.value || 0), 0);
-            if (total <= 0) return;
-            const colors = ['#2f8fff', '#0c7a6a', '#db8d1b', '#c63636'];
-            const r = Math.min(w, h) * .34, cx = w / 2, cy = h / 2;
-            let start = -Math.PI / 2;
-            parts.forEach((p, i) => {
-                const sweep = (Number(p.value || 0) / total) * Math.PI * 2;
-                ctx.beginPath(); ctx.moveTo(cx, cy); ctx.arc(cx, cy, r, start, start + sweep); ctx.closePath();
-                ctx.fillStyle = colors[i % colors.length]; ctx.fill();
-                start += sweep;
-            });
-            ctx.beginPath(); ctx.fillStyle = '#fff'; ctx.arc(cx, cy, r * .55, 0, Math.PI * 2); ctx.fill();
-        }
-
-        function drawBars(id, points, key, color) {
-            const { c, ctx } = setupCanvas(id);
-            const w = c.clientWidth;
-            const h = c.clientHeight;
-            const padTop = 18;
-            const padRight = 18;
-            const padBottom = 34;
-            const padLeft = 42;
-            const iw = w - padLeft - padRight;
-            const ih = h - padTop - padBottom;
-            const values = points.map(point => Number(point[key]) || 0);
-            const max = Math.max(...values, 1);
-
-            ctx.clearRect(0, 0, w, h);
-            ctx.strokeStyle = '#dce7f1';
-            ctx.fillStyle = '#70859a';
-            ctx.font = '12px "IBM Plex Sans", sans-serif';
-
-            for (let i = 0; i < 4; i++) {
-                const ratio = i / 3;
-                const y = padTop + ih - (ih * ratio);
-                ctx.beginPath();
-                ctx.moveTo(padLeft, y);
-                ctx.lineTo(w - padRight, y);
-                ctx.stroke();
-                ctx.fillText(String(Math.round(max * ratio)), 8, y + 4);
-            }
-
-            if (points.length === 0) {
-                return;
-            }
-
-            const slot = iw / points.length;
-            const barWidth = Math.min(34, slot * 0.58);
-
-            points.forEach((point, index) => {
-                const value = Number(point[key]) || 0;
-                const barHeight = (value / max) * ih;
-                const x = padLeft + (slot * index) + ((slot - barWidth) / 2);
-                const y = padTop + ih - barHeight;
-
-                ctx.fillStyle = color;
-                ctx.fillRect(x, y, barWidth, barHeight);
-
-                ctx.fillStyle = '#70859a';
-                ctx.textAlign = 'center';
-                ctx.fillText(point.week.slice(-3), x + (barWidth / 2), h - 10);
-                ctx.textAlign = 'start';
-            });
-        }
-
-        drawGrowthChart('biomassChart', biomassData);
-        drawBars('feedChart', feedData, 'feed_kg', '#2f8fff');
-        drawDonut('costChart', costData);
+        // Distribución de costos — doughnut
+        new Chart(document.getElementById('costChart'), {
+            type: 'doughnut',
+            data: {
+                labels: costData.map(p => p.label),
+                datasets: [{
+                    data: costData.map(p => Number(p.value) || 0),
+                    backgroundColor: ['#2f8fff', '#0c7a6a', '#db8d1b', '#c63636'],
+                    borderWidth: 2,
+                    borderColor: '#fff',
+                    hoverOffset: 6,
+                }],
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                cutout: '55%',
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        callbacks: {
+                            label: ctx => `${ctx.label}: $${ctx.parsed.toFixed(2)}`,
+                        },
+                    },
+                },
+            },
+        });
     </script>
 @endsection

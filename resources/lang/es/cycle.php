@@ -42,6 +42,11 @@ return [
     'save_mortality'        => 'Guardar mortalidad',
     'no_mortalities'        => 'No hay registros de mortalidad para este ciclo aún.',
 
+    // Cycle detail — tabs
+    'tab_resumen'               => 'Resumen',
+    'tab_proyeccion'            => 'Proyección',
+    'tab_soporte'               => 'Alertas & Agua',
+
     // Cycle detail
     'detail_title'              => 'Detalle Operativo del Ciclo',
     'detail_subtitle'           => 'Vista central para control biológico, eficiencia operativa y seguimiento diario del ciclo.',

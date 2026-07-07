@@ -353,6 +353,35 @@
             min-height: 240px;
         }
     }
+    .tab-nav {
+        display: flex;
+        gap: 4px;
+        padding: 4px;
+        background: var(--surface, #f4f7fb);
+        border-radius: 14px;
+        margin-bottom: 16px;
+        border: 1px solid var(--border, #dce7f1);
+        flex-wrap: wrap;
+    }
+    .tab-btn {
+        padding: 8px 22px;
+        border-radius: 10px;
+        border: none;
+        background: transparent;
+        color: var(--muted, #647485);
+        font: inherit;
+        font-size: .9rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: background .15s, color .15s, box-shadow .15s;
+    }
+    .tab-btn.active {
+        background: #fff;
+        color: var(--text, #1a2636);
+        box-shadow: 0 1px 6px rgba(0,0,0,.08);
+    }
+    .tab-panel { display: none; }
+    .tab-panel.active { display: block; }
 </style>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
 @endpush
@@ -424,6 +453,13 @@
             </div>
         @endif
 
+        <nav class="tab-nav" role="tablist">
+            <button class="tab-btn active" data-tab="tab-resumen" role="tab">{{ __('cycle.tab_resumen') }}</button>
+            <button class="tab-btn" data-tab="tab-proyeccion" role="tab">{{ __('cycle.tab_proyeccion') }}</button>
+            <button class="tab-btn" data-tab="tab-soporte" role="tab">{{ __('cycle.tab_soporte') }}</button>
+        </nav>
+
+        <div id="tab-resumen" class="tab-panel active">
         <div class="kpis animate-enter-down animate-enter-down-delay-2">
             <div class="kpi"><div class="label">{{ __('cycle.estimated_biomass') }}</div><div class="value">{{ number_format($vm['kpis']['biomass_kg'],2) }} kg</div></div>
             <div class="kpi"><div class="label">{{ __('cycle.average_weight') }}</div><div class="value">{{ $vm['kpis']['latest_pp_grams'] !== null ? number_format($vm['kpis']['latest_pp_grams'],2).' g' : 'N/A' }}</div></div>
@@ -474,7 +510,9 @@
                 </div>
             </div>
         </div>
+        </div>{{-- /tab-resumen --}}
 
+        <div id="tab-proyeccion" class="tab-panel">
         <div class="card animate-enter-down animate-enter-down-delay-2">
             <div class="projection-summary">
                 <div>
@@ -523,7 +561,9 @@
                 </div>
             @endif
         </div>
+        </div>{{-- /tab-proyeccion --}}
 
+        <div id="tab-soporte" class="tab-panel">
         <div class="support-grid">
             <div class="card animate-enter-down animate-enter-down-delay-3">
                 <div class="panel-head">
@@ -558,6 +598,7 @@
                 @endif
             </div>
         </div>
+        </div>{{-- /tab-soporte --}}
     </div>
 
     <script>
@@ -674,6 +715,15 @@
                     },
                 },
             },
+        });
+
+        document.querySelectorAll('.tab-btn').forEach(function(btn) {
+            btn.addEventListener('click', function() {
+                document.querySelectorAll('.tab-btn').forEach(function(b) { b.classList.remove('active'); });
+                document.querySelectorAll('.tab-panel').forEach(function(p) { p.classList.remove('active'); });
+                this.classList.add('active');
+                document.getElementById(this.dataset.tab).classList.add('active');
+            });
         });
     </script>
 @endsection

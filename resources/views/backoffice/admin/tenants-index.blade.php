@@ -20,6 +20,7 @@
 </form>
 
 <div class="card">
+    <div class="table-scroll">
     <table class="data-table">
         <thead><tr><th>{{ __('admin.tenant_col') }}</th><th>{{ __('admin.slug') }}</th><th>{{ __('admin.plan') }}</th><th>{{ __('admin.status') }}</th><th>{{ __('admin.billing') }}</th><th>{{ __('admin.read_only_col') }}</th><th>{{ __('admin.last_verified') }}</th><th>{{ __('admin.ends_at') }}</th><th></th></tr></thead>
         <tbody>
@@ -40,5 +41,6 @@
         @endforelse
         </tbody>
     </table>
+    </div>
 </div>
 @endsection

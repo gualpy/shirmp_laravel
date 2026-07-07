@@ -206,6 +206,18 @@
         window.addEventListener('scroll', syncScrolledState, { passive: true });
         syncScrolledState();
     })();
+
+    // Auto-populate data-label on .data-table cells from their thead headers
+    document.querySelectorAll('.data-table').forEach(function(table) {
+        var headers = Array.from(table.querySelectorAll('thead th')).map(function(th) {
+            return th.textContent.trim();
+        });
+        table.querySelectorAll('tbody tr').forEach(function(row) {
+            Array.from(row.querySelectorAll('td')).forEach(function(td, i) {
+                if (headers[i]) td.dataset.label = headers[i];
+            });
+        });
+    });
 </script>
 </body>
 </html>

@@ -18,6 +18,7 @@
 </form>
 
 <div class="card">
+    <div class="table-scroll">
     <table class="data-table">
         <thead><tr><th>Fecha</th><th>Tenant</th><th>Usuario</th><th>Acción</th><th>Entidad</th><th>ID</th><th>Contexto</th></tr></thead>
         <tbody>
@@ -36,5 +37,6 @@
         @endforelse
         </tbody>
     </table>
+    </div>
 </div>
 @endsection

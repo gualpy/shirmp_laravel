@@ -497,3 +497,54 @@
             .main { width: calc(100vw - 20px); padding-top: 18px; }
             .card { padding: 14px; }
         }
+
+        /* ── Responsive tables ── */
+        .table-scroll {
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+            border-radius: 14px;
+        }
+        @media (max-width: 580px) {
+            .data-table thead {
+                display: none;
+            }
+            .data-table,
+            .data-table tbody,
+            .data-table tr,
+            .data-table td {
+                display: block;
+                width: 100%;
+            }
+            .data-table tr {
+                border: 1px solid var(--border);
+                border-radius: 14px;
+                padding: 10px 12px;
+                margin-bottom: 10px;
+                background: #fff;
+            }
+            .data-table td {
+                display: flex;
+                justify-content: space-between;
+                align-items: flex-start;
+                gap: 8px;
+                border: none;
+                padding: 5px 0;
+                font-size: .88rem;
+                border-bottom: 1px solid #f0f4f8;
+            }
+            .data-table td:last-child {
+                border-bottom: none;
+            }
+            .data-table td::before {
+                content: attr(data-label);
+                font-weight: 700;
+                color: var(--muted);
+                font-size: .72rem;
+                text-transform: uppercase;
+                letter-spacing: .06em;
+                flex-shrink: 0;
+                padding-top: 2px;
+                min-width: 90px;
+            }
+            .data-table td:empty { display: none; }
+        }

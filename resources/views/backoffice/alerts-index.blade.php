@@ -75,7 +75,7 @@
     .alerts-table {
         width: 100%;
         border-collapse: collapse;
-        min-width: 1120px;
+        min-width: 720px;
     }
     .alerts-table th {
         text-align: left;
@@ -181,6 +181,18 @@
         .alerts-filter-grid {
             grid-template-columns: repeat(2, minmax(0, 1fr));
         }
+    }
+    @media (max-width: 760px) {
+        /* Hide Farm, Pond, Cycle columns — context clear from navigation */
+        .alerts-table th:nth-child(2),
+        .alerts-table td:nth-child(2),
+        .alerts-table th:nth-child(3),
+        .alerts-table td:nth-child(3),
+        .alerts-table th:nth-child(4),
+        .alerts-table td:nth-child(4) {
+            display: none;
+        }
+        .alerts-table { min-width: 0; }
     }
     @media (max-width: 720px) {
         .alerts-filter-grid {

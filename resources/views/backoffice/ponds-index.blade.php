@@ -70,6 +70,7 @@
         @if($vm['rows'] === [])
             <div class="section-subtitle">{{ __('farms.no_ponds') }}</div>
         @else
+            <div class="table-scroll">
             <table class="data-table">
                 <thead>
                 <tr><th>{{ __('farms.code') }}</th><th>{{ __('farms.farm') }}</th><th>{{ __('farms.area_ha') }}</th><th>{{ __('farms.depth_m') }}</th><th>{{ __('farms.status') }}</th><th>{{ __('farms.operation') }}</th></tr>
@@ -103,6 +104,7 @@
                 @endforeach
                 </tbody>
             </table>
+            </div>
         @endif
     </div>
 </div>

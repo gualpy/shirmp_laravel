@@ -36,6 +36,7 @@
         @if($vm['rows'] === [])
             <div class="section-subtitle">{{ __('inventory.no_warehouses') }}</div>
         @else
+            <div class="table-scroll">
             <table class="data-table">
                 <thead>
                     <tr><th>{{ __('inventory.name') }}</th><th>{{ __('inventory.location') }}</th><th>{{ __('inventory.items_count') }}</th><th>{{ __('inventory.notes') }}</th></tr>
@@ -51,6 +52,7 @@
                     @endforeach
                 </tbody>
             </table>
+            </div>
         @endif
     </div>
 </div>

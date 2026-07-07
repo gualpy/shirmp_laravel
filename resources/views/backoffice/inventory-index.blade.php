@@ -26,38 +26,41 @@
             @csrf
             <label>
                 <span class="metric-label">{{ __('inventory.warehouse') }}</span>
-                <select class="input" name="warehouse_id">
+                <select class="input{{ $errors->has('warehouse_id') ? ' input--error' : '' }}" name="warehouse_id">
                     <option value="">{{ __('inventory.select_warehouse') }}</option>
                     @foreach($vm['warehouse_options'] as $warehouse)
                         <option value="{{ $warehouse['id'] }}" @selected((string) old('warehouse_id') === (string) $warehouse['id'])>{{ $warehouse['name'] }}</option>
                     @endforeach
                 </select>
+                @error('warehouse_id') <span class="field-error">{{ $message }}</span> @enderror
             </label>
-            <label><span class="metric-label">{{ __('inventory.name') }}</span><input class="input" name="name" value="{{ old('name') }}"></label>
+            <label><span class="metric-label">{{ __('inventory.name') }}</span><input class="input{{ $errors->has('name') ? ' input--error' : '' }}" name="name" value="{{ old('name') }}">@error('name') <span class="field-error">{{ $message }}</span> @enderror</label>
             <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
                 <label>
                     <span class="metric-label">{{ __('inventory.category') }}</span>
-                    <select class="input" name="category">
+                    <select class="input{{ $errors->has('category') ? ' input--error' : '' }}" name="category">
                         @foreach($vm['category_options'] as $option)
                             <option value="{{ $option['value'] }}" @selected(old('category') === $option['value'])>{{ $option['label'] }}</option>
                         @endforeach
                     </select>
+                    @error('category') <span class="field-error">{{ $message }}</span> @enderror
                 </label>
                 <label>
                     <span class="metric-label">{{ __('inventory.unit') }}</span>
-                    <select class="input" name="unit">
+                    <select class="input{{ $errors->has('unit') ? ' input--error' : '' }}" name="unit">
                         @foreach($vm['unit_options'] as $option)
                             <option value="{{ $option['value'] }}" @selected(old('unit') === $option['value'])>{{ $option['label'] }}</option>
                         @endforeach
                     </select>
+                    @error('unit') <span class="field-error">{{ $message }}</span> @enderror
                 </label>
             </div>
             <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;">
-                <label><span class="metric-label">{{ __('inventory.current_stock') }}</span><input class="input" type="number" step="0.01" min="0" name="current_stock" value="{{ old('current_stock', '0') }}"></label>
-                <label><span class="metric-label">{{ __('inventory.min_stock') }}</span><input class="input" type="number" step="0.01" min="0" name="min_stock" value="{{ old('min_stock') }}"></label>
-                <label><span class="metric-label">{{ __('inventory.cost_per_unit') }}</span><input class="input" type="number" step="0.01" min="0" name="cost_per_unit" value="{{ old('cost_per_unit') }}"></label>
+                <label><span class="metric-label">{{ __('inventory.current_stock') }}</span><input class="input{{ $errors->has('current_stock') ? ' input--error' : '' }}" type="number" step="0.01" min="0" name="current_stock" value="{{ old('current_stock', '0') }}">@error('current_stock') <span class="field-error">{{ $message }}</span> @enderror</label>
+                <label><span class="metric-label">{{ __('inventory.min_stock') }}</span><input class="input{{ $errors->has('min_stock') ? ' input--error' : '' }}" type="number" step="0.01" min="0" name="min_stock" value="{{ old('min_stock') }}">@error('min_stock') <span class="field-error">{{ $message }}</span> @enderror</label>
+                <label><span class="metric-label">{{ __('inventory.cost_per_unit') }}</span><input class="input{{ $errors->has('cost_per_unit') ? ' input--error' : '' }}" type="number" step="0.01" min="0" name="cost_per_unit" value="{{ old('cost_per_unit') }}">@error('cost_per_unit') <span class="field-error">{{ $message }}</span> @enderror</label>
             </div>
-            <label><span class="metric-label">{{ __('inventory.notes') }}</span><textarea class="input" name="notes" rows="3">{{ old('notes') }}</textarea></label>
+            <label><span class="metric-label">{{ __('inventory.notes') }}</span><textarea class="input{{ $errors->has('notes') ? ' input--error' : '' }}" name="notes" rows="3">{{ old('notes') }}</textarea>@error('notes') <span class="field-error">{{ $message }}</span> @enderror</label>
             <div style="display:flex;gap:10px;flex-wrap:wrap;">
                 <button class="cta-primary" type="submit" {{ $canManageInventory ? '' : 'disabled' }} title="{{ $canManageInventory ? __('inventory.create_item') : (($shell['permissions']['inventory.manage'] ?? false) ? $shell['write_block_tooltip'] : $shell['permission_block_tooltip']) }}">{{ __('inventory.create_item') }}</button>
                 <a class="cta-secondary" href="/backoffice/inventory">Limpiar</a>

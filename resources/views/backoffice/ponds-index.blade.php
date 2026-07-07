@@ -39,20 +39,21 @@
             @csrf
             <label>
                 <span class="metric-label">Farm</span>
-                <select class="input" name="farm_id">
+                <select class="input{{ $errors->has('farm_id') ? ' input--error' : '' }}" name="farm_id">
                     <option value="">{{ __('farms.select_farm') }}</option>
                     @foreach($vm['farm_options'] as $farm)
                         <option value="{{ $farm['id'] }}" @selected((string) old('farm_id', $vm['selected_farm_id']) === (string) $farm['id'])>{{ $farm['name'] }}</option>
                     @endforeach
                 </select>
+                @error('farm_id') <span class="field-error">{{ $message }}</span> @enderror
             </label>
             <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
-                <label><span class="metric-label">{{ __('farms.code') }}</span><input class="input" name="code" value="{{ old('code') }}" placeholder="P04"></label>
-                <label><span class="metric-label">{{ __('farms.name') }}</span><input class="input" name="name" value="{{ old('name') }}" placeholder="East Pond"></label>
+                <label><span class="metric-label">{{ __('farms.code') }}</span><input class="input{{ $errors->has('code') ? ' input--error' : '' }}" name="code" value="{{ old('code') }}" placeholder="P04">@error('code') <span class="field-error">{{ $message }}</span> @enderror</label>
+                <label><span class="metric-label">{{ __('farms.name') }}</span><input class="input{{ $errors->has('name') ? ' input--error' : '' }}" name="name" value="{{ old('name') }}" placeholder="East Pond">@error('name') <span class="field-error">{{ $message }}</span> @enderror</label>
             </div>
             <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
-                <label><span class="metric-label">{{ __('farms.area_ha') }}</span><input class="input" type="number" step="0.01" min="0.01" name="area_ha" value="{{ old('area_ha') }}"></label>
-                <label><span class="metric-label">{{ __('farms.depth_m') }}</span><input class="input" type="number" step="0.01" min="0.01" name="avg_depth_m" value="{{ old('avg_depth_m', '1.40') }}"></label>
+                <label><span class="metric-label">{{ __('farms.area_ha') }}</span><input class="input{{ $errors->has('area_ha') ? ' input--error' : '' }}" type="number" step="0.01" min="0.01" name="area_ha" value="{{ old('area_ha') }}">@error('area_ha') <span class="field-error">{{ $message }}</span> @enderror</label>
+                <label><span class="metric-label">{{ __('farms.depth_m') }}</span><input class="input{{ $errors->has('avg_depth_m') ? ' input--error' : '' }}" type="number" step="0.01" min="0.01" name="avg_depth_m" value="{{ old('avg_depth_m', '1.40') }}">@error('avg_depth_m') <span class="field-error">{{ $message }}</span> @enderror</label>
             </div>
             <label style="display:inline-flex;align-items:center;gap:10px;font-size:.92rem;color:var(--muted);">
                 <input type="checkbox" name="is_active" value="1" @checked(old('is_active', true))>

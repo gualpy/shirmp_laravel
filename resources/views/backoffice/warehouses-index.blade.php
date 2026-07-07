@@ -21,9 +21,9 @@
         <h3 class="panel-title">{{ __('inventory.new_warehouse') }}</h3>
         <form method="POST" action="/backoffice/warehouses" style="display:grid;gap:12px;">
             @csrf
-            <label><span class="metric-label">{{ __('inventory.name') }}</span><input class="input" name="name" value="{{ old('name') }}"></label>
-            <label><span class="metric-label">{{ __('inventory.location') }}</span><input class="input" name="location" value="{{ old('location') }}"></label>
-            <label><span class="metric-label">{{ __('inventory.notes') }}</span><textarea class="input" name="notes" rows="4">{{ old('notes') }}</textarea></label>
+            <label><span class="metric-label">{{ __('inventory.name') }}</span><input class="input{{ $errors->has('name') ? ' input--error' : '' }}" name="name" value="{{ old('name') }}">@error('name') <span class="field-error">{{ $message }}</span> @enderror</label>
+            <label><span class="metric-label">{{ __('inventory.location') }}</span><input class="input{{ $errors->has('location') ? ' input--error' : '' }}" name="location" value="{{ old('location') }}">@error('location') <span class="field-error">{{ $message }}</span> @enderror</label>
+            <label><span class="metric-label">{{ __('inventory.notes') }}</span><textarea class="input{{ $errors->has('notes') ? ' input--error' : '' }}" name="notes" rows="4">{{ old('notes') }}</textarea>@error('notes') <span class="field-error">{{ $message }}</span> @enderror</label>
             <div style="display:flex;gap:10px;flex-wrap:wrap;">
                 <button class="cta-primary" type="submit" {{ $canManageInventory ? '' : 'disabled' }} title="{{ $canManageInventory ? __('inventory.create_warehouse') : (($shell['permissions']['inventory.manage'] ?? false) ? $shell['write_block_tooltip'] : $shell['permission_block_tooltip']) }}">{{ __('inventory.create_warehouse') }}</button>
                 <a class="cta-secondary" href="/backoffice/warehouses">Limpiar</a>

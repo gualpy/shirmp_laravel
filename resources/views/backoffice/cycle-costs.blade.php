@@ -214,23 +214,23 @@
                     @csrf
                     <label>
                         <span class="field-label">{{ __('cycle.cost_type') }}</span>
-                        <select name="cost_type" class="field-control">
+                        <select name="cost_type" class="field-control{{ $errors->has('cost_type') ? ' input--error' : '' }}">
                             @foreach($vm['cost_type_options'] as $option)
                                 <option value="{{ $option['value'] }}" {{ old('cost_type') === $option['value'] ? 'selected' : '' }}>{{ $option['label'] }}</option>
                             @endforeach
-                        </select>
+                        </select>@error('cost_type') <span class="field-error">{{ $message }}</span> @enderror
                     </label>
                     <label>
                         <span class="field-label">{{ __('cycle.amount') }}</span>
-                        <input type="number" step="0.01" name="amount" value="{{ old('amount') }}" class="field-control">
+                        <input type="number" step="0.01" name="amount" value="{{ old('amount') }}" class="field-control{{ $errors->has('amount') ? ' input--error' : '' }}">@error('amount') <span class="field-error">{{ $message }}</span> @enderror
                     </label>
                     <label>
                         <span class="field-label">{{ __('cycle.date') }}</span>
-                        <input type="date" name="occurred_at" value="{{ old('occurred_at', now()->format('Y-m-d')) }}" class="field-control">
+                        <input type="date" name="occurred_at" value="{{ old('occurred_at', now()->format('Y-m-d')) }}" class="field-control{{ $errors->has('occurred_at') ? ' input--error' : '' }}">@error('occurred_at') <span class="field-error">{{ $message }}</span> @enderror
                     </label>
                     <label>
                         <span class="field-label">{{ __('cycle.notes') }}</span>
-                        <textarea name="notes" class="field-control">{{ old('notes') }}</textarea>
+                        <textarea name="notes" class="field-control{{ $errors->has('notes') ? ' input--error' : '' }}">{{ old('notes') }}</textarea>@error('notes') <span class="field-error">{{ $message }}</span> @enderror
                     </label>
                     @if($errors->any())
                         <div class="empty-state" style="padding:14px 16px;color:#9a1f1f;background:#fff4f4;border-color:#f1caca;">

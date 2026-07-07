@@ -26,9 +26,9 @@
         <h3 class="panel-title">{{ __('farms.new_farm') }}</h3>
         <form method="POST" action="/backoffice/farms" style="display:grid;gap:12px;">
             @csrf
-            <label><span class="metric-label">{{ __('farms.name') }}</span><input class="input" name="name" value="{{ old('name') }}" placeholder="Farm Camaronera Norte"></label>
-            <label><span class="metric-label">{{ __('farms.location') }}</span><input class="input" name="location" value="{{ old('location') }}" placeholder="Guayas"></label>
-            <label><span class="metric-label">{{ __('farms.notes') }}</span><textarea class="input" name="notes" rows="4" placeholder="Operational or geographic notes">{{ old('notes') }}</textarea></label>
+            <label><span class="metric-label">{{ __('farms.name') }}</span><input class="input{{ $errors->has('name') ? ' input--error' : '' }}" name="name" value="{{ old('name') }}" placeholder="Farm Camaronera Norte">@error('name') <span class="field-error">{{ $message }}</span> @enderror</label>
+            <label><span class="metric-label">{{ __('farms.location') }}</span><input class="input{{ $errors->has('location') ? ' input--error' : '' }}" name="location" value="{{ old('location') }}" placeholder="Guayas">@error('location') <span class="field-error">{{ $message }}</span> @enderror</label>
+            <label><span class="metric-label">{{ __('farms.notes') }}</span><textarea class="input{{ $errors->has('notes') ? ' input--error' : '' }}" name="notes" rows="4" placeholder="Operational or geographic notes">{{ old('notes') }}</textarea>@error('notes') <span class="field-error">{{ $message }}</span> @enderror</label>
             <div style="display:flex;gap:10px;flex-wrap:wrap;">
                 <button class="cta-primary" type="submit" {{ $canManageProduction ? '' : 'disabled' }} title="{{ $canManageProduction ? __('farms.create_farm') : (($shell['permissions']['production.manage'] ?? false) ? $shell['write_block_tooltip'] : $shell['permission_block_tooltip']) }}">{{ __('farms.create_farm') }}</button>
                 <a class="cta-secondary" href="/backoffice/farms">Reset</a>

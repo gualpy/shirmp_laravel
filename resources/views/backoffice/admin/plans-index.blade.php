@@ -3,9 +3,9 @@
 @section('title', 'Superadmin · Plans')
 
 @section('content')
-<div class="card card-soft" style="margin-bottom:16px;">
-    <h1 class="section-heading">Planes SaaS</h1>
-    <div class="section-subtitle">Lectura clara de planes, billing, límites y features disponibles.</div>
+<div class="card card-soft animate-enter-down" style="margin-bottom:16px;">
+    <h1 class="section-heading">{{ __('admin.plans_title') }}</h1>
+    <div class="section-subtitle">{{ __('admin.plans_subtitle') }}</div>
 </div>
 
 <div style="display:grid;gap:14px;">
@@ -20,7 +20,7 @@
         </div>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
             <div>
-                <strong>Límites</strong>
+                <strong>{{ __('admin.limits') }}</strong>
                 <ul>
                     @foreach($row['limits'] as $limit)
                         <li>{{ $limit }}</li>

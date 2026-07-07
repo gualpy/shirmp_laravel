@@ -3,19 +3,19 @@
 @section('title', 'Superadmin · Billing '.$vm['tenant']['name'])
 
 @section('content')
-<div class="card card-soft" style="margin-bottom:16px;display:flex;justify-content:space-between;align-items:flex-start;gap:14px;flex-wrap:wrap;">
+<div class="card card-soft animate-enter-down" style="margin-bottom:16px;display:flex;justify-content:space-between;align-items:flex-start;gap:14px;flex-wrap:wrap;">
     <div>
         <h1 class="section-heading">{{ __('admin.tenant_billing_title', ['name' => $vm['tenant']['name']]) }}</h1>
         <div class="section-subtitle">Slug: {{ $vm['tenant']['slug'] }} · Plan: {{ $vm['subscription']['plan_code'] ?? 'N/A' }} · Status: {{ $vm['subscription']['status'] ?? 'N/A' }}</div>
     </div>
-    <a class="cta-secondary" href="/backoffice/admin/tenants/{{ $vm['tenant']['id'] }}">Volver al tenant</a>
+    <a class="cta-secondary" href="/backoffice/admin/tenants/{{ $vm['tenant']['id'] }}">{{ __('admin.back_to_tenant') }}</a>
 </div>
 
 @if(session('status'))
     <div class="card" style="margin-bottom:16px;border-color:#b9e2cf;background:#eefaf4;color:#176448;">{{ session('status') }}</div>
 @endif
 
-<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:16px;margin-bottom:16px;">
+<div class="animate-enter-down animate-enter-down-delay-1" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:16px;margin-bottom:16px;">
     <div class="card">
         <h3 class="panel-title">{{ __('admin.create_invoice') }}</h3>
         <form method="POST" action="/backoffice/admin/tenants/{{ $vm['tenant']['id'] }}/billing/invoices" style="display:grid;gap:10px;">
@@ -54,12 +54,12 @@
     </div>
 </div>
 
-<div class="card" style="margin-bottom:16px;">
+<div class="card animate-enter-down animate-enter-down-delay-2" style="margin-bottom:16px;">
     <h3 class="panel-title">{{ __('admin.invoices') }}</h3>
     @if($vm['invoices'] === [])
         <div class="section-subtitle">{{ __('admin.no_tenant_invoices') }}</div>
     @else
-        <div style="overflow:auto;">
+        <div class="table-scroll">
             <table class="data-table">
                 <thead>
                     <tr>
@@ -108,12 +108,12 @@
     @endif
 </div>
 
-<div class="card">
+<div class="card animate-enter-down animate-enter-down-delay-3">
     <h3 class="panel-title">{{ __('admin.payments') }}</h3>
     @if($vm['payments'] === [])
         <div class="section-subtitle">{{ __('admin.no_tenant_payments') }}</div>
     @else
-        <div style="overflow:auto;">
+        <div class="table-scroll">
             <table class="data-table">
                 <thead>
                     <tr>

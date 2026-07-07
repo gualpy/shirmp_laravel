@@ -3,17 +3,17 @@
 @section('title', 'Superadmin · Nuevo Tenant')
 
 @section('content')
-<div class="card card-soft" style="margin-bottom:16px;display:flex;justify-content:space-between;align-items:flex-start;gap:14px;flex-wrap:wrap;">
+<div class="card card-soft animate-enter-down" style="margin-bottom:16px;display:flex;justify-content:space-between;align-items:flex-start;gap:14px;flex-wrap:wrap;">
     <div>
-        <h1 class="section-heading">Onboarding de Tenant</h1>
-        <div class="section-subtitle">Alta rápida de cliente con tenant, usuario inicial, suscripción y estructura opcional.</div>
+        <h1 class="section-heading">{{ __('admin.create_tenant_title') }}</h1>
+        <div class="section-subtitle">{{ __('admin.create_tenant_subtitle') }}</div>
     </div>
-    <a class="cta-secondary" href="/backoffice/admin/tenants">Volver a tenants</a>
+    <a class="cta-secondary" href="/backoffice/admin/tenants">{{ __('admin.back_to_tenants') }}</a>
 </div>
 
 @if($errors->any())
     <div class="card" style="margin-bottom:16px;border-color:#f2c0b7;background:#fff3f1;color:#9a3626;">
-        <strong>Revisa el formulario.</strong>
+        <strong>{{ __('admin.form_errors') }}</strong>
         <ul style="margin:10px 0 0 18px;">
             @foreach($errors->all() as $error)
                 <li>{{ $error }}</li>
@@ -22,11 +22,11 @@
     </div>
 @endif
 
-<form method="POST" action="/backoffice/admin/tenants" class="card" style="display:grid;gap:18px;">
+<form method="POST" action="/backoffice/admin/tenants" class="card animate-enter-down animate-enter-down-delay-1" style="display:grid;gap:18px;">
     @csrf
 
     <section>
-        <h3 class="panel-title">A) Tenant</h3>
+        <h3 class="panel-title">{{ __('admin.section_tenant') }}</h3>
         <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px;">
             <label><span class="metric-label">{{ __('admin.company_name') }}</span><input class="input" name="name" value="{{ old('name') }}"></label>
             <label><span class="metric-label">Slug</span><input class="input" name="slug" value="{{ old('slug') }}"></label>
@@ -39,7 +39,7 @@
 
     <section>
         <h3 class="panel-title">{{ __('admin.section_user') }}</h3>
-        <div class="section-subtitle" style="margin-bottom:10px;">El rol inicial se crea como <strong>Owner</strong>.</div>
+        <div class="section-subtitle" style="margin-bottom:10px;">{!! __('admin.owner_note') !!}</div>
         <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px;">
             <label><span class="metric-label">{{ __('admin.full_name') }}</span><input class="input" name="admin_name" value="{{ old('admin_name') }}"></label>
             <label><span class="metric-label">Email</span><input class="input" type="email" name="admin_email" value="{{ old('admin_email') }}"></label>
@@ -53,7 +53,7 @@
             <label>
                 <span class="metric-label">{{ __('admin.plan') }}</span>
                 <select class="input" name="plan_id">
-                    <option value="">Selecciona un plan</option>
+                    <option value="">{{ __('admin.select_plan') }}</option>
                     @foreach($vm['plans'] as $plan)
                         <option value="{{ $plan['id'] }}" @selected((string) old('plan_id') === (string) $plan['id'])>{{ $plan['name'] }} · {{ $plan['code'] }} · {{ $plan['billing_type'] }} · ${{ $plan['price_usd'] }}</option>
                     @endforeach
@@ -94,8 +94,8 @@
     </section>
 
     <div style="display:flex;justify-content:flex-end;gap:10px;flex-wrap:wrap;">
-        <a class="cta-secondary" href="/backoffice/admin/tenants">Cancelar</a>
-        <button class="cta-primary" type="submit">Crear tenant</button>
+        <a class="cta-secondary" href="/backoffice/admin/tenants">{{ __('app.cancel') }}</a>
+        <button class="cta-primary" type="submit">{{ __('admin.create_btn') }}</button>
     </div>
 </form>
 @endsection

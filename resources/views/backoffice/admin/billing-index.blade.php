@@ -3,24 +3,24 @@
 @section('title', 'Superadmin · Billing')
 
 @section('content')
-<div class="card card-soft" style="margin-bottom:16px;">
+<div class="card card-soft animate-enter-down" style="margin-bottom:16px;">
     <h1 class="section-heading">{{ __('admin.billing_title') }}</h1>
     <div class="section-subtitle">{{ __('admin.billing_subtitle') }}</div>
 </div>
 
-<div class="card" style="margin-bottom:16px;">
+<div class="card animate-enter-down animate-enter-down-delay-1" style="margin-bottom:16px;">
     <h3 class="panel-title">{{ __('admin.invoices') }}</h3>
     @if($vm['invoices'] === [])
         <div class="section-subtitle">{{ __('admin.no_invoices') }}</div>
     @else
-        <div style="overflow:auto;">
+        <div class="table-scroll">
             <table class="data-table">
                 <thead>
                     <tr>
                         <th>{{ __('admin.invoice') }}</th>
                         <th>{{ __('admin.tenant') }}</th>
-                        <th>Periodo</th>
-                        <th>Monto</th>
+                        <th>{{ __('admin.period') }}</th>
+                        <th>{{ __('admin.amount') }}</th>
                         <th>{{ __('admin.status') }}</th>
                         <th>{{ __('admin.due_at') }}</th>
                         <th>{{ __('admin.paid_at') }}</th>
@@ -53,22 +53,22 @@
     @endif
 </div>
 
-<div class="card">
+<div class="card animate-enter-down animate-enter-down-delay-2">
     <h3 class="panel-title">{{ __('admin.payments') }}</h3>
     @if($vm['payments'] === [])
         <div class="section-subtitle">{{ __('admin.no_payments') }}</div>
     @else
-        <div style="overflow:auto;">
+        <div class="table-scroll">
             <table class="data-table">
                 <thead>
                     <tr>
-                        <th>Fecha</th>
+                        <th>{{ __('admin.date') }}</th>
                         <th>{{ __('admin.tenant') }}</th>
                         <th>{{ __('admin.invoice') }}</th>
-                        <th>Monto</th>
+                        <th>{{ __('admin.amount') }}</th>
                         <th>{{ __('admin.provider') }}</th>
                         <th>{{ __('admin.status') }}</th>
-                        <th>Referencia</th>
+                        <th>{{ __('admin.reference') }}</th>
                     </tr>
                 </thead>
                 <tbody>

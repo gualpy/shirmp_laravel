@@ -1,6 +1,6 @@
 @extends('backoffice.layout')
 
-@section('title', 'Backoffice · Dashboard')
+@section('title', 'Backoffice · Panel')
 
 @push('head')
 <style>

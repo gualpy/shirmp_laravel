@@ -1,6 +1,6 @@
 @extends('backoffice.layout')
 
-@section('title', 'Backoffice · Alerts')
+@section('title', 'Backoffice · Alertas')
 
 @push('head')
 <style>

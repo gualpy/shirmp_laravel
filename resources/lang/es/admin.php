@@ -132,6 +132,6 @@ return [
     'starts_at'              => 'Inicia el',
     'create_initial_farm'    => 'Crear granja inicial',
     'farm_name'              => 'Nombre de granja',
-    'create_ponds'           => 'Crear estanques',
-    'pond_count'             => 'Número de estanques',
+    'create_ponds'           => 'Crear piscinas',
+    'pond_count'             => 'Número de piscinas',
 ];

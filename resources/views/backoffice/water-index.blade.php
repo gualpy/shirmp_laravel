@@ -1,6 +1,6 @@
 @extends('backoffice.layout')
 
-@section('title', 'Backoffice · Water Quality')
+@section('title', 'Backoffice · Calidad de Agua')
 
 @push('head')
 <style>

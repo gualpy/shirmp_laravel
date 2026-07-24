@@ -1,6 +1,6 @@
 @extends('backoffice.layout')
 
-@section('title', 'Backoffice · Cycle mortality #'.$vm['header']['cycle_id'])
+@section('title', 'Backoffice · Mortalidad de Ciclo #'.$vm['header']['cycle_id'])
 
 @push('head')
 <style>

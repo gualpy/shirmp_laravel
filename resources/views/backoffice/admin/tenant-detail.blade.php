@@ -44,8 +44,8 @@
         <p><strong>Usuario admin:</strong> {{ $vm['admin_user']['name'] ?? 'N/A' }}</p>
         <p><strong>Email admin:</strong> {{ $vm['admin_user']['email'] ?? 'N/A' }}</p>
         <p><strong>Rol:</strong> {{ $vm['admin_user']['role'] ?? 'N/A' }}</p>
-        <p><strong>Farm inicial:</strong> {{ $vm['structure']['farm_name'] ?? 'N/A' }}</p>
-        <p><strong>Ponds creados:</strong> {{ $vm['structure']['pond_count'] }}</p>
+        <p><strong>Granja inicial:</strong> {{ $vm['structure']['farm_name'] ?? 'N/A' }}</p>
+        <p><strong>Piscinas creadas:</strong> {{ $vm['structure']['pond_count'] }}</p>
     </div>
 </div>
 

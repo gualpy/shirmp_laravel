@@ -38,10 +38,10 @@
                 </div>
 
                 <div class="brand-footer">
-                    <span class="brand-chip">Production</span>
-                    <span class="brand-chip">Alertas</span>
-                    <span class="brand-chip">Costs</span>
-                    <span class="brand-chip">Projection</span>
+                    <span class="brand-chip">{{ __('login.chip_production') }}</span>
+                    <span class="brand-chip">{{ __('login.chip_alerts') }}</span>
+                    <span class="brand-chip">{{ __('login.chip_costs') }}</span>
+                    <span class="brand-chip">{{ __('login.chip_projection') }}</span>
                 </div>
             </aside>
 
@@ -51,7 +51,7 @@
                         <img src="{{ asset('assets/img/logo.png') }}" alt="ShrimpApp">
                         <div>
                             <strong>ShrimpApp</strong>
-                            <span>Aquaculture management platform</span>
+                            <span>{{ __('login.management_platform') }}</span>
                         </div>
                     </div>
 

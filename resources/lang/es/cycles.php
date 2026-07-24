@@ -2,9 +2,9 @@
 
 return [
     'title'             => 'Ciclos Activos',
-    'subtitle'          => 'Vista operativa para identificar rápidamente biomasa, peso promedio y alertas por estanque.',
+    'subtitle'          => 'Vista operativa para identificar rápidamente biomasa, peso promedio y alertas por piscina.',
     'farm'              => 'Granja',
-    'pond'              => 'Estanque',
+    'pond'              => 'Piscina',
     'all'               => 'Todos',
     'filter'            => 'Filtrar',
     'reset'             => 'Limpiar',

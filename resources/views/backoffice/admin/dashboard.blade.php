@@ -1,6 +1,6 @@
 @extends('backoffice.layout')
 
-@section('title', 'Superadmin · Dashboard')
+@section('title', 'Superadmin · Panel')
 
 @section('content')
 <div class="card card-soft animate-enter-down" style="margin-bottom:16px;">

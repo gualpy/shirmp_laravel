@@ -10,6 +10,8 @@ use App\Modules\Backoffice\Presentation\Controllers\BackofficeAuditController;
 use App\Modules\Backoffice\Presentation\Controllers\BackofficeCycleCostsController;
 use App\Modules\Backoffice\Presentation\Controllers\BackofficeCycleCostsXlsxExportController;
 use App\Modules\Backoffice\Presentation\Controllers\BackofficeCycleExecutiveReportController;
+use App\Modules\Backoffice\Presentation\Controllers\BackofficeCycleFeedingController;
+use App\Modules\Backoffice\Presentation\Controllers\BackofficeCycleFeedingStoreController;
 use App\Modules\Backoffice\Presentation\Controllers\BackofficeCycleFeedExportController;
 use App\Modules\Backoffice\Presentation\Controllers\BackofficeCycleFeedXlsxExportController;
 use App\Modules\Backoffice\Presentation\Controllers\BackofficeCycleListController;
@@ -34,6 +36,8 @@ use App\Modules\Backoffice\Presentation\Controllers\BackofficeOperationalCostSto
 use App\Modules\Backoffice\Presentation\Controllers\BackofficePondStoreController;
 use App\Modules\Backoffice\Presentation\Controllers\BackofficePondsController;
 use App\Modules\Backoffice\Presentation\Controllers\BackofficeSessionController;
+use App\Modules\Backoffice\Presentation\Controllers\BackofficeSettingsController;
+use App\Modules\Backoffice\Presentation\Controllers\BackofficeSettingsUpdateController;
 use App\Modules\Backoffice\Presentation\Controllers\BackofficeStockingCreateController;
 use App\Modules\Backoffice\Presentation\Controllers\BackofficeStockingStoreController;
 use App\Modules\Backoffice\Presentation\Controllers\BackofficeTenantBillingController;
@@ -101,6 +105,13 @@ Route::middleware(['tenant.backoffice', 'auth', 'subscription.active'])
         Route::get('/billing/export.xlsx', BackofficeTenantBillingXlsxExportController::class)
             ->middleware('role.module:billing')
             ->name('backoffice.billing.export.xlsx');
+
+        Route::get('/settings', BackofficeSettingsController::class)
+            ->middleware('role.module:settings')
+            ->name('backoffice.settings.index');
+        Route::post('/settings', BackofficeSettingsUpdateController::class)
+            ->middleware('role.module:settings')
+            ->name('backoffice.settings.update');
 
         Route::get('/warehouses', BackofficeWarehousesController::class)
             ->middleware('role.module:inventory')
@@ -190,6 +201,13 @@ Route::middleware(['tenant.backoffice', 'auth', 'subscription.active'])
         Route::get('/cycles/{cycleId}/report', BackofficeCycleExecutiveReportController::class)
             ->middleware('role.module:reports')
             ->name('backoffice.cycles.report');
+
+        Route::get('/cycles/{cycleId}/feeding', BackofficeCycleFeedingController::class)
+            ->middleware('role.module:feeding')
+            ->name('backoffice.cycles.feeding');
+        Route::post('/cycles/{cycleId}/feeding', BackofficeCycleFeedingStoreController::class)
+            ->middleware('role.module:feeding')
+            ->name('backoffice.cycles.feeding.store');
 
         Route::get('/cycles/{cycleId}/costs', BackofficeCycleCostsController::class)
             ->middleware('role.module:costs')

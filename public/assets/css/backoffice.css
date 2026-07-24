@@ -239,19 +239,24 @@
         }
         .chips { display: flex; gap: 8px; flex-wrap: wrap; }
         .logout-btn {
-            border: 1px solid rgba(255, 255, 255, 0.14);
-            background: rgba(255, 255, 255, 0.92);
-            color: #11263b;
-            border-radius: 999px;
-            padding: 8px 13px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            border: 1px solid rgba(255, 255, 255, 0.18);
+            background: transparent;
+            color: #dbe8f4;
+            border-radius: 8px;
+            padding: 7px 12px;
             font-weight: 700;
             font-size: .82rem;
             cursor: pointer;
-            transition: transform .18s ease, box-shadow .18s ease;
+            transition: background .18s ease, color .18s ease, border-color .18s ease;
         }
         .logout-btn:hover {
-            transform: translateY(-1px);
-            box-shadow: 0 10px 20px rgba(10, 22, 33, 0.16);
+            background: rgba(255, 255, 255, 0.92);
+            color: #11263b;
+            border-color: rgba(255, 255, 255, 0.92);
         }
         .chip {
             background: var(--chip);

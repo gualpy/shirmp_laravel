@@ -1,6 +1,6 @@
 @extends('backoffice.layout')
 
-@section('title', 'Superadmin · Billing '.$vm['tenant']['name'])
+@section('title', 'Superadmin · Facturación '.$vm['tenant']['name'])
 
 @section('content')
 <div class="card card-soft animate-enter-down" style="margin-bottom:16px;display:flex;justify-content:space-between;align-items:flex-start;gap:14px;flex-wrap:wrap;">

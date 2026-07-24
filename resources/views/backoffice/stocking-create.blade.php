@@ -1,6 +1,6 @@
 @extends('backoffice.layout')
 
-@section('title', 'Backoffice · New Stocking')
+@section('title', 'Backoffice · Nueva Siembra')
 
 @section('content')
 @php($canManageProduction = ($shell['permissions']['production.manage'] ?? false) && ! $vm['read_only_mode'])

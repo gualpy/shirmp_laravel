@@ -1,11 +1,11 @@
 @extends('backoffice.layout')
 
-@section('title', 'Superadmin · Audit')
+@section('title', 'Superadmin · Auditoría')
 
 @section('content')
 <div class="card card-soft" style="margin-bottom:16px;">
-    <h1 class="section-heading">Audit Global</h1>
-    <div class="section-subtitle">Trazabilidad global para soporte, troubleshooting y auditoría operativa del SaaS.</div>
+    <h1 class="section-heading">{{ __('admin.audit_title') }}</h1>
+    <div class="section-subtitle">{{ __('admin.audit_subtitle') }}</div>
 </div>
 
 <form method="GET" class="card" style="margin-bottom:16px;display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;align-items:end;">

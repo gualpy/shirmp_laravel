@@ -1,6 +1,6 @@
 @extends('backoffice.layout')
 
-@section('title', 'Backoffice · Audit')
+@section('title', 'Backoffice · Auditoría')
 
 @section('content')
 <div class="card card-soft" style="margin-bottom:16px;">

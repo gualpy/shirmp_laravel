@@ -24,4 +24,9 @@ return [
     'back_to_main'           => 'Volver a la página principal de operaciones',
     'show_password'          => 'Mostrar',
     'hide_password'          => 'Ocultar',
+    'chip_production'        => 'Producción',
+    'chip_alerts'             => 'Alertas',
+    'chip_costs'              => 'Costos',
+    'chip_projection'         => 'Proyección',
+    'management_platform'    => 'Plataforma de gestión acuícola',
 ];

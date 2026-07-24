@@ -1,6 +1,6 @@
 @extends('backoffice.layout')
 
-@section('title', 'Backoffice · Active Cycles')
+@section('title', 'Backoffice · Ciclos Activos')
 
 @push('head')
 <style>

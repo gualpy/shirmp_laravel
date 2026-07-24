@@ -2,12 +2,12 @@
 
 return [
     'title'             => 'Alertas Operacionales',
-    'subtitle'          => 'Vista central para priorizar problemas por granja, estanque y ciclo sin perder contexto operacional.',
+    'subtitle'          => 'Vista central para priorizar problemas por granja, piscina y ciclo sin perder contexto operacional.',
     'export_excel'      => 'Exportar Excel',
     'filter'            => 'Filtrar',
     'reset'             => 'Limpiar',
     'farm'              => 'Granja',
-    'pond'              => 'Estanque',
+    'pond'              => 'Piscina',
     'cycle'             => 'Ciclo',
     'severity'          => 'Severidad',
     'state'             => 'Estado',

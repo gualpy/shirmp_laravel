@@ -1,6 +1,6 @@
 @extends('backoffice.layout')
 
-@section('title', 'Backoffice · Inventory '.$vm['item']['name'])
+@section('title', 'Backoffice · Inventario '.$vm['item']['name'])
 
 @section('content')
 @php($canManageInventory = ($shell['permissions']['inventory.manage'] ?? false) && ! $vm['read_only_mode'])

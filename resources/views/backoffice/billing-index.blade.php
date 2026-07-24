@@ -1,6 +1,6 @@
 @extends('backoffice.layout')
 
-@section('title', 'Billing · '.$vm['tenant']['name'])
+@section('title', 'Facturación · '.$vm['tenant']['name'])
 
 @section('content')
 <div class="card card-soft animate-enter-down" style="margin-bottom:16px;">
@@ -21,7 +21,7 @@
     @if($vm['invoices'] === [])
         <div class="section-subtitle">{{ __('billing.no_invoices') }}</div>
     @else
-        <div style="overflow:auto;">
+        <div class="table-scroll">
             <table class="data-table">
                 <thead>
                     <tr>
@@ -55,7 +55,7 @@
     @if($vm['payments'] === [])
         <div class="section-subtitle">{{ __('billing.no_payments') }}</div>
     @else
-        <div style="overflow:auto;">
+        <div class="table-scroll">
             <table class="data-table">
                 <thead>
                     <tr>

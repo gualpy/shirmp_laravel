@@ -1,6 +1,6 @@
 @extends('backoffice.layout')
 
-@section('title', 'Backoffice · New Stocking')
+@section('title', 'Backoffice · Nueva Siembra')
 
 @section('content')
 @php($canManageProduction = ($shell['permissions']['production.manage'] ?? false) && ! $vm['read_only_mode'])
@@ -27,27 +27,27 @@
             @csrf
             <label>
                 <span class="metric-label">{{ __('farms.available_pond') }}</span>
-                <select class="input" name="pond_id">
+                <select class="input{{ $errors->has('pond_id') ? ' input--error' : '' }}" name="pond_id">
                     <option value="">{{ __('farms.select_pond') }}</option>
                     @foreach($vm['pond_options'] as $pond)
                         <option value="{{ $pond['id'] }}" @disabled($pond['disabled']) @selected((string) old('pond_id') === (string) $pond['id'])>
                             {{ $pond['label'] }}@if($pond['disabled']) · {{ __('farms.not_available_pond') }} @endif
                         </option>
                     @endforeach
-                </select>
+                </select>@error('pond_id') <span class="field-error">{{ $message }}</span> @enderror
             </label>
             <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
-                <label><span class="metric-label">{{ __('farms.cycle_start') }}</span><input class="input" type="date" name="started_at" value="{{ old('started_at', now()->toDateString()) }}"></label>
-                <label><span class="metric-label">{{ __('farms.stocking_date') }}</span><input class="input" type="date" name="stocked_at" value="{{ old('stocked_at', now()->toDateString()) }}"></label>
+                <label><span class="metric-label">{{ __('farms.cycle_start') }}</span><input class="input{{ $errors->has('started_at') ? ' input--error' : '' }}" type="date" name="started_at" value="{{ old('started_at', now()->toDateString()) }}">@error('started_at') <span class="field-error">{{ $message }}</span> @enderror</label>
+                <label><span class="metric-label">{{ __('farms.stocking_date') }}</span><input class="input{{ $errors->has('stocked_at') ? ' input--error' : '' }}" type="date" name="stocked_at" value="{{ old('stocked_at', now()->toDateString()) }}">@error('stocked_at') <span class="field-error">{{ $message }}</span> @enderror</label>
             </div>
             <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;">
-                <label><span class="metric-label">{{ __('farms.stocked_pl') }}</span><input class="input" type="number" min="1" name="pl_qty" value="{{ old('pl_qty') }}" placeholder="420000"></label>
-                <label><span class="metric-label">{{ __('farms.hatchery') }}</span><input class="input" name="hatchery_code" value="{{ old('hatchery_code') }}" placeholder="BC"></label>
-                <label><span class="metric-label">{{ __('farms.batch') }}</span><input class="input" name="batch_code" value="{{ old('batch_code') }}" placeholder="TA-2026-003"></label>
+                <label><span class="metric-label">{{ __('farms.stocked_pl') }}</span><input class="input{{ $errors->has('pl_qty') ? ' input--error' : '' }}" type="number" min="1" name="pl_qty" value="{{ old('pl_qty') }}" placeholder="420000">@error('pl_qty') <span class="field-error">{{ $message }}</span> @enderror</label>
+                <label><span class="metric-label">{{ __('farms.hatchery') }}</span><input class="input{{ $errors->has('hatchery_code') ? ' input--error' : '' }}" name="hatchery_code" value="{{ old('hatchery_code') }}" placeholder="BC">@error('hatchery_code') <span class="field-error">{{ $message }}</span> @enderror</label>
+                <label><span class="metric-label">{{ __('farms.batch') }}</span><input class="input{{ $errors->has('batch_code') ? ' input--error' : '' }}" name="batch_code" value="{{ old('batch_code') }}" placeholder="TA-2026-003">@error('batch_code') <span class="field-error">{{ $message }}</span> @enderror</label>
             </div>
             <div style="display:grid;grid-template-columns:220px 1fr;gap:10px;">
-                <label><span class="metric-label">{{ __('farms.initial_abw') }}</span><input class="input" type="number" min="0.01" step="0.01" name="initial_pp_grams" value="{{ old('initial_pp_grams', '0.05') }}"></label>
-                <label><span class="metric-label">{{ __('farms.cycle_notes') }}</span><input class="input" name="cycle_notes" value="{{ old('cycle_notes') }}" placeholder="{{ __('farms.initial_notes_ph') }}"></label>
+                <label><span class="metric-label">{{ __('farms.initial_abw') }}</span><input class="input{{ $errors->has('initial_pp_grams') ? ' input--error' : '' }}" type="number" min="0.01" step="0.01" name="initial_pp_grams" value="{{ old('initial_pp_grams', '0.05') }}">@error('initial_pp_grams') <span class="field-error">{{ $message }}</span> @enderror</label>
+                <label><span class="metric-label">{{ __('farms.cycle_notes') }}</span><input class="input{{ $errors->has('cycle_notes') ? ' input--error' : '' }}" name="cycle_notes" value="{{ old('cycle_notes') }}" placeholder="{{ __('farms.initial_notes_ph') }}">@error('cycle_notes') <span class="field-error">{{ $message }}</span> @enderror</label>
             </div>
             <div style="display:flex;gap:10px;flex-wrap:wrap;">
                 <button class="cta-primary" type="submit" {{ $canManageProduction ? '' : 'disabled' }} title="{{ $canManageProduction ? __('farms.open_cycle_stock') : (($shell['permissions']['production.manage'] ?? false) ? $shell['write_block_tooltip'] : $shell['permission_block_tooltip']) }}">{{ __('farms.open_cycle_stock') }}</button>

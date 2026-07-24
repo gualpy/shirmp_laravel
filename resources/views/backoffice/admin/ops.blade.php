@@ -3,12 +3,12 @@
 @section('title', 'Superadmin · Ops')
 
 @section('content')
-<div class="card card-soft" style="margin-bottom:16px;">
-    <h1 class="section-heading">Operaciones</h1>
-    <div class="section-subtitle">Señales básicas para validar despliegue, runtime y configuración operativa antes de staging o producción.</div>
+<div class="card card-soft animate-enter-down" style="margin-bottom:16px;">
+    <h1 class="section-heading">{{ __('admin.ops_title') }}</h1>
+    <div class="section-subtitle">{{ __('admin.ops_subtitle') }}</div>
 </div>
 
-<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;margin-bottom:16px;">
+<div class="animate-enter-down animate-enter-down-delay-1" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;margin-bottom:16px;">
     <div class="card"><div class="metric-label">{{ __('admin.app_env') }}</div><div class="metric-value">{{ $vm['app_env'] }}</div></div>
     <div class="card"><div class="metric-label">{{ __('admin.app_debug') }}</div><div class="metric-value">{{ $vm['app_debug'] ? 'true' : 'false' }}</div></div>
     <div class="card"><div class="metric-label">{{ __('admin.queue') }}</div><div class="metric-value">{{ $vm['queue_connection'] }}</div></div>
@@ -17,9 +17,9 @@
     <div class="card"><div class="metric-label">{{ __('admin.ready') }}</div><div class="metric-value">{{ $vm['readiness']['status'] }}</div></div>
 </div>
 
-<div class="card" style="margin-bottom:16px;">
-    <div class="section-heading" style="font-size:1.1rem;">{{ __('admin.readiness') }}</div>
-    <div class="section-subtitle" style="margin-bottom:14px;">Chequeo simple de `app key`, base de datos y cache. No expone secretos.</div>
+<div class="card animate-enter-down animate-enter-down-delay-2" style="margin-bottom:16px;">
+    <h3 class="panel-title">{{ __('admin.readiness') }}</h3>
+    <div class="section-subtitle" style="margin-bottom:14px;">{{ __('admin.readiness_sub') }}</div>
     <div style="display:flex;gap:10px;flex-wrap:wrap;">
         @foreach ($vm['readiness']['checks'] as $check => $ok)
             <span class="chip {{ $ok ? '' : 'read-only-badge' }}">{{ $check }}: {{ $ok ? 'ok' : 'error' }}</span>
@@ -30,9 +30,9 @@
     @endif
 </div>
 
-<div class="card" style="margin-bottom:16px;">
-    <div class="section-heading" style="font-size:1.1rem;">{{ __('admin.backups') }}</div>
-    <div class="section-subtitle" style="margin-bottom:14px;">Ultimos backups detectados en almacenamiento no publico de Laravel.</div>
+<div class="card animate-enter-down animate-enter-down-delay-3" style="margin-bottom:16px;">
+    <h3 class="panel-title">{{ __('admin.backups') }}</h3>
+    <div class="section-subtitle" style="margin-bottom:14px;">{{ __('admin.backups_sub') }}</div>
     <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px;">
         <span class="chip">DB backups: {{ $vm['backup_counts']['database'] }}</span>
         <span class="chip">Files backups: {{ $vm['backup_counts']['files'] }}</span>
@@ -65,9 +65,9 @@
     </div>
 </div>
 
-<div class="card">
-    <div class="section-heading" style="font-size:1.1rem;">{{ __('admin.deployment_docs') }}</div>
-    <div class="section-subtitle" style="margin-bottom:14px;">Guías operativas para `.env`, logs, queues, optimize, permisos y backup.</div>
+<div class="card animate-enter-down">
+    <h3 class="panel-title">{{ __('admin.deployment_docs') }}</h3>
+    <div class="section-subtitle" style="margin-bottom:14px;">{{ __('admin.deployment_docs_sub') }}</div>
     <div style="display:grid;gap:10px;">
         @foreach ($vm['docs'] as $doc)
             <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 14px;border:1px solid var(--border);border-radius:14px;background:rgba(255,255,255,.78);">

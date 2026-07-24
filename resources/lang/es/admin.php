@@ -111,7 +111,9 @@ return [
     'db_driver'              => 'Driver DB',
     'ready'                  => 'Listo',
     'readiness'              => 'Readiness',
+    'readiness_sub'          => 'Chequeo de app key, base de datos y caché. No expone secretos.',
     'backups'                => 'Respaldos',
+    'backups_sub'            => 'Últimos respaldos detectados en almacenamiento privado de Laravel.',
     'database_backup'        => 'Base de datos',
     'files_backup'           => 'Archivos',
     'not_detected'           => 'No detectado',
@@ -130,6 +132,6 @@ return [
     'starts_at'              => 'Inicia el',
     'create_initial_farm'    => 'Crear granja inicial',
     'farm_name'              => 'Nombre de granja',
-    'create_ponds'           => 'Crear estanques',
-    'pond_count'             => 'Número de estanques',
+    'create_ponds'           => 'Crear piscinas',
+    'pond_count'             => 'Número de piscinas',
 ];

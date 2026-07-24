@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>@yield('title', 'Aquaculture Backoffice')</title>
+    <title>@yield('title', 'Backoffice Acuícola')</title>
     <link rel="stylesheet" href="{{ asset('assets/css/backoffice.css') }}">
     @stack('head')
 </head>
@@ -60,8 +60,7 @@
 
                 <div class="nav-meta">
                     <div class="chips">
-                        <span class="chip">{{ $shell['tenant_name'] }}</span>
-                        <span class="chip">{{ $shell['user_name'] }}</span>
+                        <span class="chip">{{ $shell['tenant_name'] }} · {{ $shell['user_name'] }}</span>
                         <span class="chip">Plan: {{ $shell['plan_code'] ?? 'N/A' }}</span>
                         @if($shell['read_only_mode'])
                             <span class="chip read-only-badge">{{ __('layout.read_only') }}</span>
@@ -69,7 +68,10 @@
                     </div>
                     <form method="POST" action="{{ route('logout') }}">
                         @csrf
-                        <button class="logout-btn" type="submit">{{ __('layout.sign_out') }}</button>
+                        <button class="logout-btn" type="submit">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+                            {{ __('layout.sign_out') }}
+                        </button>
                     </form>
                 </div>
 
@@ -87,8 +89,7 @@
 
             <div class="mobile-panel" id="mobileNavPanel">
                 <div class="chips" style="margin-top:14px;">
-                    <span class="chip">{{ $shell['tenant_name'] }}</span>
-                    <span class="chip">{{ $shell['user_name'] }}</span>
+                    <span class="chip">{{ $shell['tenant_name'] }} · {{ $shell['user_name'] }}</span>
                     <span class="chip">Plan: {{ $shell['plan_code'] ?? 'N/A' }}</span>
                     @if($shell['read_only_mode'])
                         <span class="chip read-only-badge">{{ __('layout.read_only') }}</span>
@@ -206,6 +207,18 @@
         window.addEventListener('scroll', syncScrolledState, { passive: true });
         syncScrolledState();
     })();
+
+    // Auto-populate data-label on .data-table cells from their thead headers
+    document.querySelectorAll('.data-table').forEach(function(table) {
+        var headers = Array.from(table.querySelectorAll('thead th')).map(function(th) {
+            return th.textContent.trim();
+        });
+        table.querySelectorAll('tbody tr').forEach(function(row) {
+            Array.from(row.querySelectorAll('td')).forEach(function(td, i) {
+                if (headers[i]) td.dataset.label = headers[i];
+            });
+        });
+    });
 </script>
 </body>
 </html>

@@ -1,6 +1,6 @@
 @extends('backoffice.layout')
 
-@section('title', 'Backoffice · Audit')
+@section('title', 'Backoffice · Auditoría')
 
 @section('content')
 <div class="card card-soft" style="margin-bottom:16px;">
@@ -17,6 +17,7 @@
 </form>
 
 <div class="card">
+    <div class="table-scroll">
     <table class="data-table">
         <thead><tr><th>{{ __('audit.date') }}</th><th>{{ __('audit.user') }}</th><th>{{ __('audit.action') }}</th><th>{{ __('audit.entity') }}</th><th>{{ __('audit.id') }}</th><th>{{ __('audit.context') }}</th></tr></thead>
         <tbody>
@@ -34,5 +35,6 @@
         @endforelse
         </tbody>
     </table>
+    </div>
 </div>
 @endsection

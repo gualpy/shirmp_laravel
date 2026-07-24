@@ -7,15 +7,15 @@
     <div class="card" style="margin-bottom:16px;border-color:#b9e2cf;background:#eefaf4;color:#176448;">{{ session('status') }}</div>
 @endif
 
-<div class="card card-soft" style="margin-bottom:16px;">
+<div class="card card-soft animate-enter-down" style="margin-bottom:16px;">
     <h1 class="section-heading">{{ $vm['tenant']['name'] }}</h1>
     <div class="section-subtitle">Slug: {{ $vm['tenant']['slug'] }}</div>
     <div style="margin-top:12px;display:flex;gap:10px;flex-wrap:wrap;">
-        <a class="cta-secondary" href="/backoffice/admin/tenants/{{ $vm['tenant']['id'] }}/billing">Ver billing</a>
+        <a class="cta-secondary" href="/backoffice/admin/tenants/{{ $vm['tenant']['id'] }}/billing">{{ __('admin.back_to_billing') }}</a>
     </div>
 </div>
 
-<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:14px;">
+<div class="animate-enter-down animate-enter-down-delay-1" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:14px;">
     <div class="card">
         <h3 class="panel-title">{{ __('admin.general_info') }}</h3>
         <p><strong>Nombre:</strong> {{ $vm['tenant']['name'] }}</p>
@@ -44,12 +44,12 @@
         <p><strong>Usuario admin:</strong> {{ $vm['admin_user']['name'] ?? 'N/A' }}</p>
         <p><strong>Email admin:</strong> {{ $vm['admin_user']['email'] ?? 'N/A' }}</p>
         <p><strong>Rol:</strong> {{ $vm['admin_user']['role'] ?? 'N/A' }}</p>
-        <p><strong>Farm inicial:</strong> {{ $vm['structure']['farm_name'] ?? 'N/A' }}</p>
-        <p><strong>Ponds creados:</strong> {{ $vm['structure']['pond_count'] }}</p>
+        <p><strong>Granja inicial:</strong> {{ $vm['structure']['farm_name'] ?? 'N/A' }}</p>
+        <p><strong>Piscinas creadas:</strong> {{ $vm['structure']['pond_count'] }}</p>
     </div>
 </div>
 
-<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:14px;margin-top:14px;">
+<div class="animate-enter-down animate-enter-down-delay-2" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:14px;margin-top:14px;">
     <div class="card">
         <div class="panel-head"><h3 class="panel-title">{{ __('admin.enabled_features') }}</h3></div>
         @if($vm['features']===[])

@@ -1,6 +1,6 @@
 @extends('backoffice.layout')
 
-@section('title', 'Backoffice · Farms')
+@section('title', 'Backoffice · Granjas')
 
 @section('content')
 @php($canManageProduction = ($shell['permissions']['production.manage'] ?? false) && ! $vm['read_only_mode'])
@@ -10,8 +10,8 @@
         <div class="section-subtitle">{{ __('farms.farms_subtitle') }}</div>
     </div>
     <div style="display:flex;gap:10px;flex-wrap:wrap;">
-        <span class="chip">{{ $vm['stats']['farms'] }} farms</span>
-        <span class="chip">{{ $vm['stats']['ponds'] }} ponds</span>
+        <span class="chip">{{ $vm['stats']['farms'] }} {{ __('farms.farms_count') }}</span>
+        <span class="chip">{{ $vm['stats']['ponds'] }} {{ __('farms.ponds_count') }}</span>
         <a class="cta-secondary" href="/backoffice/ponds">{{ __('farms.view_ponds') }}</a>
         <a class="cta-secondary" href="/backoffice/stocking/create">{{ __('farms.new_stocking') }}</a>
     </div>
@@ -26,12 +26,12 @@
         <h3 class="panel-title">{{ __('farms.new_farm') }}</h3>
         <form method="POST" action="/backoffice/farms" style="display:grid;gap:12px;">
             @csrf
-            <label><span class="metric-label">{{ __('farms.name') }}</span><input class="input" name="name" value="{{ old('name') }}" placeholder="Farm Camaronera Norte"></label>
-            <label><span class="metric-label">{{ __('farms.location') }}</span><input class="input" name="location" value="{{ old('location') }}" placeholder="Guayas"></label>
-            <label><span class="metric-label">{{ __('farms.notes') }}</span><textarea class="input" name="notes" rows="4" placeholder="Operational or geographic notes">{{ old('notes') }}</textarea></label>
+            <label><span class="metric-label">{{ __('farms.name') }}</span><input class="input{{ $errors->has('name') ? ' input--error' : '' }}" name="name" value="{{ old('name') }}" placeholder="Granja Camaronera Norte">@error('name') <span class="field-error">{{ $message }}</span> @enderror</label>
+            <label><span class="metric-label">{{ __('farms.location') }}</span><input class="input{{ $errors->has('location') ? ' input--error' : '' }}" name="location" value="{{ old('location') }}" placeholder="Guayas">@error('location') <span class="field-error">{{ $message }}</span> @enderror</label>
+            <label><span class="metric-label">{{ __('farms.notes') }}</span><textarea class="input{{ $errors->has('notes') ? ' input--error' : '' }}" name="notes" rows="4" placeholder="Notas operativas o geográficas">{{ old('notes') }}</textarea>@error('notes') <span class="field-error">{{ $message }}</span> @enderror</label>
             <div style="display:flex;gap:10px;flex-wrap:wrap;">
                 <button class="cta-primary" type="submit" {{ $canManageProduction ? '' : 'disabled' }} title="{{ $canManageProduction ? __('farms.create_farm') : (($shell['permissions']['production.manage'] ?? false) ? $shell['write_block_tooltip'] : $shell['permission_block_tooltip']) }}">{{ __('farms.create_farm') }}</button>
-                <a class="cta-secondary" href="/backoffice/farms">Reset</a>
+                <a class="cta-secondary" href="/backoffice/farms">{{ __('cycles.reset') }}</a>
             </div>
         </form>
     </div>
@@ -41,6 +41,7 @@
         @if($vm['rows'] === [])
             <div class="section-subtitle">{{ __('farms.no_farms') }}</div>
         @else
+            <div class="table-scroll">
             <table class="data-table">
                 <thead>
                 <tr><th>{{ __('farms.farm') }}</th><th>{{ __('farms.location') }}</th><th>{{ __('farms.ponds') }}</th><th>{{ __('farms.context') }}</th></tr>
@@ -64,6 +65,7 @@
                 @endforeach
                 </tbody>
             </table>
+            </div>
         @endif
     </div>
 </div>

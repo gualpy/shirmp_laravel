@@ -1,6 +1,6 @@
 @extends('backoffice.layout')
 
-@section('title', 'Backoffice · Water Quality')
+@section('title', 'Backoffice · Calidad de Agua')
 
 @push('head')
 <style>
@@ -206,29 +206,32 @@
                     @csrf
                     <label>
                         <span class="field-label">{{ __('water.pond') }}</span>
-                        <select name="pond" class="field-control">
+                        <select name="pond" class="field-control{{ $errors->has('pond') ? ' input--error' : '' }}">
                             <option value="">{{ __('water.select_pond') }}</option>
                             @foreach($vm['options']['form_ponds'] as $pond)
                                 <option value="{{ $pond['id'] }}" {{ old('pond', $vm['defaults']['pond']) == $pond['id'] ? 'selected' : '' }}>{{ $pond['label'] }}</option>
                             @endforeach
                         </select>
+                        @error('pond') <span class="field-error">{{ $message }}</span> @enderror
                     </label>
                     <label>
                         <span class="field-label">{{ __('water.date_time') }}</span>
-                        <input type="datetime-local" name="measured_at" value="{{ old('measured_at', $vm['defaults']['measured_at']) }}" class="field-control">
+                        <input type="datetime-local" name="measured_at" value="{{ old('measured_at', $vm['defaults']['measured_at']) }}" class="field-control{{ $errors->has('measured_at') ? ' input--error' : '' }}">
+                        @error('measured_at') <span class="field-error">{{ $message }}</span> @enderror
                     </label>
                     <div class="entry-grid">
-                        <label><span class="field-label">{{ __('water.do') }}</span><input type="number" step="0.01" name="do" value="{{ old('do') }}" class="field-control"></label>
-                        <label><span class="field-label">{{ __('water.ph') }}</span><input type="number" step="0.01" name="ph" value="{{ old('ph') }}" class="field-control"></label>
-                        <label><span class="field-label">{{ __('water.temp') }}</span><input type="number" step="0.01" name="temperature" value="{{ old('temperature') }}" class="field-control"></label>
-                        <label><span class="field-label">{{ __('water.salinity') }}</span><input type="number" step="0.01" name="salinity" value="{{ old('salinity') }}" class="field-control"></label>
-                        <label><span class="field-label">{{ __('water.alkalinity') }}</span><input type="number" step="0.01" name="alkalinity" value="{{ old('alkalinity') }}" class="field-control"></label>
-                        <label><span class="field-label">{{ __('water.ammonia') }}</span><input type="number" step="0.001" name="ammonia" value="{{ old('ammonia') }}" class="field-control"></label>
-                        <label><span class="field-label">{{ __('water.nitrite') }}</span><input type="number" step="0.001" name="nitrite" value="{{ old('nitrite') }}" class="field-control"></label>
+                        <label><span class="field-label">{{ __('water.do') }}</span><input type="number" step="0.01" name="do" value="{{ old('do') }}" class="field-control{{ $errors->has('do') ? ' input--error' : '' }}">@error('do') <span class="field-error">{{ $message }}</span> @enderror</label>
+                        <label><span class="field-label">{{ __('water.ph') }}</span><input type="number" step="0.01" name="ph" value="{{ old('ph') }}" class="field-control{{ $errors->has('ph') ? ' input--error' : '' }}">@error('ph') <span class="field-error">{{ $message }}</span> @enderror</label>
+                        <label><span class="field-label">{{ __('water.temp') }}</span><input type="number" step="0.01" name="temperature" value="{{ old('temperature') }}" class="field-control{{ $errors->has('temperature') ? ' input--error' : '' }}">@error('temperature') <span class="field-error">{{ $message }}</span> @enderror</label>
+                        <label><span class="field-label">{{ __('water.salinity') }}</span><input type="number" step="0.01" name="salinity" value="{{ old('salinity') }}" class="field-control{{ $errors->has('salinity') ? ' input--error' : '' }}">@error('salinity') <span class="field-error">{{ $message }}</span> @enderror</label>
+                        <label><span class="field-label">{{ __('water.alkalinity') }}</span><input type="number" step="0.01" name="alkalinity" value="{{ old('alkalinity') }}" class="field-control{{ $errors->has('alkalinity') ? ' input--error' : '' }}">@error('alkalinity') <span class="field-error">{{ $message }}</span> @enderror</label>
+                        <label><span class="field-label">{{ __('water.ammonia') }}</span><input type="number" step="0.001" name="ammonia" value="{{ old('ammonia') }}" class="field-control{{ $errors->has('ammonia') ? ' input--error' : '' }}">@error('ammonia') <span class="field-error">{{ $message }}</span> @enderror</label>
+                        <label><span class="field-label">{{ __('water.nitrite') }}</span><input type="number" step="0.001" name="nitrite" value="{{ old('nitrite') }}" class="field-control{{ $errors->has('nitrite') ? ' input--error' : '' }}">@error('nitrite') <span class="field-error">{{ $message }}</span> @enderror</label>
                     </div>
                     <label>
                         <span class="field-label">{{ __('water.notes') }}</span>
-                        <textarea name="notes" class="field-control">{{ old('notes') }}</textarea>
+                        <textarea name="notes" class="field-control{{ $errors->has('notes') ? ' input--error' : '' }}">{{ old('notes') }}</textarea>
+                        @error('notes') <span class="field-error">{{ $message }}</span> @enderror
                     </label>
                     @if($errors->any())
                         <div class="empty-state" style="padding:14px 16px;color:#9a1f1f;background:#fff4f4;border-color:#f1caca;">

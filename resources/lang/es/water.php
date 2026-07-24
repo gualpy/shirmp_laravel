@@ -2,14 +2,14 @@
 
 return [
     'title'             => 'Registrar calidad de agua',
-    'subtitle'          => 'Entrada rápida para técnicos de campo. Un registro, un estanque, sin saltar módulos.',
+    'subtitle'          => 'Entrada rápida para técnicos de campo. Un registro, una piscina, sin saltar módulos.',
     'recent_records'    => 'Registros recientes',
-    'recent_subtitle'   => 'Monitorea rápidamente eventos fuera de rango por fecha, granja, estanque o ciclo.',
+    'recent_subtitle'   => 'Monitorea rápidamente eventos fuera de rango por fecha, granja, piscina o ciclo.',
     'save_record'       => 'Guardar registro',
     'reset'             => 'Limpiar',
     'filter'            => 'Filtrar',
-    'pond'              => 'Estanque',
-    'select_pond'       => 'Selecciona un estanque',
+    'pond'              => 'Piscina',
+    'select_pond'       => 'Selecciona una piscina',
     'date_time'         => 'Fecha y hora',
     'do'                => 'OD',
     'ph'                => 'pH',

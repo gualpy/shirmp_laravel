@@ -12,6 +12,8 @@ use App\Modules\Backoffice\Presentation\Controllers\BackofficeCycleCostsXlsxExpo
 use App\Modules\Backoffice\Presentation\Controllers\BackofficeCycleExecutiveReportController;
 use App\Modules\Backoffice\Presentation\Controllers\BackofficeCycleFeedingController;
 use App\Modules\Backoffice\Presentation\Controllers\BackofficeCycleFeedingStoreController;
+use App\Modules\Backoffice\Presentation\Controllers\BackofficeCycleSamplingController;
+use App\Modules\Backoffice\Presentation\Controllers\BackofficeCycleSamplingStoreController;
 use App\Modules\Backoffice\Presentation\Controllers\BackofficeCycleFeedExportController;
 use App\Modules\Backoffice\Presentation\Controllers\BackofficeCycleFeedXlsxExportController;
 use App\Modules\Backoffice\Presentation\Controllers\BackofficeCycleListController;
@@ -208,6 +210,13 @@ Route::middleware(['tenant.backoffice', 'auth', 'subscription.active'])
         Route::post('/cycles/{cycleId}/feeding', BackofficeCycleFeedingStoreController::class)
             ->middleware('role.module:feeding')
             ->name('backoffice.cycles.feeding.store');
+
+        Route::get('/cycles/{cycleId}/sampling', BackofficeCycleSamplingController::class)
+            ->middleware('role.module:sampling')
+            ->name('backoffice.cycles.sampling');
+        Route::post('/cycles/{cycleId}/sampling', BackofficeCycleSamplingStoreController::class)
+            ->middleware('role.module:sampling')
+            ->name('backoffice.cycles.sampling.store');
 
         Route::get('/cycles/{cycleId}/costs', BackofficeCycleCostsController::class)
             ->middleware('role.module:costs')

@@ -388,6 +388,7 @@
 @section('content')
     @php($canManageMortality = ($shell['permissions']['mortality.manage'] ?? false) && ! $shell['read_only_mode'])
     @php($canManageFeeding = ($shell['permissions']['feeding.manage'] ?? false) && ! $shell['read_only_mode'])
+    @php($canManageSampling = ($shell['permissions']['sampling.manage'] ?? false) && ! $shell['read_only_mode'])
     @php($canViewCosts = $shell['permissions']['costs.view'] ?? false)
     @php($canManageWater = ($shell['permissions']['water.manage'] ?? false) && ! $shell['read_only_mode'])
     @php($canViewReports = $shell['permissions']['reports.view'] ?? false)
@@ -416,6 +417,11 @@
             @if($shell['permissions']['feeding.view'] ?? false)
                 <a class="action-btn secondary-action" href="/backoffice/cycles/{{ $vm['header']['cycle_id'] }}/feeding" title="{{ $canManageFeeding ? __('cycle.record_feeding_tooltip') : __('cycle.view_feeding_tooltip') }}">
                     {{ $canManageFeeding ? __('cycle.record_feeding_title') : __('cycle.view_feeding') }}
+                </a>
+            @endif
+            @if($shell['permissions']['sampling.view'] ?? false)
+                <a class="action-btn secondary-action" href="/backoffice/cycles/{{ $vm['header']['cycle_id'] }}/sampling" title="{{ $canManageSampling ? __('cycle.record_sampling_tooltip') : __('cycle.view_sampling_tooltip') }}">
+                    {{ $canManageSampling ? __('cycle.record_sampling_title') : __('cycle.view_sampling') }}
                 </a>
             @endif
             @if($canViewCosts)

@@ -56,6 +56,20 @@ return [
     'no_feed_types'           => 'No hay tipos de alimento configurados para este tenant. Contactá al administrador.',
     'feeding_saved'           => 'Alimentación registrada correctamente.',
 
+    // Sampling
+    'sampling_title'          => 'Muestreo de Peso',
+    'sampling_subtitle'       => 'Registro periódico de peso promedio (PP) para seguimiento de crecimiento y biomasa.',
+    'record_sampling'         => 'Registrar muestreo',
+    'record_sampling_sub'     => 'Carga el peso promedio obtenido en el muestreo de campo.',
+    'pp_grams'                => 'Peso promedio (g)',
+    'save_sampling'           => 'Guardar muestreo',
+    'sampling_history'        => 'Historial de muestreos',
+    'sampling_history_sub'    => 'Registros ordenados por fecha para análisis rápido y trazabilidad operativa.',
+    'no_samplings'            => 'No hay registros de muestreo para este ciclo aún.',
+    'sampling_saved'          => 'Muestreo registrado correctamente.',
+    'latest_pp_grams'         => 'Último peso promedio',
+    'growth_g_per_week'       => 'Crecimiento semanal',
+
     // Cycle detail — tabs
     'tab_resumen'               => 'Resumen',
     'tab_proyeccion'            => 'Proyección',
@@ -73,6 +87,10 @@ return [
     'view_feeding'               => 'Ver alimentación',
     'record_feeding_tooltip'    => 'Registrar y revisar alimentación diaria',
     'view_feeding_tooltip'      => 'Ver historial de alimentación',
+    'record_sampling_title'     => 'Registrar muestreo',
+    'view_sampling'              => 'Ver muestreos',
+    'record_sampling_tooltip'   => 'Registrar y revisar muestreo de peso',
+    'view_sampling_tooltip'     => 'Ver historial de muestreos',
     'record_mortality_tooltip'  => 'Registrar y revisar mortalidad diaria',
     'view_mortality_tooltip'    => 'Ver historial de mortalidad',
     'view_costs_tooltip'        => 'Ver costos del ciclo',

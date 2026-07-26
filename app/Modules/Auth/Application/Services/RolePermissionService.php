@@ -33,6 +33,10 @@ final class RolePermissionService
             'view' => ['Owner', 'Admin', 'Production', 'ReadOnly'],
             'manage' => ['Owner', 'Admin', 'Production'],
         ],
+        'harvest' => [
+            'view' => ['Owner', 'Admin', 'Production', 'ReadOnly'],
+            'manage' => ['Owner', 'Admin', 'Production'],
+        ],
         'alerts' => [
             'view' => ['Owner', 'Admin', 'Production', 'ReadOnly'],
             'manage' => ['Owner', 'Admin', 'Production'],

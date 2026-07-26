@@ -73,7 +73,6 @@ final class CycleDetailViewService
             ],
             'water_quality_latest' => $water,
             'projection' => $projection,
-            'actions' => $this->resolvedActions($cycle, $readOnlyMode, $tenant),
             'read_only_mode' => $readOnlyMode,
             'feature_flags' => [
                 'dashboard' => $tenant ? $this->saasService->checkFeature($tenant, 'dashboard') : true,
@@ -176,29 +175,4 @@ final class CycleDetailViewService
         ];
     }
 
-    /**
-     * @return array<int, array<string, mixed>>
-     */
-    private function resolvedActions(Cycle $cycle, bool $readOnlyMode, $tenant): array
-    {
-        $waterEnabled = $tenant ? $this->saasService->checkFeature($tenant, 'water_quality') : true;
-
-        $actions = [
-            ['key' => 'sampling', 'label' => 'Record Sampling', 'href' => '/api/v1/cycles/'.$cycle->id.'/samplings', 'method' => 'POST', 'requires_feature' => 'water_quality', 'feature_enabled' => $waterEnabled],
-            ['key' => 'feeding', 'label' => 'Record Feeding', 'href' => '/api/v1/cycles/'.$cycle->id.'/feed-entries', 'method' => 'POST', 'requires_feature' => null, 'feature_enabled' => true],
-            ['key' => 'harvest', 'label' => 'Record Harvest', 'href' => '/api/v1/cycles/'.$cycle->id.'/harvests', 'method' => 'POST', 'requires_feature' => null, 'feature_enabled' => true],
-        ];
-
-        return collect($actions)->map(function (array $action) use ($readOnlyMode): array {
-            $disabled = $readOnlyMode || ! $action['feature_enabled'];
-            $reason = $readOnlyMode
-                ? 'Disabled in read-only mode.'
-                : (! $action['feature_enabled'] ? 'Not available in the current plan.' : '');
-
-            $action['disabled'] = $disabled;
-            $action['disabled_reason'] = $reason;
-
-            return $action;
-        })->values()->all();
-    }
 }

@@ -389,6 +389,7 @@
     @php($canManageMortality = ($shell['permissions']['mortality.manage'] ?? false) && ! $shell['read_only_mode'])
     @php($canManageFeeding = ($shell['permissions']['feeding.manage'] ?? false) && ! $shell['read_only_mode'])
     @php($canManageSampling = ($shell['permissions']['sampling.manage'] ?? false) && ! $shell['read_only_mode'])
+    @php($canManageHarvest = ($shell['permissions']['harvest.manage'] ?? false) && ! $shell['read_only_mode'])
     @php($canViewCosts = $shell['permissions']['costs.view'] ?? false)
     @php($canManageWater = ($shell['permissions']['water.manage'] ?? false) && ! $shell['read_only_mode'])
     @php($canViewReports = $shell['permissions']['reports.view'] ?? false)
@@ -424,6 +425,11 @@
                     {{ $canManageSampling ? __('cycle.record_sampling_title') : __('cycle.view_sampling') }}
                 </a>
             @endif
+            @if($shell['permissions']['harvest.view'] ?? false)
+                <a class="action-btn secondary-action" href="/backoffice/cycles/{{ $vm['header']['cycle_id'] }}/harvest" title="{{ $canManageHarvest ? __('cycle.record_harvest_tooltip') : __('cycle.view_harvest_tooltip') }}">
+                    {{ $canManageHarvest ? __('cycle.record_harvest_title') : __('cycle.view_harvest') }}
+                </a>
+            @endif
             @if($canViewCosts)
                 <a class="action-btn secondary-action" href="/backoffice/cycles/{{ $vm['header']['cycle_id'] }}/costs" title="{{ __('cycle.view_costs_tooltip') }}">
                     {{ __('cycle.view_costs') }}
@@ -434,13 +440,6 @@
                     {{ $canManageWater ? __('cycle.record_water') : __('cycle.view_water') }}
                 </a>
             @endif
-            @foreach($vm['actions'] as $action)
-                <a class="action-btn {{ $action['disabled'] ? 'disabled' : '' }}"
-                   href="{{ $action['disabled'] ? '#' : $action['href'] }}"
-                   title="{{ $action['disabled'] ? $action['disabled_reason'] : __('cycle.quick_action_tooltip') }}">
-                    {{ $action['label'] }}
-                </a>
-            @endforeach
         </div>
 
         @if($canViewReports)

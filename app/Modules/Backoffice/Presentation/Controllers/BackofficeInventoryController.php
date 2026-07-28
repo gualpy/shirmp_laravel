@@ -14,7 +14,7 @@ final class BackofficeInventoryController extends Controller
     {
         return view('backoffice.inventory-index', [
             'shell' => $shellService->build($request->user()),
-            'vm' => $service->inventoryIndexView(),
+            'vm' => $service->inventoryIndexView($request->integer('warehouse_id') ?: null),
             'activeMenu' => 'inventory',
         ]);
     }

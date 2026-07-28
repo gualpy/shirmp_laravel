@@ -14,7 +14,7 @@ final class CreateFeedingTableAction extends BaseAction
     {
         if ($dto->farmId !== null && Farm::query()->find($dto->farmId) === null) {
             throw ValidationException::withMessages([
-                'farm_id' => ['Farm not found for current tenant.'],
+                'farm_id' => [__('messages.farm.not_found')],
             ]);
         }
 

@@ -142,7 +142,7 @@ final class SaaSService
 
         if ($isOnPrem && empty($payload['license_key'])) {
             throw ValidationException::withMessages([
-                'license_key' => ['license_key is required for onprem plans.'],
+                'license_key' => [__('messages.saas.license_key_required')],
             ]);
         }
 
@@ -183,7 +183,7 @@ final class SaaSService
             if ($subscription->plan?->billing_type === PlanBillingType::ONPREM) {
                 if (empty($subscription->license_key)) {
                     throw ValidationException::withMessages([
-                        'license_key' => ['license_key is required for onprem plans.'],
+                        'license_key' => [__('messages.saas.license_key_required')],
                     ]);
                 }
                 $subscription->offline_mode_enabled = true;

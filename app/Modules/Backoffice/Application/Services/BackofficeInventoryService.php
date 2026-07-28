@@ -39,13 +39,20 @@ final class BackofficeInventoryService
     }
 
     /** @return array<string, mixed> */
-    public function inventoryIndexView(): array
+    public function inventoryIndexView(?int $warehouseId = null): array
     {
         $tenant = $this->requireTenant();
-        $items = InventoryItem::query()->with('warehouse')->orderBy('name')->get();
+        $items = InventoryItem::query()
+            ->with('warehouse')
+            ->when($warehouseId !== null, fn ($query) => $query->where('warehouse_id', $warehouseId))
+            ->orderBy('name')
+            ->get();
         $warehouses = Warehouse::query()->orderBy('name')->get();
 
         return [
+            'filter_warehouse' => $warehouseId !== null
+                ? $warehouses->firstWhere('id', $warehouseId)?->name
+                : null,
             'rows' => $items->map(fn (InventoryItem $item): array => [
                 'id' => $item->id,
                 'name' => $item->name,

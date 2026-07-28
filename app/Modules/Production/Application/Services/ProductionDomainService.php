@@ -24,7 +24,7 @@ final class ProductionDomainService extends BaseService
 
         if ($query->exists()) {
             throw ValidationException::withMessages([
-                'status' => ['This pond already has an active cycle.'],
+                'status' => [__('messages.cycle.pond_has_active_cycle')],
             ]);
         }
     }
@@ -33,7 +33,7 @@ final class ProductionDomainService extends BaseService
     {
         if ($cycle->status !== CycleStatus::ACTIVE) {
             throw ValidationException::withMessages([
-                'cycle' => ['Only active cycles allow this operation.'],
+                'cycle' => [__('messages.cycle.must_be_active')],
             ]);
         }
     }
@@ -56,7 +56,7 @@ final class ProductionDomainService extends BaseService
 
         if ($areaHa <= 0) {
             throw ValidationException::withMessages([
-                'area_ha' => ['Pond area_ha must be greater than zero.'],
+                'area_ha' => [__('messages.pond.area_ha_positive')],
             ]);
         }
 
@@ -72,7 +72,7 @@ final class ProductionDomainService extends BaseService
 
         if ($stocking === null) {
             throw ValidationException::withMessages([
-                'stocking' => ['Cycle requires stocking before this operation.'],
+                'stocking' => [__('messages.cycle.requires_stocking')],
             ]);
         }
 
@@ -83,7 +83,7 @@ final class ProductionDomainService extends BaseService
     {
         if ($cycle->harvests()->where('type', HarvestType::FINAL->value)->exists()) {
             throw ValidationException::withMessages([
-                'type' => ['A final harvest already exists for this cycle.'],
+                'type' => [__('messages.cycle.final_harvest_exists')],
             ]);
         }
     }

@@ -26,14 +26,14 @@ final class CreateFeedEntryAction extends BaseAction
             field: 'fed_at',
             value: $dto->fedAt,
             baseline: $stocking->stocked_at->format('Y-m-d'),
-            message: 'fed_at must be on or after stocking stocked_at.',
+            message: __('messages.feeding.fed_at_after_stocking'),
         );
 
         $feedType = FeedType::query()->find($dto->feedTypeId);
 
         if ($feedType === null) {
             throw ValidationException::withMessages([
-                'feed_type_id' => ['Feed type not found for current tenant.'],
+                'feed_type_id' => [__('messages.feeding.feed_type_not_found')],
             ]);
         }
 

@@ -37,7 +37,7 @@ final class BackofficeWaterQualityStoreController extends Controller
 
         if ($cycle === null) {
             throw ValidationException::withMessages([
-                'pond' => ['The selected pond does not have an active cycle available.'],
+                'pond' => [__('messages.pond.no_active_cycle')],
             ]);
         }
 

@@ -15,7 +15,7 @@ final class DailyMortalityDomainService
     {
         if ($cycle->status !== CycleStatus::ACTIVE) {
             throw ValidationException::withMessages([
-                'cycle' => ['Daily mortality can only be recorded for an active cycle.'],
+                'cycle' => [__('messages.mortality.active_cycle_only')],
             ]);
         }
     }
@@ -27,13 +27,13 @@ final class DailyMortalityDomainService
 
         if ($start !== null && $recorded->lt($start)) {
             throw ValidationException::withMessages([
-                'recorded_at' => ['recorded_at must be on or after cycle started_at.'],
+                'recorded_at' => [__('messages.mortality.recorded_at_after_start')],
             ]);
         }
 
         if ($cycle->ended_at !== null && $recorded->gt($cycle->ended_at->copy()->endOfDay())) {
             throw ValidationException::withMessages([
-                'recorded_at' => ['recorded_at must be on or before cycle ended_at.'],
+                'recorded_at' => [__('messages.mortality.recorded_at_before_end')],
             ]);
         }
     }
@@ -42,7 +42,7 @@ final class DailyMortalityDomainService
     {
         if ($cycle->pond_id !== $pondId) {
             throw ValidationException::withMessages([
-                'pond_id' => ['The selected pond does not belong to the provided cycle.'],
+                'pond_id' => [__('messages.pond.not_belongs_to_cycle')],
             ]);
         }
     }

@@ -85,6 +85,7 @@ final class BackofficeShellService
                     'enabled' => true,
                     'children' => [
                         ['key' => 'inventory', 'label' => __('layout.menu_inventory'), 'href' => '/backoffice/inventory', 'visible' => $permissions['inventory.view'], 'enabled' => true],
+                        ['key' => 'warehouses', 'label' => __('layout.menu_warehouses'), 'href' => '/backoffice/warehouses', 'visible' => $permissions['inventory.view'], 'enabled' => true],
                         ['key' => 'cost_engine', 'label' => __('layout.menu_costs'), 'href' => '#', 'visible' => $features['cost_engine'] && $permissions['costs.view'], 'enabled' => false],
                     ],
                 ],

@@ -16,7 +16,7 @@ final class CreatePondAction extends BaseAction
 
         if ($farm === null) {
             throw ValidationException::withMessages([
-                'farm_id' => ['Farm not found for current tenant.'],
+                'farm_id' => [__('messages.farm.not_found')],
             ]);
         }
 

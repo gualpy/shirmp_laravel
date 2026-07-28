@@ -30,7 +30,7 @@ final class CreateHarvestAction extends BaseAction
             field: 'harvested_at',
             value: $dto->harvestedAt,
             baseline: $stocking->stocked_at->format('Y-m-d'),
-            message: 'harvested_at must be on or after stocking stocked_at.',
+            message: __('messages.harvest.harvested_at_after_stocking'),
         );
 
         return DB::transaction(function () use ($cycle, $dto): Harvest {

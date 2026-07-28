@@ -21,7 +21,7 @@ final class UpdateStockingAction extends BaseAction
             field: 'stocked_at',
             value: $dto->stockedAt,
             baseline: $cycle->started_at->format('Y-m-d'),
-            message: 'stocked_at must be on or after cycle started_at.',
+            message: __('messages.stocking.stocked_at_after_start'),
         );
 
         $density = $this->domainService->calculateStockingDensity($cycle->pond, $dto->plQty);

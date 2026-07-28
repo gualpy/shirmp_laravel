@@ -27,6 +27,7 @@ return [
     'menu_audit'         => 'Auditoría',
     'menu_billing'       => 'Facturación',
     'menu_inventory'     => 'Inventario',
+    'menu_warehouses'    => 'Bodegas',
     'menu_costs'         => 'Costos',
     'menu_water'         => 'Agua',
     'menu_admin'         => 'Admin',

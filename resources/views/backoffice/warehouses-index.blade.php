@@ -44,7 +44,7 @@
                 <tbody>
                     @foreach($vm['rows'] as $row)
                         <tr>
-                            <td><strong>{{ $row['name'] }}</strong></td>
+                            <td><a class="panel-link" href="/backoffice/inventory?warehouse_id={{ $row['id'] }}"><strong>{{ $row['name'] }}</strong></a></td>
                             <td>{{ $row['location'] ?? 'N/A' }}</td>
                             <td>{{ $row['items_count'] }}</td>
                             <td>{{ $row['notes'] ?? 'N/A' }}</td>

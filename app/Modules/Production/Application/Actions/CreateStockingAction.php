@@ -21,7 +21,7 @@ final class CreateStockingAction extends BaseAction
 
         if ($cycle->stocking !== null) {
             throw ValidationException::withMessages([
-                'cycle_id' => ['Cycle already has a stocking record.'],
+                'cycle_id' => [__('messages.stocking.already_exists')],
             ]);
         }
 
@@ -29,7 +29,7 @@ final class CreateStockingAction extends BaseAction
             field: 'stocked_at',
             value: $dto->stockedAt,
             baseline: $cycle->started_at->format('Y-m-d'),
-            message: 'stocked_at must be on or after cycle started_at.',
+            message: __('messages.stocking.stocked_at_after_start'),
         );
 
         $density = $this->domainService->calculateStockingDensity($cycle->pond, $dto->plQty);

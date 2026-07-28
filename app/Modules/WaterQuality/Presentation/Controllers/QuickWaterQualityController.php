@@ -28,7 +28,7 @@ final class QuickWaterQualityController extends Controller
 
         if ($cycle === null) {
             throw ValidationException::withMessages([
-                'pond' => ['The selected pond has no active cycle available for water quality registration.'],
+                'pond' => [__('messages.pond.no_active_cycle_water')],
             ]);
         }
 

@@ -23,7 +23,7 @@ final class CreateSamplingAction extends BaseAction
             field: 'sampled_at',
             value: $dto->sampledAt,
             baseline: $stocking->stocked_at->format('Y-m-d'),
-            message: 'sampled_at must be on or after stocking stocked_at.',
+            message: __('messages.sampling.sampled_at_after_stocking'),
         );
 
         return $cycle->samplings()->create($dto->toArray());

@@ -16,7 +16,7 @@ final class WaterQualityDomainService extends BaseService
     {
         if ($cycle->status === CycleStatus::CANCELLED) {
             throw ValidationException::withMessages([
-                'cycle' => ['Cannot register water quality for a cancelled cycle.'],
+                'cycle' => [__('messages.water_quality.cancelled_cycle')],
             ]);
         }
     }
@@ -28,13 +28,13 @@ final class WaterQualityDomainService extends BaseService
 
         if ($measured->lt($start)) {
             throw ValidationException::withMessages([
-                'measured_at' => ['measured_at must be on or after cycle started_at.'],
+                'measured_at' => [__('messages.water_quality.measured_at_after_start')],
             ]);
         }
 
         if ($cycle->ended_at !== null && $measured->gt($cycle->ended_at->copy()->endOfDay())) {
             throw ValidationException::withMessages([
-                'measured_at' => ['measured_at must be on or before cycle ended_at.'],
+                'measured_at' => [__('messages.water_quality.measured_at_before_end')],
             ]);
         }
     }

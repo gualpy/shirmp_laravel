@@ -22,7 +22,7 @@ final class UpdateCycleAction extends BaseAction
         if ($dto->status !== null) {
             if ($cycle->status === CycleStatus::HARVESTED && $dto->status !== CycleStatus::HARVESTED) {
                 throw ValidationException::withMessages([
-                    'status' => ['Harvested cycle cannot be moved to another status.'],
+                    'status' => [__('messages.cycle.harvested_locked')],
                 ]);
             }
 

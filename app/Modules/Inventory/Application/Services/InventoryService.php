@@ -90,11 +90,11 @@ final class InventoryService
             $quantity = (float) $payload['quantity'];
 
             if ($type !== InventoryMovementType::ADJUSTMENT && $quantity <= 0) {
-                throw ValidationException::withMessages(['quantity' => ['Quantity must be greater than zero.']]);
+                throw ValidationException::withMessages(['quantity' => [__('messages.inventory.quantity_positive')]]);
             }
 
             if ($type === InventoryMovementType::ADJUSTMENT && $quantity == 0.0) {
-                throw ValidationException::withMessages(['quantity' => ['Adjustment quantity cannot be zero.']]);
+                throw ValidationException::withMessages(['quantity' => [__('messages.inventory.adjustment_not_zero')]]);
             }
 
             $delta = match ($type) {
@@ -105,7 +105,7 @@ final class InventoryService
 
             $nextStock = (float) $lockedItem->current_stock + $delta;
             if ($nextStock < 0) {
-                throw ValidationException::withMessages(['quantity' => ['Stock cannot go negative.']]);
+                throw ValidationException::withMessages(['quantity' => [__('messages.inventory.stock_negative')]]);
             }
 
             $movement = InventoryMovement::query()->create([

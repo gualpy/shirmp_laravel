@@ -19,6 +19,13 @@
     <div class="card" style="margin-bottom:16px;border-color:#b9e2cf;background:#eefaf4;color:#176448;">{{ session('status') }}</div>
 @endif
 
+@if($vm['filter_warehouse'])
+    <div class="card" style="margin-bottom:16px;display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;">
+        <span>{{ __('inventory.filtered_by_warehouse') }} <strong>{{ $vm['filter_warehouse'] }}</strong></span>
+        <a class="cta-secondary" href="/backoffice/inventory">{{ __('inventory.clear_filter') }}</a>
+    </div>
+@endif
+
 <div style="display:grid;grid-template-columns:minmax(340px,420px) minmax(0,1fr);gap:16px;align-items:start;">
     <div class="card animate-enter-down animate-enter-down-delay-1">
         <h3 class="panel-title">{{ __('inventory.new_item') }}</h3>

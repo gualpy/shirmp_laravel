@@ -6,6 +6,8 @@ return [
     'subtitle'          => 'Vista operativa y administrativa de stock por bodega.',
     'export_excel'      => 'Exportar Excel',
     'warehouses_link'   => 'Bodegas',
+    'filtered_by_warehouse' => 'Filtrando por bodega:',
+    'clear_filter'      => 'Quitar filtro',
     'new_item'          => 'Nuevo item',
     'create_item'       => 'Crear item',
     'items_list'        => 'Items',

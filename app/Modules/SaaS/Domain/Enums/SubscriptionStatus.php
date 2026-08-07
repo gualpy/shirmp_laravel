@@ -8,5 +8,6 @@ enum SubscriptionStatus: string
     case TRIAL = 'trial';
     case SUSPENDED = 'suspended';
     case EXPIRED = 'expired';
+    case PENDING_PAYMENT = 'pending_payment';
 }
 

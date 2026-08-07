@@ -144,6 +144,79 @@ final class BillingService
         return BillingPayment::query()->withoutGlobalScopes()->findOrFail($payment->id);
     }
 
+    public function createPendingPayment(BillingInvoice $invoice, BillingPaymentProvider $provider, string $providerSessionId): BillingPayment
+    {
+        return BillingPayment::query()->create([
+            'tenant_id' => $invoice->tenant_id,
+            'invoice_id' => $invoice->id,
+            'amount_usd' => $invoice->amount_usd,
+            'currency' => $invoice->currency,
+            'status' => BillingPaymentStatus::PENDING->value,
+            'provider' => $provider->value,
+            'provider_session_id' => $providerSessionId,
+        ]);
+    }
+
+    public function findPendingPaymentBySessionId(string $providerSessionId): ?BillingPayment
+    {
+        return BillingPayment::query()
+            ->withoutGlobalScopes()
+            ->where('provider_session_id', $providerSessionId)
+            ->first();
+    }
+
+    /**
+     * Idempotent: if the payment is already completed (e.g. duplicate webhook
+     * delivery), this is a no-op and returns the payment untouched.
+     */
+    public function completePendingPayment(BillingPayment $payment, ?string $providerReference = null): BillingPayment
+    {
+        if ($payment->status === BillingPaymentStatus::COMPLETED) {
+            return $payment;
+        }
+
+        $payment->update([
+            'status' => BillingPaymentStatus::COMPLETED->value,
+            'provider_reference' => $providerReference,
+            'paid_at' => now(),
+        ]);
+
+        $invoice = BillingInvoice::query()->withoutGlobalScopes()->with('tenant')->findOrFail($payment->invoice_id);
+
+        $this->markInvoicePaid(
+            $invoice,
+            $payment->paid_at,
+            is_string($payment->provider) ? $payment->provider : $payment->provider->value,
+        );
+
+        $this->auditLogService->record(
+            actionKey: 'payment.gateway_completed',
+            entityType: 'BillingPayment',
+            entityId: $payment->id,
+            context: [
+                'invoice_id' => $invoice->id,
+                'invoice_number' => $invoice->invoice_number,
+                'amount_usd' => (float) $payment->amount_usd,
+                'provider' => is_string($payment->provider) ? $payment->provider : $payment->provider->value,
+                'provider_reference' => $providerReference,
+            ],
+            tenant: $invoice->tenant,
+        );
+
+        return BillingPayment::query()->withoutGlobalScopes()->findOrFail($payment->id);
+    }
+
+    public function markPendingPaymentFailed(BillingPayment $payment): BillingPayment
+    {
+        if ($payment->status !== BillingPaymentStatus::PENDING) {
+            return $payment;
+        }
+
+        $payment->update(['status' => BillingPaymentStatus::FAILED->value]);
+
+        return $payment->refresh();
+    }
+
     private function nextInvoiceNumber(): string
     {
         $datePrefix = now()->format('Ymd');

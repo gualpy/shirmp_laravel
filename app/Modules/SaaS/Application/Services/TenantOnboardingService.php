@@ -6,9 +6,14 @@ use App\Models\Tenant;
 use App\Models\User;
 use App\Modules\Audit\Application\Services\AuditLogService;
 use App\Modules\Auth\Domain\Enums\UserRole;
+use App\Modules\Billing\Application\Services\BillingService;
+use App\Modules\Billing\Domain\Enums\BillingInvoiceStatus;
 use App\Modules\Production\Domain\Models\Farm;
 use App\Modules\Production\Domain\Models\Pond;
+use App\Modules\SaaS\Domain\Enums\PlanBillingType;
+use App\Modules\SaaS\Domain\Enums\SubscriptionStatus;
 use App\Modules\SaaS\Domain\Models\Plan;
+use Carbon\CarbonImmutable;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
@@ -18,6 +23,7 @@ final class TenantOnboardingService
     public function __construct(
         private readonly SaaSService $saasService,
         private readonly AuditLogService $auditLogService,
+        private readonly BillingService $billingService,
     ) {
     }
 
@@ -131,6 +137,111 @@ final class TenantOnboardingService
 
             return $tenant->refresh();
         });
+    }
+
+    /**
+     * Self-service signup: creates tenant + owner user + subscription + invoice
+     * all in a "pending payment" state. No farm/pond scaffolding here (unlike
+     * the manual admin onboard()) — the owner sets that up once activated.
+     *
+     * @param  array<string, mixed>  $payload
+     * @return array{tenant: Tenant, user: User, plan: Plan, invoice: \App\Modules\Billing\Domain\Models\BillingInvoice}
+     */
+    public function onboardPending(array $payload): array
+    {
+        return DB::transaction(function () use ($payload): array {
+            $tenant = Tenant::query()->create([
+                'name' => $payload['name'],
+                'slug' => $payload['slug'],
+                'company_email' => $payload['admin_email'],
+                'is_active' => false,
+            ]);
+
+            $this->auditLogService->record(
+                actionKey: 'tenant.signup_started',
+                entityType: 'Tenant',
+                entityId: $tenant->id,
+                context: ['slug' => $tenant->slug, 'name' => $tenant->name],
+                tenant: $tenant,
+            );
+
+            $user = User::withoutGlobalScopes()->create([
+                'tenant_id' => $tenant->id,
+                'name' => $payload['admin_name'],
+                'email' => $payload['admin_email'],
+                'password' => Hash::make($payload['admin_password']),
+                'role' => UserRole::OWNER->value,
+            ]);
+
+            $this->auditLogService->record(
+                actionKey: 'tenant.admin_user_created',
+                entityType: 'User',
+                entityId: $user->id,
+                context: ['email' => $user->email, 'role' => UserRole::OWNER->value],
+                tenant: $tenant,
+                user: $user,
+            );
+
+            $plan = Plan::query()->where('is_active', true)->findOrFail((int) $payload['plan_id']);
+
+            $subscription = $this->saasService->assignPlan($tenant, $plan, [
+                'status' => SubscriptionStatus::PENDING_PAYMENT->value,
+                'starts_at' => now(),
+            ]);
+
+            $this->auditLogService->record(
+                actionKey: 'subscription.pending_created',
+                entityType: 'TenantSubscription',
+                entityId: $subscription->id,
+                context: ['plan_id' => $plan->id, 'plan_code' => $plan->code],
+                tenant: $tenant,
+                user: $user,
+            );
+
+            $billingStart = CarbonImmutable::now()->startOfDay();
+            $billingEnd = match ($plan->billing_type) {
+                PlanBillingType::YEARLY => $billingStart->addYear(),
+                PlanBillingType::LIFETIME => $billingStart->addYears(100),
+                default => $billingStart->addMonthNoOverflow(),
+            };
+
+            $invoice = $this->billingService->createInvoiceForSubscription($tenant, $subscription, [
+                'billing_period_start' => $billingStart->toDateString(),
+                'billing_period_end' => $billingEnd->toDateString(),
+                'amount_usd' => $plan->price_usd,
+                'currency' => 'USD',
+                'status' => BillingInvoiceStatus::PENDING->value,
+                'issued_at' => now(),
+                'due_at' => now(),
+                'notes' => 'Factura generada automáticamente por signup self-service.',
+            ]);
+
+            return [
+                'tenant' => $tenant->refresh(),
+                'user' => $user,
+                'plan' => $plan,
+                'invoice' => $invoice,
+            ];
+        });
+    }
+
+    /** @return list<array{id: int, name: string, code: string, billing_type: string, price_usd: string}> */
+    public function signupPlans(): array
+    {
+        return Plan::query()
+            ->where('is_active', true)
+            ->where('billing_type', '!=', PlanBillingType::ONPREM->value)
+            ->orderBy('price_usd')
+            ->get()
+            ->map(fn (Plan $plan): array => [
+                'id' => $plan->id,
+                'name' => $plan->name,
+                'code' => $plan->code,
+                'billing_type' => $plan->billing_type->value,
+                'price_usd' => number_format((float) $plan->price_usd, 2),
+            ])
+            ->values()
+            ->all();
     }
 
     /** @return array<string, mixed> */

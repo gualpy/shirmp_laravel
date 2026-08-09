@@ -21,7 +21,7 @@ return [
     'remember_device'        => 'Recordar este dispositivo',
     'access_note'            => 'Acceso para operaciones y gestión.',
     'enter_backoffice'       => 'Ingresar al Backoffice',
-    'back_to_main'           => 'Volver a la página principal de operaciones',
+    'back_to_main'           => 'Volver al sitio principal',
     'show_password'          => 'Mostrar',
     'hide_password'          => 'Ocultar',
     'chip_production'        => 'Producción',
@@ -29,4 +29,6 @@ return [
     'chip_costs'              => 'Costos',
     'chip_projection'         => 'Proyección',
     'management_platform'    => 'Plataforma de gestión acuícola',
+    'no_account'              => '¿No tenés cuenta?',
+    'create_account'          => 'Creala aquí',
 ];

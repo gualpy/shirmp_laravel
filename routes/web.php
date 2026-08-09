@@ -2,6 +2,9 @@
 
 use App\Http\Controllers\HealthzController;
 use App\Http\Controllers\ReadyzController;
+use App\Modules\SaaS\Presentation\Controllers\LandingController;
+use App\Modules\SaaS\Presentation\Controllers\SignupController;
+use App\Modules\SaaS\Presentation\Controllers\SignupPendingController;
 use App\Modules\Backoffice\Presentation\Controllers\BackofficeAlertAcknowledgeController;
 use App\Modules\Backoffice\Presentation\Controllers\BackofficeAlertResolveController;
 use App\Modules\Backoffice\Presentation\Controllers\BackofficeAlertsController;
@@ -66,18 +69,26 @@ use App\Modules\Backoffice\Presentation\Controllers\BackofficeAdminTenantStoreCo
 use App\Modules\Backoffice\Presentation\Controllers\BackofficeSuperAdminDashboardController;
 use Illuminate\Support\Facades\Route;
 
-Route::get('/', function () {
+/*Route::get('/', function () {
     return view('welcome');
-});
+});*/
 
 Route::get('/healthz', HealthzController::class)->name('healthz');
 Route::get('/readyz', ReadyzController::class)->name('readyz');
 
+Route::get('/', LandingController::class)->name('landing');
+Route::get('/app', [BackofficeSessionController::class, 'create'])->name('app.login');
 Route::get('/login', [BackofficeSessionController::class, 'create'])->name('login');
 Route::post('/login', [BackofficeSessionController::class, 'store'])->name('backoffice.login.store');
 Route::post('/logout', [BackofficeSessionController::class, 'destroy'])
     ->middleware('auth')
     ->name('logout');
+
+Route::get('/signup', [SignupController::class, 'create'])->name('signup.create');
+Route::post('/signup', [SignupController::class, 'store'])
+    ->middleware('throttle:6,1')
+    ->name('signup.store');
+Route::get('/signup/{tenant}/pending', SignupPendingController::class)->name('signup.pending');
 
 Route::middleware(['tenant.backoffice', 'auth', 'subscription.active'])
     ->prefix('backoffice')
@@ -245,7 +256,7 @@ Route::middleware(['tenant.backoffice', 'auth', 'subscription.active'])
             ->name('backoffice.cycles.mortalities.store');
     });
 
-Route::middleware(['auth', 'superadmin'])
+Route::middleware(['tenant.backoffice', 'auth', 'superadmin'])
     ->prefix('backoffice/admin')
     ->group(function (): void {
         Route::get('/', BackofficeSuperAdminDashboardController::class)

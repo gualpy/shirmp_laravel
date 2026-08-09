@@ -23,6 +23,7 @@ class BillingPayment extends Model
         'status',
         'provider',
         'provider_reference',
+        'provider_session_id',
         'paid_at',
         'notes',
     ];

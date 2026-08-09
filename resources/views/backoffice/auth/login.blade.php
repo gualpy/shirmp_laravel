@@ -104,6 +104,7 @@
                     </form>
 
                     <p class="form-note">{{ __('login.back_to_main') }} <a href="{{ url('/') }}">aquí</a>.</p>
+                    <p class="form-note">{{ __('login.no_account') }} <a href="{{ route('signup.create') }}">{{ __('login.create_account') }}</a></p>
                 </div>
             </section>
         </section>

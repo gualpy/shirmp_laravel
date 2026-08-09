@@ -225,12 +225,14 @@ final class TenantOnboardingService
         });
     }
 
-    /** @return list<array{id: int, name: string, code: string, billing_type: string, price_usd: string}> */
+    /** @return list<array{id: int, name: string, code: string, billing_type: string, price_usd: string, highlights: list<string>}> */
     public function signupPlans(): array
     {
         return Plan::query()
             ->where('is_active', true)
             ->where('billing_type', '!=', PlanBillingType::ONPREM->value)
+            ->whereNotNull('price_usd')
+            ->with(['limits', 'features'])
             ->orderBy('price_usd')
             ->get()
             ->map(fn (Plan $plan): array => [
@@ -239,9 +241,52 @@ final class TenantOnboardingService
                 'code' => $plan->code,
                 'billing_type' => $plan->billing_type->value,
                 'price_usd' => number_format((float) $plan->price_usd, 2),
+                'highlights' => $this->planHighlights($plan),
             ])
             ->values()
             ->all();
+    }
+
+    /** @return list<string> */
+    private function planHighlights(Plan $plan): array
+    {
+        $limitLabels = [
+            'max_farms' => ['granja', 'granjas'],
+            'max_ponds' => ['piscina', 'piscinas'],
+            'max_cycles_active' => ['ciclo activo', 'ciclos activos'],
+            'max_users' => ['usuario', 'usuarios'],
+        ];
+
+        $featureLabels = [
+            'dashboard' => 'Dashboard operativo',
+            'alerts' => 'Alertas automáticas',
+            'cost_engine' => 'Motor de costos',
+            'water_quality' => 'Calidad de agua',
+            'advanced_reports' => 'Reportes avanzados',
+            'api_access' => 'Acceso a API',
+            'export_excel' => 'Exportación a Excel',
+            'export_pdf' => 'Exportación a PDF',
+        ];
+
+        $highlights = [];
+
+        foreach ($plan->limits as $limit) {
+            if (! isset($limitLabels[$limit->key]) || $limit->value === null) {
+                continue;
+            }
+
+            [$singular, $plural] = $limitLabels[$limit->key];
+            $noun = ((int) $limit->value) === 1 ? $singular : $plural;
+            $highlights[] = sprintf('Hasta %d %s', $limit->value, $noun);
+        }
+
+        foreach ($plan->features as $feature) {
+            if ($feature->is_enabled && isset($featureLabels[$feature->feature_key])) {
+                $highlights[] = $featureLabels[$feature->feature_key];
+            }
+        }
+
+        return $highlights;
     }
 
     /** @return array<string, mixed> */

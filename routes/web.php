@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\HealthzController;
 use App\Http\Controllers\ReadyzController;
+use App\Modules\SaaS\Presentation\Controllers\LandingController;
 use App\Modules\SaaS\Presentation\Controllers\SignupController;
 use App\Modules\SaaS\Presentation\Controllers\SignupPendingController;
 use App\Modules\Backoffice\Presentation\Controllers\BackofficeAlertAcknowledgeController;
@@ -75,7 +76,8 @@ use Illuminate\Support\Facades\Route;
 Route::get('/healthz', HealthzController::class)->name('healthz');
 Route::get('/readyz', ReadyzController::class)->name('readyz');
 
-Route::get('/', [BackofficeSessionController::class, 'create'])->name('login');
+Route::get('/', LandingController::class)->name('landing');
+Route::get('/app', [BackofficeSessionController::class, 'create'])->name('app.login');
 Route::get('/login', [BackofficeSessionController::class, 'create'])->name('login');
 Route::post('/login', [BackofficeSessionController::class, 'store'])->name('backoffice.login.store');
 Route::post('/logout', [BackofficeSessionController::class, 'destroy'])

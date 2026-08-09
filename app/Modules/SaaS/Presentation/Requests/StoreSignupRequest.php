@@ -25,7 +25,8 @@ final class StoreSignupRequest extends FormRequest
                 'integer',
                 Rule::exists('plans', 'id')
                     ->where('is_active', true)
-                    ->whereNotIn('billing_type', ['onprem']),
+                    ->whereNotIn('billing_type', ['onprem'])
+                    ->whereNotNull('price_usd'),
             ],
             'payment_provider' => ['required', Rule::in(['stripe', 'paypal'])],
         ];

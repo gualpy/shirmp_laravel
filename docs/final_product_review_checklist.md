@@ -152,16 +152,18 @@
   - operacion enterprise mas madura de licencias
 
 ### Billing
-- Estado: `partial`
+- Estado: `good enough for beta`
 - Que funciona hoy:
   - invoices y payments
   - billing tenant y superadmin
   - exporte `xlsx`
   - audit
+  - pasarela real de pago con PayPal (Orders v2): signup self-service, pago de facturas de renovacion desde backoffice, y webhook de confirmacion async
 - Que falta:
-  - pasarela real de pago
+  - Stripe descartado (no soporta cuentas de Ecuador); PayPal es la unica pasarela real
   - automatizacion de cobranza
   - suspension comercial automatizada si aplica
+  - tests automatizados del gateway/webhook/checkout
 
 ### SuperAdmin
 - Estado: `good enough for beta`
@@ -265,7 +267,7 @@
 - pricing final
 - copy comercial
 - flujo de alta de cliente final
-- pasarela de pago real
+- pasarela de pago real en modo live (hoy validada en sandbox, falta activar cuenta PayPal live)
 - materiales de demo/ventas
 - politica de soporte y onboarding comercial
 
@@ -273,7 +275,7 @@
 
 - local sigue usando SQLite mientras production deberia ir con PostgreSQL
 - restore sigue siendo manual
-- billing no tiene Stripe ni gateway real
+- billing tiene PayPal real (sandbox validado); falta configurar credenciales live y dominio fijo con HTTPS para el webhook en produccion
 - observabilidad sigue basica
 - superadmin aun es MVP
 - algunas vistas aun pueden mejorar en UX de alta frecuencia operativa
@@ -303,7 +305,7 @@
 - probar restore real y rollback de deploy
 
 ### D) Despues del lanzamiento
-- integrar pasarela de pago
+- activar cuenta PayPal live (hoy sandbox) y configurar webhook con dominio final
 - mejorar onboarding self-service
 - ampliar analytics y reporteria
 - iterar UX sobre feedback de clientes piloto

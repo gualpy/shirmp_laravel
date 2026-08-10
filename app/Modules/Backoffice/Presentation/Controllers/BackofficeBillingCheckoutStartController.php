@@ -3,8 +3,7 @@
 namespace App\Modules\Backoffice\Presentation\Controllers;
 
 use App\Http\Controllers\Controller;
-use App\Modules\Billing\Application\Services\BillingService;
-use App\Modules\Billing\Application\Services\PaymentGatewayFactory;
+use App\Modules\Billing\Application\Services\BillingCheckoutService;
 use App\Modules\Billing\Domain\Enums\BillingInvoiceStatus;
 use App\Modules\Billing\Domain\Enums\BillingPaymentProvider;
 use App\Modules\Billing\Domain\Models\BillingInvoice;
@@ -15,8 +14,7 @@ final class BackofficeBillingCheckoutStartController extends Controller
 {
     public function __invoke(
         int $invoiceId,
-        PaymentGatewayFactory $gatewayFactory,
-        BillingService $billingService,
+        BillingCheckoutService $checkoutService,
     ): RedirectResponse {
         $invoice = BillingInvoice::query()->findOrFail($invoiceId);
         $plan = $invoice->subscription?->plan;
@@ -27,21 +25,17 @@ final class BackofficeBillingCheckoutStartController extends Controller
                 ->withErrors(['checkout' => __('billing.checkout_not_payable')]);
         }
 
-        $provider = BillingPaymentProvider::PAYPAL;
         $successUrl = route('backoffice.billing.checkout.return', ['invoiceId' => $invoice->id]);
         $cancelUrl = route('backoffice.billing.index');
 
         try {
-            $checkoutSession = $gatewayFactory->make($provider)
-                ->createCheckoutSession($invoice, $plan, $successUrl, $cancelUrl);
+            $checkoutSession = $checkoutService->start($invoice, $plan, BillingPaymentProvider::PAYPAL, $successUrl, $cancelUrl);
         } catch (Throwable $e) {
             report($e);
 
             return redirect()->route('backoffice.billing.index')
                 ->withErrors(['checkout' => __('billing.checkout_error')]);
         }
-
-        $billingService->createPendingPayment($invoice, $provider, $checkoutSession->sessionId);
 
         return redirect()->away($checkoutSession->redirectUrl);
     }

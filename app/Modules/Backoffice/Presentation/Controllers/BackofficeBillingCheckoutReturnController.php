@@ -8,6 +8,7 @@ use App\Modules\Billing\Application\Services\PaymentGatewayFactory;
 use App\Modules\Billing\Domain\Enums\BillingPaymentProvider;
 use App\Modules\Billing\Domain\Enums\BillingPaymentStatus;
 use App\Modules\Billing\Domain\Models\BillingInvoice;
+use App\Modules\SaaS\Application\Services\SubscriptionActivationService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Throwable;
@@ -19,6 +20,7 @@ final class BackofficeBillingCheckoutReturnController extends Controller
         int $invoiceId,
         BillingService $billingService,
         PaymentGatewayFactory $gatewayFactory,
+        SubscriptionActivationService $activationService,
     ): RedirectResponse {
         $invoice = BillingInvoice::query()->findOrFail($invoiceId);
 
@@ -44,7 +46,8 @@ final class BackofficeBillingCheckoutReturnController extends Controller
             $confirmed = $gatewayFactory->make($provider)->finalizeReturn($request, $payment);
 
             if ($confirmed) {
-                $billingService->completePendingPayment($payment, $payment->provider_session_id);
+                $completed = $billingService->completePendingPayment($payment, $payment->provider_session_id);
+                $activationService->activateFromPayment($completed);
 
                 return redirect()->route('backoffice.billing.index')->with('status', __('billing.checkout_success'));
             }

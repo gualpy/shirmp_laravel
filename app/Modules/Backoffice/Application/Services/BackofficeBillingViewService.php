@@ -8,6 +8,7 @@ use App\Modules\Billing\Domain\Enums\BillingInvoiceStatus;
 use App\Modules\Billing\Domain\Models\BillingInvoice;
 use App\Modules\Billing\Domain\Models\BillingPayment;
 use App\Modules\SaaS\Application\Services\SaaSService;
+use App\Modules\SaaS\Domain\Enums\PlanBillingType;
 use Illuminate\Support\Collection;
 
 final class BackofficeBillingViewService
@@ -22,6 +23,14 @@ final class BackofficeBillingViewService
     public function tenantView(Tenant $tenant): array
     {
         $invoices = $this->billingService->listInvoicesForTenant($tenant);
+        $mappedInvoices = $this->mapInvoices($invoices, false)->all();
+        $subscription = $this->saasService->currentSubscription($tenant);
+
+        $hasOpenInvoice = collect($mappedInvoices)->contains('payable', true);
+        $canRenew = $subscription !== null
+            && $subscription->plan !== null
+            && ! in_array($subscription->plan->billing_type, [PlanBillingType::ONPREM, PlanBillingType::LIFETIME], true)
+            && ! $hasOpenInvoice;
 
         return [
             'tenant' => [
@@ -29,8 +38,10 @@ final class BackofficeBillingViewService
                 'name' => $tenant->company_display_name ?: $tenant->name,
                 'slug' => $tenant->slug,
             ],
-            'invoices' => $this->mapInvoices($invoices, false)->all(),
+            'invoices' => $mappedInvoices,
             'payments' => $this->mapPayments($this->paymentsFromInvoices($invoices), false)->all(),
+            'can_renew' => $canRenew,
+            'subscription_ends_at' => $subscription?->ends_at?->format('Y-m-d'),
         ];
     }
 

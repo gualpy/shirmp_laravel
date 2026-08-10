@@ -21,8 +21,12 @@ final class SubscriptionActivationService
 
     /**
      * Flips tenant + subscription to active once a gateway payment has been
-     * confirmed completed. Idempotent: re-activating an already-active
-     * subscription is a harmless no-op.
+     * confirmed completed, and always rolls the subscription's ends_at
+     * forward to the paid invoice's period end - both on first activation
+     * and on a renewal of an already-active subscription. Resets the
+     * renewal reminder flag so the next period gets its own reminder.
+     * Idempotent: re-processing an already-active period is a harmless
+     * no-op beyond re-writing the same ends_at.
      */
     public function activateFromPayment(BillingPayment $payment): void
     {
@@ -33,15 +37,19 @@ final class SubscriptionActivationService
             return;
         }
 
-        if ($subscription->status === SubscriptionStatus::ACTIVE) {
-            return;
-        }
+        $wasActive = $subscription->status === SubscriptionStatus::ACTIVE;
 
-        DB::transaction(function () use ($subscription, $invoice): void {
+        DB::transaction(function () use ($subscription, $invoice, $wasActive): void {
             $subscription->update([
                 'status' => SubscriptionStatus::ACTIVE->value,
-                'starts_at' => now(),
+                'starts_at' => $wasActive ? $subscription->starts_at : now(),
+                'ends_at' => $invoice->billing_period_end,
+                'renewal_reminder_sent_at' => null,
             ]);
+
+            if ($wasActive) {
+                return;
+            }
 
             $tenant = $invoice->tenant;
             $tenant->update(['is_active' => true]);
@@ -58,7 +66,9 @@ final class SubscriptionActivationService
             );
         });
 
-        $this->sendWelcomeEmail($invoice->tenant, $subscription->plan);
+        if (! $wasActive) {
+            $this->sendWelcomeEmail($invoice->tenant, $subscription->plan);
+        }
     }
 
     private function sendWelcomeEmail(Tenant $tenant, ?Plan $plan): void

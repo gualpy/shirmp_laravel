@@ -24,4 +24,6 @@ return [
     'checkout_not_payable' => 'Esta factura no tiene un plan asociado y no puede pagarse online.',
     'checkout_success' => 'Pago confirmado. ¡Gracias!',
     'checkout_pending' => 'El pago no se confirmó todavía. Si ya pagaste, esperá unos segundos y recargá la página.',
+    'plan_ends_at'      => 'Tu plan vence el :date.',
+    'renew_plan'        => 'Renovar mi plan',
 ];

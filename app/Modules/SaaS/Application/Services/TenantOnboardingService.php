@@ -199,11 +199,7 @@ final class TenantOnboardingService
             );
 
             $billingStart = CarbonImmutable::now()->startOfDay();
-            $billingEnd = match ($plan->billing_type) {
-                PlanBillingType::YEARLY => $billingStart->addYear(),
-                PlanBillingType::LIFETIME => $billingStart->addYears(100),
-                default => $billingStart->addMonthNoOverflow(),
-            };
+            $billingEnd = $plan->periodEndFrom($billingStart);
 
             $invoice = $this->billingService->createInvoiceForSubscription($tenant, $subscription, [
                 'billing_period_start' => $billingStart->toDateString(),

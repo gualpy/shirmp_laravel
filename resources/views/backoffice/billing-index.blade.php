@@ -11,6 +11,15 @@
         </div>
         <a class="cta-secondary" href="/backoffice/billing/export.xlsx">{{ __('billing.export_excel') }}</a>
     </div>
+    @if($vm['subscription_ends_at'])
+        <div class="section-subtitle" style="margin-top:10px;">{{ __('billing.plan_ends_at', ['date' => $vm['subscription_ends_at']]) }}</div>
+    @endif
+    @if($vm['can_renew'])
+        <form method="POST" action="/backoffice/billing/renew" style="margin-top:12px;">
+            @csrf
+            <button type="submit" class="cta-secondary" style="padding:8px 16px;">{{ __('billing.renew_plan') }}</button>
+        </form>
+    @endif
 </div>
 
 @if(session('status'))

@@ -12,6 +12,7 @@ use App\Modules\Backoffice\Presentation\Controllers\BackofficeAlertsXlsxExportCo
 use App\Modules\Backoffice\Presentation\Controllers\BackofficeAuditController;
 use App\Modules\Backoffice\Presentation\Controllers\BackofficeBillingCheckoutStartController;
 use App\Modules\Backoffice\Presentation\Controllers\BackofficeBillingCheckoutReturnController;
+use App\Modules\Backoffice\Presentation\Controllers\BackofficeBillingRenewController;
 use App\Modules\Backoffice\Presentation\Controllers\BackofficeCycleCostsController;
 use App\Modules\Backoffice\Presentation\Controllers\BackofficeCycleCostsXlsxExportController;
 use App\Modules\Backoffice\Presentation\Controllers\BackofficeCycleExecutiveReportController;
@@ -128,6 +129,9 @@ Route::middleware(['tenant.backoffice', 'auth', 'subscription.active'])
         Route::get('/billing/invoices/{invoiceId}/checkout/return', BackofficeBillingCheckoutReturnController::class)
             ->middleware('role.module:billing')
             ->name('backoffice.billing.checkout.return');
+        Route::post('/billing/renew', BackofficeBillingRenewController::class)
+            ->middleware('role.module:billing')
+            ->name('backoffice.billing.renew');
 
         Route::get('/settings', BackofficeSettingsController::class)
             ->middleware('role.module:settings')

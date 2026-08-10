@@ -28,7 +28,7 @@ final class StoreSignupRequest extends FormRequest
                     ->whereNotIn('billing_type', ['onprem'])
                     ->whereNotNull('price_usd'),
             ],
-            'payment_provider' => ['required', Rule::in(['stripe', 'paypal'])],
+            'payment_provider' => ['required', Rule::in(['paypal'])],
         ];
     }
 }

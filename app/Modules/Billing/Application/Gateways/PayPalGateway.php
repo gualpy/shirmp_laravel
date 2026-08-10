@@ -110,6 +110,7 @@ final class PayPalGateway implements PaymentGatewayInterface
 
         $response = Http::withToken($this->accessToken())
             ->acceptJson()
+            ->withBody('{}', 'application/json')
             ->post($this->baseUrl()."/v2/checkout/orders/{$orderId}/capture")
             ->throw();
 

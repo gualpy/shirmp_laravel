@@ -41,7 +41,7 @@ return [
     'step_1_title'  => 'Creá tu cuenta',
     'step_1_body'   => 'Datos de tu empresa y usuario administrador. Sin instalaciones.',
     'step_2_title'  => 'Elegí tu plan',
-    'step_2_body'   => 'Pago automático con Stripe o PayPal, activación inmediata.',
+    'step_2_body'   => 'Pago automático con PayPal, activación inmediata.',
     'step_3_title'  => 'Configurá tu finca',
     'step_3_body'   => 'Cargá tus piscinas y arrancá tu primer ciclo el mismo día.',
 

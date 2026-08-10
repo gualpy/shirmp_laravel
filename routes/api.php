@@ -32,7 +32,6 @@ use App\Modules\SaaS\Presentation\Controllers\AdminPlanLimitController;
 use App\Modules\SaaS\Presentation\Controllers\AdminTenantSubscriptionController;
 use App\Modules\SaaS\Presentation\Controllers\SubscriptionStatusController;
 use App\Modules\Billing\Presentation\Controllers\PayPalWebhookController;
-use App\Modules\Billing\Presentation\Controllers\StripeWebhookController;
 use App\Modules\Shared\Presentation\Controllers\CurrentTenantController;
 use App\Modules\Shared\Presentation\Controllers\TenantNoteController;
 use App\Modules\WaterQuality\Presentation\Controllers\CycleWaterQualityController;
@@ -43,7 +42,6 @@ use Illuminate\Support\Facades\Route;
 Route::prefix('v1')->group(function (): void {
     Route::get('/health', HealthController::class)->withoutMiddleware(ResolveTenant::class);
 
-    Route::post('/webhooks/stripe', StripeWebhookController::class)->withoutMiddleware(ResolveTenant::class);
     Route::post('/webhooks/paypal', PayPalWebhookController::class)->withoutMiddleware(ResolveTenant::class);
 
     Route::get('/tenant/current', CurrentTenantController::class);

@@ -101,11 +101,9 @@
                         </div>
 
                         <div class="field">
-                            <label for="payment_provider">{{ __('signup.payment_provider') }}</label>
-                            <select id="payment_provider" name="payment_provider" required>
-                                <option value="stripe" @selected(old('payment_provider', 'stripe') === 'stripe')>Stripe</option>
-                                <option value="paypal" @selected(old('payment_provider') === 'paypal')>PayPal</option>
-                            </select>
+                            <label>{{ __('signup.payment_provider') }}</label>
+                            <div class="form-note">PayPal</div>
+                            <input type="hidden" name="payment_provider" value="paypal">
                         </div>
 
                         <button class="submit-btn" type="submit">{{ __('signup.submit') }}</button>

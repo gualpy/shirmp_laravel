@@ -3,6 +3,7 @@
 namespace App\Modules\SaaS\Domain\Models;
 
 use App\Modules\SaaS\Domain\Enums\PlanBillingType;
+use Carbon\CarbonImmutable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -41,6 +42,15 @@ class Plan extends Model
     public function subscriptions(): HasMany
     {
         return $this->hasMany(TenantSubscription::class);
+    }
+
+    public function periodEndFrom(CarbonImmutable $start): CarbonImmutable
+    {
+        return match ($this->billing_type) {
+            PlanBillingType::YEARLY => $start->addYear(),
+            PlanBillingType::LIFETIME => $start->addYears(100),
+            default => $start->addMonthNoOverflow(),
+        };
     }
 }
 

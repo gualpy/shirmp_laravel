@@ -4,9 +4,11 @@ namespace App\Modules\Backoffice\Application\Services;
 
 use App\Models\Tenant;
 use App\Modules\Billing\Application\Services\BillingService;
+use App\Modules\Billing\Domain\Enums\BillingInvoiceStatus;
 use App\Modules\Billing\Domain\Models\BillingInvoice;
 use App\Modules\Billing\Domain\Models\BillingPayment;
 use App\Modules\SaaS\Application\Services\SaaSService;
+use App\Modules\SaaS\Domain\Enums\PlanBillingType;
 use Illuminate\Support\Collection;
 
 final class BackofficeBillingViewService
@@ -21,6 +23,14 @@ final class BackofficeBillingViewService
     public function tenantView(Tenant $tenant): array
     {
         $invoices = $this->billingService->listInvoicesForTenant($tenant);
+        $mappedInvoices = $this->mapInvoices($invoices, false)->all();
+        $subscription = $this->saasService->currentSubscription($tenant);
+
+        $hasOpenInvoice = collect($mappedInvoices)->contains('payable', true);
+        $canRenew = $subscription !== null
+            && $subscription->plan !== null
+            && ! in_array($subscription->plan->billing_type, [PlanBillingType::ONPREM, PlanBillingType::LIFETIME], true)
+            && ! $hasOpenInvoice;
 
         return [
             'tenant' => [
@@ -28,8 +38,10 @@ final class BackofficeBillingViewService
                 'name' => $tenant->company_display_name ?: $tenant->name,
                 'slug' => $tenant->slug,
             ],
-            'invoices' => $this->mapInvoices($invoices, false)->all(),
+            'invoices' => $mappedInvoices,
             'payments' => $this->mapPayments($this->paymentsFromInvoices($invoices), false)->all(),
+            'can_renew' => $canRenew,
+            'subscription_ends_at' => $subscription?->ends_at?->format('Y-m-d'),
         ];
     }
 
@@ -81,6 +93,7 @@ final class BackofficeBillingViewService
     {
         return $invoices->map(function (BillingInvoice $invoice) use ($includeTenant): array {
             $latestPayment = $invoice->payments->sortByDesc(fn (BillingPayment $payment) => optional($payment->paid_at)->timestamp ?? 0)->first();
+            $status = $invoice->status instanceof BillingInvoiceStatus ? $invoice->status : BillingInvoiceStatus::from($invoice->status);
 
             return [
                 'id' => $invoice->id,
@@ -90,12 +103,15 @@ final class BackofficeBillingViewService
                 'tenant_slug' => $includeTenant ? $invoice->tenant?->slug : null,
                 'period' => $invoice->billing_period_start?->format('Y-m-d').' -> '.$invoice->billing_period_end?->format('Y-m-d'),
                 'amount_usd' => number_format((float) $invoice->amount_usd, 2),
-                'status' => is_string($invoice->status) ? $invoice->status : $invoice->status->value,
+                'status' => $status->value,
                 'issued_at' => $invoice->issued_at?->format('Y-m-d H:i'),
                 'due_at' => $invoice->due_at?->format('Y-m-d H:i'),
                 'paid_at' => $invoice->paid_at?->format('Y-m-d H:i'),
                 'provider' => $latestPayment ? (is_string($latestPayment->provider) ? $latestPayment->provider : $latestPayment->provider->value) : ($invoice->payment_method ?: 'N/A'),
                 'notes' => $invoice->notes,
+                'payable' => ! $includeTenant
+                    && in_array($status, [BillingInvoiceStatus::PENDING, BillingInvoiceStatus::OVERDUE], true)
+                    && $invoice->subscription?->plan !== null,
             ];
         });
     }

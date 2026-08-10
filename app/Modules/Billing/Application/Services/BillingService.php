@@ -9,9 +9,12 @@ use App\Modules\Billing\Domain\Enums\BillingPaymentProvider;
 use App\Modules\Billing\Domain\Enums\BillingPaymentStatus;
 use App\Modules\Billing\Domain\Models\BillingInvoice;
 use App\Modules\Billing\Domain\Models\BillingPayment;
+use App\Modules\SaaS\Domain\Enums\PlanBillingType;
 use App\Modules\SaaS\Domain\Models\TenantSubscription;
+use Carbon\CarbonImmutable;
 use Carbon\CarbonInterface;
 use Illuminate\Database\Eloquent\Collection;
+use InvalidArgumentException;
 
 final class BillingService
 {
@@ -76,6 +79,47 @@ final class BillingService
         return BillingInvoice::query()->withoutGlobalScopes()->with('tenant')->findOrFail($invoice->id);
     }
 
+    /**
+     * On-demand renewal: generates the next-period invoice for a subscription
+     * the moment the tenant clicks "renew", instead of a background job
+     * pre-creating it ahead of time. The invoice is what the checkout uses to
+     * know the amount to charge, so it must exist before the gateway session.
+     */
+    public function createRenewalInvoiceForSubscription(Tenant $tenant, TenantSubscription $subscription): BillingInvoice
+    {
+        $plan = $subscription->plan;
+
+        if ($plan === null || in_array($plan->billing_type, [PlanBillingType::ONPREM, PlanBillingType::LIFETIME], true)) {
+            throw new InvalidArgumentException('This plan cannot be renewed through the billing checkout flow.');
+        }
+
+        $hasOpenInvoice = BillingInvoice::query()
+            ->withoutGlobalScopes()
+            ->where('subscription_id', $subscription->id)
+            ->whereIn('status', [BillingInvoiceStatus::PENDING->value, BillingInvoiceStatus::OVERDUE->value])
+            ->exists();
+
+        if ($hasOpenInvoice) {
+            throw new InvalidArgumentException('A pending invoice already exists for this subscription.');
+        }
+
+        $billingStart = ($subscription->ends_at !== null
+            ? CarbonImmutable::instance($subscription->ends_at)
+            : CarbonImmutable::now())->startOfDay();
+        $billingEnd = $plan->periodEndFrom($billingStart);
+
+        return $this->createInvoiceForSubscription($tenant, $subscription, [
+            'billing_period_start' => $billingStart->toDateString(),
+            'billing_period_end' => $billingEnd->toDateString(),
+            'amount_usd' => $plan->price_usd,
+            'currency' => 'USD',
+            'status' => BillingInvoiceStatus::PENDING->value,
+            'issued_at' => now(),
+            'due_at' => now(),
+            'notes' => 'Factura de renovación generada al iniciar el pago.',
+        ]);
+    }
+
     public function markInvoiceOverdue(BillingInvoice $invoice): BillingInvoice
     {
         $invoice->update(['status' => BillingInvoiceStatus::OVERDUE]);
@@ -88,7 +132,7 @@ final class BillingService
     {
         return BillingInvoice::query()
             ->withoutGlobalScopes()
-            ->with(['payments.invoice'])
+            ->with(['payments.invoice', 'subscription.plan'])
             ->where('tenant_id', $tenant->id)
             ->orderByDesc('issued_at')
             ->get();

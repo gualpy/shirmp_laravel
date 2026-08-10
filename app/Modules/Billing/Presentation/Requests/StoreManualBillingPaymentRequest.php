@@ -2,7 +2,9 @@
 
 namespace App\Modules\Billing\Presentation\Requests;
 
+use App\Modules\Billing\Domain\Enums\BillingPaymentProvider;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 final class StoreManualBillingPaymentRequest extends FormRequest
 {
@@ -16,7 +18,7 @@ final class StoreManualBillingPaymentRequest extends FormRequest
         return [
             'amount_usd' => ['required', 'numeric', 'min:0.01'],
             'currency' => ['nullable', 'string', 'max:10'],
-            'provider' => ['nullable', 'in:manual,stripe,onprem,other'],
+            'provider' => ['nullable', Rule::enum(BillingPaymentProvider::class)],
             'provider_reference' => ['nullable', 'string', 'max:255'],
             'paid_at' => ['nullable', 'date'],
             'notes' => ['nullable', 'string'],

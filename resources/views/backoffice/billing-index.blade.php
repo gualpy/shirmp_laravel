@@ -11,7 +11,25 @@
         </div>
         <a class="cta-secondary" href="/backoffice/billing/export.xlsx">{{ __('billing.export_excel') }}</a>
     </div>
+    @if($vm['subscription_ends_at'])
+        <div class="section-subtitle" style="margin-top:10px;">{{ __('billing.plan_ends_at', ['date' => $vm['subscription_ends_at']]) }}</div>
+    @endif
+    @if($vm['can_renew'])
+        <form method="POST" action="/backoffice/billing/renew" style="margin-top:12px;">
+            @csrf
+            <button type="submit" class="cta-secondary" style="padding:8px 16px;">{{ __('billing.renew_plan') }}</button>
+        </form>
+    @endif
 </div>
+
+@if(session('status'))
+    <div class="status-flash" style="margin-bottom:16px;">{{ session('status') }}</div>
+@endif
+@if($errors->has('checkout'))
+    <div class="empty-state" style="padding:14px 16px;margin-bottom:16px;color:#9a1f1f;background:#fff4f4;border-color:#f1caca;">
+        {{ $errors->first('checkout') }}
+    </div>
+@endif
 
 <div class="card animate-enter-down animate-enter-down-delay-1" style="margin-bottom:16px;">
     <div class="panel-head" style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;">
@@ -31,6 +49,7 @@
                         <th>{{ __('billing.status') }}</th>
                         <th>{{ __('billing.due_date') }}</th>
                         <th>{{ __('billing.paid_at') }}</th>
+                        <th>{{ __('billing.action') }}</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -42,6 +61,16 @@
                             <td><span class="status-badge status-{{ $invoice['status'] }}">{{ $invoice['status'] }}</span></td>
                             <td>{{ $invoice['due_at'] ?? 'N/A' }}</td>
                             <td>{{ $invoice['paid_at'] ?? 'N/A' }}</td>
+                            <td>
+                                @if($invoice['payable'])
+                                    <form method="POST" action="/backoffice/billing/invoices/{{ $invoice['id'] }}/checkout">
+                                        @csrf
+                                        <button type="submit" class="cta-secondary" style="padding:6px 14px;font-size:.85rem;">{{ __('billing.pay_with_paypal') }}</button>
+                                    </form>
+                                @else
+                                    &mdash;
+                                @endif
+                            </td>
                         </tr>
                     @endforeach
                 </tbody>

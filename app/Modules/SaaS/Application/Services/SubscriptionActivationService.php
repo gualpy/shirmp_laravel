@@ -2,10 +2,16 @@
 
 namespace App\Modules\SaaS\Application\Services;
 
+use App\Models\Tenant;
+use App\Models\User;
 use App\Modules\Audit\Application\Services\AuditLogService;
+use App\Modules\Auth\Domain\Enums\UserRole;
 use App\Modules\Billing\Domain\Models\BillingPayment;
+use App\Modules\SaaS\Application\Mail\TenantWelcomeMail;
 use App\Modules\SaaS\Domain\Enums\SubscriptionStatus;
+use App\Modules\SaaS\Domain\Models\Plan;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Mail;
 
 final class SubscriptionActivationService
 {
@@ -20,7 +26,7 @@ final class SubscriptionActivationService
      */
     public function activateFromPayment(BillingPayment $payment): void
     {
-        $invoice = $payment->invoice()->withoutGlobalScopes()->with('tenant', 'subscription')->firstOrFail();
+        $invoice = $payment->invoice()->withoutGlobalScopes()->with('tenant', 'subscription.plan')->firstOrFail();
         $subscription = $invoice->subscription;
 
         if ($subscription === null) {
@@ -51,5 +57,25 @@ final class SubscriptionActivationService
                 tenant: $tenant,
             );
         });
+
+        $this->sendWelcomeEmail($invoice->tenant, $subscription->plan);
+    }
+
+    private function sendWelcomeEmail(Tenant $tenant, ?Plan $plan): void
+    {
+        if ($plan === null) {
+            return;
+        }
+
+        $owner = User::withoutGlobalScopes()
+            ->where('tenant_id', $tenant->id)
+            ->where('role', UserRole::OWNER->value)
+            ->first();
+
+        if ($owner === null) {
+            return;
+        }
+
+        Mail::to($owner->email)->send(new TenantWelcomeMail($tenant, $owner, $plan));
     }
 }

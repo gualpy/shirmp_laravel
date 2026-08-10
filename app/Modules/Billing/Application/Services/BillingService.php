@@ -88,7 +88,7 @@ final class BillingService
     {
         return BillingInvoice::query()
             ->withoutGlobalScopes()
-            ->with(['payments.invoice'])
+            ->with(['payments.invoice', 'subscription.plan'])
             ->where('tenant_id', $tenant->id)
             ->orderByDesc('issued_at')
             ->get();

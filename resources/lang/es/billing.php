@@ -18,4 +18,10 @@ return [
     'date'              => 'Fecha',
     'provider'          => 'Proveedor',
     'reference'         => 'Referencia',
+    'action'            => 'Acción',
+    'pay_with_paypal'   => 'Pagar con PayPal',
+    'checkout_error'    => 'No se pudo iniciar el pago con PayPal. Intentá de nuevo o contactá soporte.',
+    'checkout_not_payable' => 'Esta factura no tiene un plan asociado y no puede pagarse online.',
+    'checkout_success' => 'Pago confirmado. ¡Gracias!',
+    'checkout_pending' => 'El pago no se confirmó todavía. Si ya pagaste, esperá unos segundos y recargá la página.',
 ];

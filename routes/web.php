@@ -10,6 +10,8 @@ use App\Modules\Backoffice\Presentation\Controllers\BackofficeAlertResolveContro
 use App\Modules\Backoffice\Presentation\Controllers\BackofficeAlertsController;
 use App\Modules\Backoffice\Presentation\Controllers\BackofficeAlertsXlsxExportController;
 use App\Modules\Backoffice\Presentation\Controllers\BackofficeAuditController;
+use App\Modules\Backoffice\Presentation\Controllers\BackofficeBillingCheckoutStartController;
+use App\Modules\Backoffice\Presentation\Controllers\BackofficeBillingCheckoutReturnController;
 use App\Modules\Backoffice\Presentation\Controllers\BackofficeCycleCostsController;
 use App\Modules\Backoffice\Presentation\Controllers\BackofficeCycleCostsXlsxExportController;
 use App\Modules\Backoffice\Presentation\Controllers\BackofficeCycleExecutiveReportController;
@@ -120,6 +122,12 @@ Route::middleware(['tenant.backoffice', 'auth', 'subscription.active'])
         Route::get('/billing/export.xlsx', BackofficeTenantBillingXlsxExportController::class)
             ->middleware('role.module:billing')
             ->name('backoffice.billing.export.xlsx');
+        Route::post('/billing/invoices/{invoiceId}/checkout', BackofficeBillingCheckoutStartController::class)
+            ->middleware('role.module:billing')
+            ->name('backoffice.billing.checkout.start');
+        Route::get('/billing/invoices/{invoiceId}/checkout/return', BackofficeBillingCheckoutReturnController::class)
+            ->middleware('role.module:billing')
+            ->name('backoffice.billing.checkout.return');
 
         Route::get('/settings', BackofficeSettingsController::class)
             ->middleware('role.module:settings')

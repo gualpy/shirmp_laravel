@@ -117,8 +117,13 @@ final class CycleDetailViewService
      */
     private function feedWeeklySeries(Cycle $cycle): array
     {
+        $yweekExpr = match ($cycle->feedEntries()->getConnection()->getDriverName()) {
+            'pgsql' => "to_char(fed_at, 'YYYY-\"W\"WW')",
+            default => "strftime('%Y-W%W', fed_at)",
+        };
+
         return $cycle->feedEntries()
-            ->selectRaw("strftime('%Y-W%W', fed_at) as yweek, SUM(amount_kg) as feed_kg")
+            ->selectRaw("{$yweekExpr} as yweek, SUM(amount_kg) as feed_kg")
             ->groupBy('yweek')
             ->orderBy('yweek')
             ->get()

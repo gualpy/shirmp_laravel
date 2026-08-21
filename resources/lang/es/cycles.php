@@ -19,4 +19,8 @@ return [
     'new_stocking_cta'  => 'Crear nueva siembra',
     'cycle'             => 'Ciclo',
     'status'            => 'Estado',
+    'kpi_active_cycles' => 'Ciclos activos',
+    'kpi_total_biomass' => 'Biomasa total',
+    'kpi_avg_weight'    => 'Peso promedio',
+    'day'               => 'Día',
 ];

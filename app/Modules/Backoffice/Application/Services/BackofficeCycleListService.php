@@ -7,9 +7,12 @@ use App\Modules\Production\Domain\Enums\CycleStatus;
 use App\Modules\Production\Domain\Models\Cycle;
 use App\Modules\Production\Domain\Models\Farm;
 use App\Modules\Production\Domain\Models\Pond;
+use Carbon\CarbonImmutable;
 
 final class BackofficeCycleListService
 {
+    private const TYPICAL_CYCLE_DAYS = 100;
+
     public function __construct(private readonly MetricsService $metricsService)
     {
     }
@@ -35,11 +38,17 @@ final class BackofficeCycleListService
             ->orderByDesc('started_at');
 
         $rows = $query->get()->map(function (Cycle $cycle): array {
+            $daysInCycle = $cycle->started_at !== null
+                ? (int) $cycle->started_at->diffInDays(CarbonImmutable::now())
+                : 0;
+
             return [
                 'cycle_id' => $cycle->id,
                 'pond_code' => (string) ($cycle->pond?->code ?? 'N/A'),
                 'farm' => (string) ($cycle->pond?->farm?->name ?? 'N/A'),
                 'started_at' => $cycle->started_at?->format('Y-m-d'),
+                'days_in_cycle' => $daysInCycle,
+                'cycle_progress_pct' => (int) min(100, round($daysInCycle / self::TYPICAL_CYCLE_DAYS * 100)),
                 'biomass_kg' => round($this->metricsService->biomass_kg($cycle, 1.0) ?? 0, 2),
                 'latest_pp' => $this->metricsService->latest_pp_grams($cycle),
                 'alerts_critical' => (int) ($cycle->critical_alerts_count ?? 0),
@@ -49,6 +58,13 @@ final class BackofficeCycleListService
         })->values()->all();
 
         return [
+            'kpis' => [
+                'active_cycles' => count($rows),
+                'total_biomass_kg' => round(array_sum(array_column($rows, 'biomass_kg')), 2),
+                'avg_pp_grams' => $this->averagePp($rows),
+                'critical_alerts' => array_sum(array_column($rows, 'alerts_critical')),
+                'warning_alerts' => array_sum(array_column($rows, 'alerts_warning')),
+            ],
             'filters' => [
                 'farm' => $farmId,
                 'pond' => $pondId,
@@ -69,6 +85,20 @@ final class BackofficeCycleListService
             ],
             'rows' => $rows,
         ];
+    }
+
+    /**
+     * @param  array<int, array<string, mixed>>  $rows
+     */
+    private function averagePp(array $rows): ?float
+    {
+        $values = array_filter(array_column($rows, 'latest_pp'), fn ($value) => $value !== null);
+
+        if (count($values) === 0) {
+            return null;
+        }
+
+        return round(array_sum($values) / count($values), 2);
     }
 }
 

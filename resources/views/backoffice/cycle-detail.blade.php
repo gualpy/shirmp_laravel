@@ -55,14 +55,15 @@
         color: #fff;
         border: none;
         border-radius: 18px;
-        padding: 14px 16px;
+        padding: 14px 40px 14px 16px;
         font-size: .94rem;
         font-weight: 800;
         box-shadow: 0 14px 28px rgba(11, 98, 109, 0.2);
         text-decoration: none;
         display: flex;
         align-items: center;
-        justify-content: space-between;
+        gap: 12px;
+        position: relative;
         min-height: 62px;
         transition: transform .18s ease, box-shadow .18s ease;
     }
@@ -74,12 +75,33 @@
         content: "›";
         font-size: 1.2rem;
         opacity: .95;
+        position: absolute;
+        right: 16px;
+        top: 50%;
+        transform: translateY(-50%);
     }
     .action-btn.disabled {
         background: linear-gradient(180deg, #dce3ea, #cfd6de);
         color: #61707f;
         box-shadow: none;
         pointer-events: none;
+    }
+    .action-icon {
+        flex-shrink: 0;
+        width: 34px;
+        height: 34px;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.05rem;
+        background: rgba(255, 255, 255, 0.18);
+    }
+    .secondary-action .action-icon {
+        background: rgba(47, 143, 255, 0.14);
+    }
+    .action-label {
+        line-height: 1.25;
     }
     .kpis {
         display: grid;
@@ -411,33 +433,39 @@
 
         <div class="actions animate-enter-down animate-enter-down-delay-1">
             @if($shell['permissions']['mortality.view'] ?? false)
-                <a class="action-btn secondary-action" href="/backoffice/cycles/{{ $vm['header']['cycle_id'] }}/mortalities" title="{{ $canManageMortality ? __('cycle.record_mortality_tooltip') : __('cycle.view_mortality_tooltip') }}">
-                    {{ $canManageMortality ? __('cycle.record_mortality_title') : __('cycle.view_mortality') }}
+                <a class="action-btn" href="/backoffice/cycles/{{ $vm['header']['cycle_id'] }}/mortalities" title="{{ $canManageMortality ? __('cycle.record_mortality_tooltip') : __('cycle.view_mortality_tooltip') }}">
+                    <span class="action-icon" aria-hidden="true">💀</span>
+                    <span class="action-label">{{ $canManageMortality ? __('cycle.record_mortality_title') : __('cycle.view_mortality') }}</span>
                 </a>
             @endif
             @if($shell['permissions']['feeding.view'] ?? false)
-                <a class="action-btn secondary-action" href="/backoffice/cycles/{{ $vm['header']['cycle_id'] }}/feeding" title="{{ $canManageFeeding ? __('cycle.record_feeding_tooltip') : __('cycle.view_feeding_tooltip') }}">
-                    {{ $canManageFeeding ? __('cycle.record_feeding_title') : __('cycle.view_feeding') }}
+                <a class="action-btn" href="/backoffice/cycles/{{ $vm['header']['cycle_id'] }}/feeding" title="{{ $canManageFeeding ? __('cycle.record_feeding_tooltip') : __('cycle.view_feeding_tooltip') }}">
+                    <span class="action-icon" aria-hidden="true">🍽️</span>
+                    <span class="action-label">{{ $canManageFeeding ? __('cycle.record_feeding_title') : __('cycle.view_feeding') }}</span>
                 </a>
             @endif
             @if($shell['permissions']['sampling.view'] ?? false)
                 <a class="action-btn secondary-action" href="/backoffice/cycles/{{ $vm['header']['cycle_id'] }}/sampling" title="{{ $canManageSampling ? __('cycle.record_sampling_tooltip') : __('cycle.view_sampling_tooltip') }}">
-                    {{ $canManageSampling ? __('cycle.record_sampling_title') : __('cycle.view_sampling') }}
+                    <span class="action-icon" aria-hidden="true">📏</span>
+                    <span class="action-label">{{ $canManageSampling ? __('cycle.record_sampling_title') : __('cycle.view_sampling') }}</span>
                 </a>
             @endif
             @if($shell['permissions']['harvest.view'] ?? false)
                 <a class="action-btn secondary-action" href="/backoffice/cycles/{{ $vm['header']['cycle_id'] }}/harvest" title="{{ $canManageHarvest ? __('cycle.record_harvest_tooltip') : __('cycle.view_harvest_tooltip') }}">
-                    {{ $canManageHarvest ? __('cycle.record_harvest_title') : __('cycle.view_harvest') }}
+                    <span class="action-icon" aria-hidden="true">🦐</span>
+                    <span class="action-label">{{ $canManageHarvest ? __('cycle.record_harvest_title') : __('cycle.view_harvest') }}</span>
                 </a>
             @endif
             @if($canViewCosts)
                 <a class="action-btn secondary-action" href="/backoffice/cycles/{{ $vm['header']['cycle_id'] }}/costs" title="{{ __('cycle.view_costs_tooltip') }}">
-                    {{ __('cycle.view_costs') }}
+                    <span class="action-icon" aria-hidden="true">💰</span>
+                    <span class="action-label">{{ __('cycle.view_costs') }}</span>
                 </a>
             @endif
             @if($shell['permissions']['water.view'] ?? false)
                 <a class="action-btn secondary-action" href="/backoffice/water?cycle={{ $vm['header']['cycle_id'] }}{{ $canManageWater ? '#register-water' : '' }}" title="{{ $canManageWater ? __('cycle.record_water_tooltip') : __('cycle.view_water_tooltip') }}">
-                    {{ $canManageWater ? __('cycle.record_water') : __('cycle.view_water') }}
+                    <span class="action-icon" aria-hidden="true">💧</span>
+                    <span class="action-label">{{ $canManageWater ? __('cycle.record_water') : __('cycle.view_water') }}</span>
                 </a>
             @endif
         </div>

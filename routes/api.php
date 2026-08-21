@@ -49,7 +49,7 @@ Route::prefix('v1')->group(function (): void {
 
     Route::prefix('auth')->group(function (): void {
         Route::post('/register', RegisterController::class);
-        Route::post('/login', LoginController::class);
+        Route::post('/login', LoginController::class)->middleware('throttle:6,1');
         Route::get('/me', MeController::class)->middleware(['auth:sanctum', 'subscription.active']);
         Route::post('/logout', LogoutController::class)->middleware(['auth:sanctum', 'subscription.active', 'write.allowed']);
     });

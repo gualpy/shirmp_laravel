@@ -82,7 +82,7 @@ Route::get('/readyz', ReadyzController::class)->name('readyz');
 Route::get('/', LandingController::class)->name('landing');
 Route::get('/app', [BackofficeSessionController::class, 'create'])->name('app.login');
 Route::get('/login', [BackofficeSessionController::class, 'create'])->name('login');
-Route::post('/login', [BackofficeSessionController::class, 'store'])->name('backoffice.login.store');
+Route::post('/login', [BackofficeSessionController::class, 'store'])->middleware('throttle:6,1')->name('backoffice.login.store');
 Route::post('/logout', [BackofficeSessionController::class, 'destroy'])
     ->middleware('auth')
     ->name('logout');

@@ -193,7 +193,7 @@
             <div class="kpi-card"><div class="kpi-card__label">{{ __('cycle.feed_cost') }}</div><div class="kpi-card__value">${{ number_format($vm['summary']['totals']['feed_cost'], 2) }}</div></div>
             <div class="kpi-card"><div class="kpi-card__label">{{ __('cycle.operational_cost') }}</div><div class="kpi-card__value">${{ number_format($vm['summary']['totals']['operational_cost'], 2) }}</div></div>
             <div class="kpi-card"><div class="kpi-card__label">{{ __('cycle.total_cost') }}</div><div class="kpi-card__value">${{ number_format($vm['summary']['totals']['total_cost'], 2) }}</div></div>
-            <div class="kpi-card"><div class="kpi-card__label">{{ __('cycle.cost_per_lb') }}</div><div class="kpi-card__value">${{ number_format($vm['summary']['metrics']['cost_per_lb'], 4) }}</div></div>
+            <div class="kpi-card"><div class="kpi-card__label">{{ __('cycle.cost_per_lb') }}</div><div class="kpi-card__value">{{ $vm['summary']['metrics']['cost_per_lb'] !== null ? '$'.number_format($vm['summary']['metrics']['cost_per_lb'], 4) : __('cycle.no_harvest_yet') }}</div></div>
             <div class="kpi-card"><div class="kpi-card__label">{{ __('cycle.cost_per_ha') }}</div><div class="kpi-card__value">${{ number_format($vm['summary']['metrics']['cost_per_ha'], 4) }}</div></div>
         </div>
 

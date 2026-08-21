@@ -14,6 +14,7 @@ return [
     'total_cost'            => 'Costo total',
     'cost_per_lb'           => 'Costo por lb',
     'cost_per_ha'           => 'Costo por ha',
+    'no_harvest_yet'        => 'Sin cosecha aún',
     'missing_cost'          => 'Falta `cost_per_kg` para el alimento :name. El costo total puede estar subestimado.',
     'record_cost'           => 'Registrar costo operacional',
     'record_cost_subtitle'  => 'Entrada rápida para administración y control económico del ciclo.',

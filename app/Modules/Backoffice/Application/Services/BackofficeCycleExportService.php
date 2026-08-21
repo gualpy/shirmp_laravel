@@ -179,7 +179,7 @@ final class BackofficeCycleExportService
                 ->orderBy('fed_at')
                 ->get()
                 ->map(fn ($entry): array => [
-                    $entry->fed_at?->format('Y-m-d'),
+                    $entry->fed_at?->format('Y-m-d H:i'),
                     (string) ($entry->feedType?->name ?? 'N/A'),
                     $entry->amount_kg,
                     $entry->notes,

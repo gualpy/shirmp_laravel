@@ -14,7 +14,7 @@ final class FeedEntryResource extends JsonResource
             'tenant_id' => $this->tenant_id,
             'cycle_id' => $this->cycle_id,
             'feed_type_id' => $this->feed_type_id,
-            'fed_at' => $this->fed_at?->format('Y-m-d'),
+            'fed_at' => $this->fed_at?->format('Y-m-d H:i'),
             'amount_kg' => (float) $this->amount_kg,
             'notes' => $this->notes,
             'feed_type' => $this->relationLoaded('feedType') ? [

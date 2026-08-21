@@ -160,7 +160,7 @@
                         @csrf
                         <label>
                             <span class="field-label">{{ __('cycle.date') }}</span>
-                            <input type="date" name="fed_at" value="{{ old('fed_at', $vm['defaults']['fed_at']) }}" class="field-control{{ $errors->has('fed_at') ? ' input--error' : '' }}">@error('fed_at') <span class="field-error">{{ $message }}</span> @enderror
+                            <input type="datetime-local" name="fed_at" value="{{ old('fed_at', $vm['defaults']['fed_at']) }}" class="field-control{{ $errors->has('fed_at') ? ' input--error' : '' }}">@error('fed_at') <span class="field-error">{{ $message }}</span> @enderror
                         </label>
                         <label>
                             <span class="field-label">{{ __('cycle.feed_type') }}</span>

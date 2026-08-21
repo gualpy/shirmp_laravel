@@ -26,7 +26,7 @@ class FeedEntry extends Model
     protected function casts(): array
     {
         return [
-            'fed_at' => 'date',
+            'fed_at' => 'datetime',
             'amount_kg' => 'decimal:3',
         ];
     }

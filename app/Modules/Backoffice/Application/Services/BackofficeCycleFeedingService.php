@@ -44,7 +44,7 @@ final class BackofficeCycleFeedingService
                 ->get()
                 ->map(fn ($entry): array => [
                     'id' => $entry->id,
-                    'fed_at' => $entry->fed_at?->format('Y-m-d'),
+                    'fed_at' => $entry->fed_at?->format('Y-m-d H:i'),
                     'feed_type' => (string) ($entry->feedType?->name ?? 'N/A'),
                     'amount_kg' => (float) $entry->amount_kg,
                     'notes' => $entry->notes,
@@ -60,7 +60,7 @@ final class BackofficeCycleFeedingService
                 ->all(),
             'read_only_mode' => (bool) $this->licenseService->requireActiveOrGrace($tenant)['read_only_mode'],
             'defaults' => [
-                'fed_at' => now()->format('Y-m-d'),
+                'fed_at' => now()->format('Y-m-d\TH:i'),
             ],
         ];
     }

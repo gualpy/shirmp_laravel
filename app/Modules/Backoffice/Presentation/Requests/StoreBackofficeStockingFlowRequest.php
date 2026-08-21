@@ -23,7 +23,7 @@ final class StoreBackofficeStockingFlowRequest extends FormRequest
             'cycle_notes' => ['nullable', 'string'],
             'stocked_at' => ['required', 'date'],
             'pl_qty' => ['required', 'integer', 'min:1'],
-            'hatchery_code' => ['nullable', 'string', 'max:255'],
+            'supplier_id' => ['nullable', 'integer', Rule::exists('suppliers', 'id')->where(fn ($query) => $query->where('tenant_id', $tenantId))],
             'batch_code' => ['nullable', 'string', 'max:255'],
             'initial_pp_grams' => ['nullable', 'numeric', 'gt:0'],
         ];

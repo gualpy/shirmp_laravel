@@ -42,7 +42,15 @@
             </div>
             <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;">
                 <label><span class="metric-label">{{ __('farms.stocked_pl') }}</span><input class="input{{ $errors->has('pl_qty') ? ' input--error' : '' }}" type="number" min="1" name="pl_qty" value="{{ old('pl_qty') }}" placeholder="420000">@error('pl_qty') <span class="field-error">{{ $message }}</span> @enderror</label>
-                <label><span class="metric-label">{{ __('farms.hatchery') }}</span><input class="input{{ $errors->has('hatchery_code') ? ' input--error' : '' }}" name="hatchery_code" value="{{ old('hatchery_code') }}" placeholder="BC">@error('hatchery_code') <span class="field-error">{{ $message }}</span> @enderror</label>
+                <label>
+                    <span class="metric-label">{{ __('farms.hatchery') }}</span>
+                    <select class="input{{ $errors->has('supplier_id') ? ' input--error' : '' }}" name="supplier_id">
+                        <option value="">{{ __('farms.select_hatchery') }}</option>
+                        @foreach($vm['supplier_options'] as $supplier)
+                            <option value="{{ $supplier['id'] }}" @selected((string) old('supplier_id') === (string) $supplier['id'])>{{ $supplier['name'] }}</option>
+                        @endforeach
+                    </select>@error('supplier_id') <span class="field-error">{{ $message }}</span> @enderror
+                </label>
                 <label><span class="metric-label">{{ __('farms.batch') }}</span><input class="input{{ $errors->has('batch_code') ? ' input--error' : '' }}" name="batch_code" value="{{ old('batch_code') }}" placeholder="TA-2026-003">@error('batch_code') <span class="field-error">{{ $message }}</span> @enderror</label>
             </div>
             <div style="display:grid;grid-template-columns:220px 1fr;gap:10px;">

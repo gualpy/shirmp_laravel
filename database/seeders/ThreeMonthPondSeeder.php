@@ -13,6 +13,8 @@ use App\Modules\Production\Domain\Models\Farm;
 use App\Modules\Production\Domain\Models\Pond;
 use App\Modules\Production\Domain\Models\Sampling;
 use App\Modules\Production\Domain\Models\Stocking;
+use App\Modules\Suppliers\Domain\Enums\SupplierType;
+use App\Modules\Suppliers\Domain\Models\Supplier;
 use Carbon\CarbonImmutable;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
@@ -71,6 +73,11 @@ class ThreeMonthPondSeeder extends Seeder
             $plQty = 350000;
             $areaHa = (float) $pond->area_ha;
 
+            $hatchery = Supplier::withoutGlobalScopes()->updateOrCreate(
+                ['tenant_id' => $tenant->id, 'name' => 'Bioceanica'],
+                ['type' => SupplierType::HATCHERY->value, 'is_active' => true],
+            );
+
             Stocking::withoutGlobalScopes()->updateOrCreate(
                 [
                     'tenant_id' => $tenant->id,
@@ -79,7 +86,7 @@ class ThreeMonthPondSeeder extends Seeder
                 [
                     'stocked_at' => $start->addDay()->toDateString(),
                     'pl_qty' => $plQty,
-                    'hatchery_code' => 'BC',
+                    'supplier_id' => $hatchery->id,
                     'batch_code' => 'TA-'.$start->format('Y').'-P04',
                     'initial_pp_grams' => 0.05,
                     'density_pl_ha' => round($plQty / $areaHa, 2),

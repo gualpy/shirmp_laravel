@@ -115,13 +115,35 @@
         padding: 16px;
         box-shadow: var(--shadow-soft);
     }
+    .kpi__head {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 8px;
+        margin-bottom: 6px;
+    }
     .kpi .label {
         font-size: .74rem;
         color: var(--muted);
         font-weight: 700;
-        margin-bottom: 6px;
         text-transform: uppercase;
         letter-spacing: .08em;
+    }
+    .kpi__icon {
+        flex-shrink: 0;
+        width: 26px;
+        height: 26px;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: rgba(12, 122, 106, 0.08);
+        color: var(--primary);
+    }
+    .kpi__icon svg { width: 15px; height: 15px; }
+    .kpi--alert .kpi__icon {
+        background: rgba(198, 54, 54, 0.1);
+        color: #c63636;
     }
     .kpi .value {
         font-size: 1.46rem;
@@ -505,13 +527,55 @@
 
         <div id="tab-resumen" class="tab-panel active">
         <div class="kpis animate-enter-down animate-enter-down-delay-2">
-            <div class="kpi"><div class="label">{{ __('cycle.stocked_pl') }}</div><div class="value">{{ $vm['kpis']['stocked_pl'] !== null ? number_format($vm['kpis']['stocked_pl']) : 'N/A' }}</div></div>
-            <div class="kpi"><div class="label">{{ __('cycle.estimated_biomass') }}</div><div class="value">{{ number_format($vm['kpis']['biomass_kg'],2) }} kg</div></div>
-            <div class="kpi"><div class="label">{{ __('cycle.average_weight') }}</div><div class="value">{{ $vm['kpis']['latest_pp_grams'] !== null ? number_format($vm['kpis']['latest_pp_grams'],2).' g' : 'N/A' }}</div></div>
-            <div class="kpi"><div class="label">{{ __('cycle.fcr') }}</div><div class="value">{{ number_format($vm['kpis']['fcr'],3) }}</div></div>
-            <div class="kpi"><div class="label">{{ __('cycle.accum_feed') }}</div><div class="value">{{ number_format($vm['kpis']['total_feed_kg'],2) }} kg</div></div>
-            <div class="kpi"><div class="label">{{ __('cycle.accum_cost') }}</div><div class="value">${{ number_format($vm['kpis']['total_cost_usd'],2) }}</div></div>
-            <div class="kpi"><div class="label">{{ __('cycle.open_alerts') }}</div><div class="value">{{ $vm['kpis']['open_alerts'] }}</div></div>
+            <div class="kpi">
+                <div class="kpi__head">
+                    <div class="label">{{ __('cycle.stocked_pl') }}</div>
+                    <span class="kpi__icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20v-8"/><path d="M12 12c0-4 3-6 6-6 0 4-2 6-6 6z"/><path d="M12 12C12 8 9 6 6 6c0 4 2 6 6 6z"/></svg></span>
+                </div>
+                <div class="value">{{ $vm['kpis']['stocked_pl'] !== null ? number_format($vm['kpis']['stocked_pl']) : 'N/A' }}</div>
+            </div>
+            <div class="kpi">
+                <div class="kpi__head">
+                    <div class="label">{{ __('cycle.estimated_biomass') }}</div>
+                    <span class="kpi__icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="5" r="2"/><path d="M5 22l3-12h8l3 12"/><path d="M5 22h14"/></svg></span>
+                </div>
+                <div class="value">{{ number_format($vm['kpis']['biomass_kg'],2) }} kg</div>
+            </div>
+            <div class="kpi">
+                <div class="kpi__head">
+                    <div class="label">{{ __('cycle.average_weight') }}</div>
+                    <span class="kpi__icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M3 15h18M9 3v18M15 3v18"/></svg></span>
+                </div>
+                <div class="value">{{ $vm['kpis']['latest_pp_grams'] !== null ? number_format($vm['kpis']['latest_pp_grams'],2).' g' : 'N/A' }}</div>
+            </div>
+            <div class="kpi">
+                <div class="kpi__head">
+                    <div class="label">{{ __('cycle.fcr') }}</div>
+                    <span class="kpi__icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 7h13l-3-3M17 17H4l3 3"/></svg></span>
+                </div>
+                <div class="value">{{ number_format($vm['kpis']['fcr'],3) }}</div>
+            </div>
+            <div class="kpi">
+                <div class="kpi__head">
+                    <div class="label">{{ __('cycle.accum_feed') }}</div>
+                    <span class="kpi__icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 11h16"/><path d="M5 11a7 7 0 0 0 14 0"/><path d="M8 15l-1 4M16 15l1 4M6 19h12"/></svg></span>
+                </div>
+                <div class="value">{{ number_format($vm['kpis']['total_feed_kg'],2) }} kg</div>
+            </div>
+            <div class="kpi">
+                <div class="kpi__head">
+                    <div class="label">{{ __('cycle.accum_cost') }}</div>
+                    <span class="kpi__icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v10M15 9.5c0-1.4-1.3-2.5-3-2.5s-3 1-3 2.2c0 3 6 1.5 6 4.5 0 1.4-1.3 2.3-3 2.3s-3-1-3-2.3"/></svg></span>
+                </div>
+                <div class="value">${{ number_format($vm['kpis']['total_cost_usd'],2) }}</div>
+            </div>
+            <div class="kpi{{ $vm['kpis']['open_alerts'] > 0 ? ' kpi--alert' : '' }}">
+                <div class="kpi__head">
+                    <div class="label">{{ __('cycle.open_alerts') }}</div>
+                    <span class="kpi__icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8a6 6 0 0 1 12 0c0 5 2 6 2 6H4s2-1 2-6"/><path d="M10 20a2 2 0 0 0 4 0"/></svg></span>
+                </div>
+                <div class="value">{{ $vm['kpis']['open_alerts'] }}</div>
+            </div>
         </div>
 
         <div class="chart-grid">

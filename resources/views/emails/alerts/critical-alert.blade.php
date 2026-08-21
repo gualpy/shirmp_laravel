@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>{{ __('mail.welcome_subject', ['app' => config('app.name')]) }}</title>
+    <title>{{ __('mail.critical_alert_subject', ['app' => config('app.name'), 'title' => $alert->title]) }}</title>
 </head>
 <body style="margin:0;padding:0;background:#f4f9fb;font-family:'Segoe UI',Arial,sans-serif;color:#123047;">
     <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#f4f9fb;padding:32px 16px;">
@@ -11,28 +11,31 @@
             <td align="center">
                 <table role="presentation" width="100%" style="max-width:520px;background:#ffffff;border-radius:16px;overflow:hidden;">
                     <tr>
-                        <td style="background:linear-gradient(135deg,#031a29 0%,#0a3850 55%,#0f6b80 100%);padding:28px 32px;">
+                        <td style="background:linear-gradient(135deg,#2a0a0a 0%,#5a1414 55%,#8a1f1f 100%);padding:28px 32px;">
                             <span style="color:#ffffff;font-size:1.3rem;font-weight:800;letter-spacing:-0.01em;">{{ config('app.name') }}</span>
                         </td>
                     </tr>
                     <tr>
                         <td style="padding:32px;">
-                            <h1 style="font-size:1.3rem;margin:0 0 16px;">¡Hola, {{ $owner->name }}!</h1>
-                            <p style="font-size:0.95rem;line-height:1.6;margin:0 0 16px;">
-                                Tu cuenta de <strong>{{ $tenant->company_display_name ?: $tenant->name }}</strong> ya está activa en {{ config('app.name') }}, con el plan <strong>{{ $plan->name }}</strong>.
+                            <h1 style="font-size:1.3rem;margin:0 0 16px;">Alerta crítica</h1>
+                            <p style="font-size:0.95rem;line-height:1.6;margin:0 0 8px;">
+                                <strong>{{ $alert->title }}</strong>
                             </p>
-                            <p style="font-size:0.95rem;line-height:1.6;margin:0 0 24px;">
-                                Ya puedes entrar con el usuario y la contraseña que definiste al registrarte.
+                            <p style="font-size:0.95rem;line-height:1.6;margin:0 0 16px;">
+                                {{ $alert->message }}
+                            </p>
+                            <p style="font-size:0.85rem;line-height:1.6;color:#5b7388;margin:0 0 24px;">
+                                Detectado el {{ $alert->detected_at->format('d/m/Y H:i') }} en {{ $tenant->company_display_name ?: $tenant->name }}, ciclo #{{ $alert->cycle_id }}.
                             </p>
                             <table role="presentation" cellpadding="0" cellspacing="0" style="margin:0 0 24px;">
                                 <tr>
                                     <td style="background:#12b5cb;border-radius:12px;">
-                                        <a href="{{ $loginUrl }}" style="display:inline-block;padding:13px 26px;color:#04222f;font-weight:800;text-decoration:none;font-size:0.95rem;">Ir a mi cuenta</a>
+                                        <a href="{{ $loginUrl }}" style="display:inline-block;padding:13px 26px;color:#04222f;font-weight:800;text-decoration:none;font-size:0.95rem;">Ver detalle</a>
                                     </td>
                                 </tr>
                             </table>
                             <p style="font-size:0.85rem;line-height:1.6;color:#5b7388;margin:0;">
-                                Si no reconoces esta actividad, contáctanos respondiendo este correo.
+                                Recibes este correo porque eres el responsable de la cuenta.
                             </p>
                         </td>
                     </tr>

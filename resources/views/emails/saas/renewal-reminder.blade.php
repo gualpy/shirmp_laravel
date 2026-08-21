@@ -22,7 +22,7 @@
                                 Tu plan <strong>{{ $plan->name }}</strong> de <strong>{{ $tenant->company_display_name ?: $tenant->name }}</strong> vence el <strong>{{ $endsAt->format('d/m/Y') }}</strong>.
                             </p>
                             <p style="font-size:0.95rem;line-height:1.6;margin:0 0 24px;">
-                                Entrá a tu cuenta y renová antes de esa fecha para que no se interrumpa el servicio.
+                                Entra a tu cuenta y renueva antes de esa fecha para que no se interrumpa el servicio.
                             </p>
                             <table role="presentation" cellpadding="0" cellspacing="0" style="margin:0 0 24px;">
                                 <tr>
@@ -32,7 +32,7 @@
                                 </tr>
                             </table>
                             <p style="font-size:0.85rem;line-height:1.6;color:#5b7388;margin:0;">
-                                Si ya renovaste, ignorá este mensaje.
+                                Si ya renovaste, ignora este mensaje.
                             </p>
                         </td>
                     </tr>

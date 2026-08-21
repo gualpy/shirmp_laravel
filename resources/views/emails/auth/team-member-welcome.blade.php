@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>{{ __('mail.welcome_subject', ['app' => config('app.name')]) }}</title>
+    <title>{{ __('mail.team_member_welcome_subject', ['app' => config('app.name')]) }}</title>
 </head>
 <body style="margin:0;padding:0;background:#f4f9fb;font-family:'Segoe UI',Arial,sans-serif;color:#123047;">
     <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#f4f9fb;padding:32px 16px;">
@@ -17,12 +17,12 @@
                     </tr>
                     <tr>
                         <td style="padding:32px;">
-                            <h1 style="font-size:1.3rem;margin:0 0 16px;">¡Hola, {{ $owner->name }}!</h1>
+                            <h1 style="font-size:1.3rem;margin:0 0 16px;">¡Hola, {{ $user->name }}!</h1>
                             <p style="font-size:0.95rem;line-height:1.6;margin:0 0 16px;">
-                                Tu cuenta de <strong>{{ $tenant->company_display_name ?: $tenant->name }}</strong> ya está activa en {{ config('app.name') }}, con el plan <strong>{{ $plan->name }}</strong>.
+                                Se creó tu cuenta en <strong>{{ $tenant->company_display_name ?: $tenant->name }}</strong> con el rol <strong>{{ $user->role instanceof \BackedEnum ? $user->role->value : $user->role }}</strong>.
                             </p>
                             <p style="font-size:0.95rem;line-height:1.6;margin:0 0 24px;">
-                                Ya puedes entrar con el usuario y la contraseña que definiste al registrarte.
+                                Ya puedes entrar con el correo y la contraseña que definiste al registrarte.
                             </p>
                             <table role="presentation" cellpadding="0" cellspacing="0" style="margin:0 0 24px;">
                                 <tr>
@@ -32,7 +32,7 @@
                                 </tr>
                             </table>
                             <p style="font-size:0.85rem;line-height:1.6;color:#5b7388;margin:0;">
-                                Si no reconoces esta actividad, contáctanos respondiendo este correo.
+                                Si no reconoces esta cuenta, contáctanos respondiendo este correo.
                             </p>
                         </td>
                     </tr>

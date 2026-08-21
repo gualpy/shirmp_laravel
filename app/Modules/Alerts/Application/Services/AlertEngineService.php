@@ -2,10 +2,13 @@
 
 namespace App\Modules\Alerts\Application\Services;
 
+use App\Models\User;
+use App\Modules\Alerts\Application\Mail\CriticalAlertMail;
 use App\Modules\Alerts\Domain\Enums\AlertCode;
 use App\Modules\Alerts\Domain\Enums\AlertSeverity;
 use App\Modules\Alerts\Domain\Models\AlertEvent;
 use App\Modules\Alerts\Domain\Models\AlertRule;
+use App\Modules\Auth\Domain\Enums\UserRole;
 use App\Modules\Configuration\Application\Services\FeedingRecommendationService;
 use App\Modules\Production\Application\Services\MetricsService;
 use App\Modules\Production\Domain\Enums\CycleStatus;
@@ -13,6 +16,7 @@ use App\Modules\Production\Domain\Models\Cycle;
 use App\Modules\Shared\Application\Services\BaseService;
 use App\Modules\WaterQuality\Domain\Models\WaterQualityEntry;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Mail;
 
 final class AlertEngineService extends BaseService
 {
@@ -279,7 +283,7 @@ final class AlertEngineService extends BaseService
             return null;
         }
 
-        return AlertEvent::query()->create([
+        $event = AlertEvent::query()->create([
             'tenant_id' => $cycle->tenant_id,
             'farm_id' => $cycle->pond->farm_id,
             'cycle_id' => $cycle->id,
@@ -290,5 +294,31 @@ final class AlertEngineService extends BaseService
             'detected_at' => $detectedAt,
             'context_json' => $context,
         ]);
+
+        if ($severity === AlertSeverity::CRITICAL) {
+            $this->sendCriticalAlertEmail($cycle, $event);
+        }
+
+        return $event;
+    }
+
+    private function sendCriticalAlertEmail(Cycle $cycle, AlertEvent $event): void
+    {
+        $tenant = $cycle->tenant()->first();
+
+        if ($tenant === null) {
+            return;
+        }
+
+        $owner = User::withoutGlobalScopes()
+            ->where('tenant_id', $tenant->id)
+            ->where('role', UserRole::OWNER->value)
+            ->first();
+
+        if ($owner === null) {
+            return;
+        }
+
+        Mail::to($owner->email)->send(new CriticalAlertMail($tenant, $owner, $event));
     }
 }

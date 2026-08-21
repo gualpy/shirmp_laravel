@@ -8,4 +8,5 @@ return [
     'plan_changed_subject' => 'Tu plan de :app cambió',
     'team_member_welcome_subject' => 'Tu cuenta en :app ya está lista',
     'critical_alert_subject' => '[Alerta] :title — :app',
+    'password_reset_subject' => 'Restablece tu contraseña de :app',
 ];

@@ -97,7 +97,7 @@
                                 <input id="remember" name="remember" type="checkbox" value="1" @checked(old('remember'))>
                                 <span>{{ __('login.remember_device') }}</span>
                             </label>
-                            <span>{{ __('login.access_note') }}</span>
+                            <a href="{{ route('password.request') }}">{{ __('login.forgot_password_link') }}</a>
                         </div>
 
                         <button class="submit-btn" type="submit">{{ __('login.enter_backoffice') }}</button>

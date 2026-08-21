@@ -33,6 +33,7 @@ use App\Modules\Backoffice\Presentation\Controllers\BackofficeCycleSamplingXlsxE
 use App\Modules\Backoffice\Presentation\Controllers\BackofficeCycleWaterExportController;
 use App\Modules\Backoffice\Presentation\Controllers\BackofficeCycleWaterXlsxExportController;
 use App\Modules\Backoffice\Presentation\Controllers\BackofficeDailyMortalityStoreController;
+use App\Modules\Backoffice\Presentation\Controllers\BackofficeForgotPasswordController;
 use App\Modules\Backoffice\Presentation\Controllers\BackofficeFarmStoreController;
 use App\Modules\Backoffice\Presentation\Controllers\BackofficeFarmsController;
 use App\Modules\Backoffice\Presentation\Controllers\BackofficeHomeController;
@@ -45,6 +46,7 @@ use App\Modules\Backoffice\Presentation\Controllers\BackofficeInventoryXlsxExpor
 use App\Modules\Backoffice\Presentation\Controllers\BackofficeOperationalCostStoreController;
 use App\Modules\Backoffice\Presentation\Controllers\BackofficePondStoreController;
 use App\Modules\Backoffice\Presentation\Controllers\BackofficePondsController;
+use App\Modules\Backoffice\Presentation\Controllers\BackofficeResetPasswordController;
 use App\Modules\Backoffice\Presentation\Controllers\BackofficeSessionController;
 use App\Modules\Backoffice\Presentation\Controllers\BackofficeSettingsController;
 use App\Modules\Backoffice\Presentation\Controllers\BackofficeSettingsUpdateController;
@@ -86,6 +88,15 @@ Route::post('/login', [BackofficeSessionController::class, 'store'])->middleware
 Route::post('/logout', [BackofficeSessionController::class, 'destroy'])
     ->middleware('auth')
     ->name('logout');
+
+Route::get('/forgot-password', [BackofficeForgotPasswordController::class, 'create'])->name('password.request');
+Route::post('/forgot-password', [BackofficeForgotPasswordController::class, 'store'])
+    ->middleware('throttle:6,1')
+    ->name('password.email');
+Route::get('/reset-password', [BackofficeResetPasswordController::class, 'create'])->name('password.reset');
+Route::post('/reset-password', [BackofficeResetPasswordController::class, 'store'])
+    ->middleware('throttle:6,1')
+    ->name('password.update');
 
 Route::get('/signup', [SignupController::class, 'create'])->name('signup.create');
 Route::post('/signup', [SignupController::class, 'store'])

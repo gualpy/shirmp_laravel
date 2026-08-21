@@ -15,7 +15,8 @@ return [
     'critical'          => 'Crítico',
     'warning'           => 'Advertencia',
     'view_detail'       => 'Ver detalle',
-    'no_cycles'         => 'No hay ciclos activos para los filtros seleccionados.',
+    'no_cycles'         => 'No hay ciclos activos para los filtros seleccionados. ',
+    'new_stocking_cta'  => 'Crear nueva siembra',
     'cycle'             => 'Ciclo',
     'status'            => 'Estado',
 ];

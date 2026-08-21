@@ -20,7 +20,7 @@
     }
     .filter-grid {
         display: grid;
-        grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) auto auto;
+        grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) auto;
         gap: 10px;
         align-items: end;
     }
@@ -175,7 +175,7 @@
             <form method="GET" action="/backoffice/cycles" class="filter-grid">
                 <label>
                     <span class="field-label">{{ __('cycles.farm') }}</span>
-                    <select name="farm" class="field-control">
+                    <select name="farm" class="field-control" onchange="this.form.submit()">
                         <option value="">{{ __('cycles.all') }}</option>
                         @foreach($vm['options']['farms'] as $farm)
                             <option value="{{ $farm['id'] }}" {{ $vm['filters']['farm'] === $farm['id'] ? 'selected' : '' }}>
@@ -186,7 +186,7 @@
                 </label>
                 <label>
                     <span class="field-label">{{ __('cycles.pond') }}</span>
-                    <select name="pond" class="field-control">
+                    <select name="pond" class="field-control" onchange="this.form.submit()">
                         <option value="">{{ __('cycles.all') }}</option>
                         @foreach($vm['options']['ponds'] as $pond)
                             <option value="{{ $pond['id'] }}" {{ $vm['filters']['pond'] === $pond['id'] ? 'selected' : '' }}>
@@ -195,7 +195,6 @@
                         @endforeach
                     </select>
                 </label>
-                <button type="submit" class="filter-btn filter-btn--primary">{{ __('cycles.filter') }}</button>
                 <a href="/backoffice/cycles" class="filter-btn" style="text-decoration:none;display:inline-flex;align-items:center;justify-content:center;">{{ __('cycles.reset') }}</a>
             </form>
         </div>
@@ -223,7 +222,7 @@
                     </div>
                 </a>
             @empty
-                <div class="empty-state animate-enter-down animate-enter-down-delay-1">{{ __('cycles.no_cycles') }}</div>
+                <div class="empty-state animate-enter-down animate-enter-down-delay-1">{{ __('cycles.no_cycles') }}<a href="/backoffice/stocking/create">{{ __('cycles.new_stocking_cta') }}</a></div>
             @endforelse
         </div>
     </div>

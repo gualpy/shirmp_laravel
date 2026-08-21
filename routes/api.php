@@ -24,6 +24,7 @@ use App\Modules\Production\Presentation\Controllers\FarmController;
 use App\Modules\Production\Presentation\Controllers\HarvestController;
 use App\Modules\Production\Presentation\Controllers\HealthController;
 use App\Modules\Production\Presentation\Controllers\PondController;
+use App\Modules\Suppliers\Presentation\Controllers\SupplierController;
 use App\Modules\Production\Presentation\Controllers\SamplingController;
 use App\Modules\Production\Presentation\Controllers\StockingController;
 use App\Modules\SaaS\Presentation\Controllers\AdminPlanController;
@@ -82,6 +83,10 @@ Route::prefix('v1')->group(function (): void {
             Route::get('/feed-types', [FeedTypeController::class, 'index']);
             Route::post('/feed-types', [FeedTypeController::class, 'store']);
             Route::patch('/feed-types/{feedType}', [FeedTypeController::class, 'update']);
+
+            Route::get('/suppliers', [SupplierController::class, 'index']);
+            Route::post('/suppliers', [SupplierController::class, 'store']);
+            Route::patch('/suppliers/{supplier}', [SupplierController::class, 'update']);
 
             Route::get('/cycles/{cycle}/feed-entries', [FeedEntryController::class, 'index']);
             Route::post('/cycles/{cycle}/feed-entries', [FeedEntryController::class, 'store']);

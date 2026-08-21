@@ -244,6 +244,17 @@ final class SaaSService
     /**
      * @param  array<string, mixed>  $payload
      */
+    public function updatePlan(Plan $plan, array $payload): Plan
+    {
+        $plan->fill($payload);
+        $plan->save();
+
+        return $plan->refresh();
+    }
+
+    /**
+     * @param  array<string, mixed>  $payload
+     */
     public function upsertPlanLimit(Plan $plan, array $payload): PlanLimit
     {
         return PlanLimit::query()->updateOrCreate(

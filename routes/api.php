@@ -136,7 +136,9 @@ Route::prefix('v1')->group(function (): void {
     Route::prefix('admin')
         ->middleware(['auth:sanctum', 'superadmin'])
         ->group(function (): void {
+            Route::get('/plans', [AdminPlanController::class, 'index']);
             Route::post('/plans', [AdminPlanController::class, 'store']);
+            Route::patch('/plans/{plan}', [AdminPlanController::class, 'update']);
             Route::post('/plans/{plan}/limits', [AdminPlanLimitController::class, 'store']);
             Route::post('/plans/{plan}/features', [AdminPlanFeatureController::class, 'store']);
             Route::post('/tenants/{tenant}/assign-plan', [AdminTenantSubscriptionController::class, 'assignPlan']);

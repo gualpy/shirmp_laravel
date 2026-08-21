@@ -425,9 +425,6 @@
                         <span>{{ __('cycle.farm') }} {{ $vm['header']['farm_name'] }}</span>
                         <span>{{ __('cycle.pond') }} {{ $vm['header']['pond_code'] }}</span>
                         <span>{{ __('cycle.started') }} {{ $vm['header']['started_at'] }}</span>
-                        @if($vm['header']['pl_qty'] !== null)
-                            <span>{{ __('cycle.stocked_pl') }} {{ number_format($vm['header']['pl_qty']) }}</span>
-                        @endif
                         @if($vm['header']['density_pl_m2'] !== null)
                             <span>{{ __('cycle.density') }} {{ number_format($vm['header']['density_pl_m2'], 2) }} PL/m²</span>
                         @endif
@@ -508,6 +505,7 @@
 
         <div id="tab-resumen" class="tab-panel active">
         <div class="kpis animate-enter-down animate-enter-down-delay-2">
+            <div class="kpi"><div class="label">{{ __('cycle.stocked_pl') }}</div><div class="value">{{ $vm['kpis']['stocked_pl'] !== null ? number_format($vm['kpis']['stocked_pl']) : 'N/A' }}</div></div>
             <div class="kpi"><div class="label">{{ __('cycle.estimated_biomass') }}</div><div class="value">{{ number_format($vm['kpis']['biomass_kg'],2) }} kg</div></div>
             <div class="kpi"><div class="label">{{ __('cycle.average_weight') }}</div><div class="value">{{ $vm['kpis']['latest_pp_grams'] !== null ? number_format($vm['kpis']['latest_pp_grams'],2).' g' : 'N/A' }}</div></div>
             <div class="kpi"><div class="label">{{ __('cycle.fcr') }}</div><div class="value">{{ number_format($vm['kpis']['fcr'],3) }}</div></div>

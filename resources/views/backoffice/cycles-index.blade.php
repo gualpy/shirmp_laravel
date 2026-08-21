@@ -110,6 +110,15 @@
         color: var(--muted);
         white-space: nowrap;
     }
+    .freshness {
+        margin-top: 4px;
+        font-size: .78rem;
+        color: var(--muted);
+    }
+    .freshness--stale {
+        color: #aa6a08;
+        font-weight: 700;
+    }
     .cycle-card {
         text-decoration: none;
         color: inherit;
@@ -287,6 +296,15 @@
                                     <div class="cycle-progress__fill" style="width:{{ $row['cycle_progress_pct'] }}%;"></div>
                                 </div>
                                 <span class="cycle-progress__label">{{ __('cycles.day') }} {{ $row['days_in_cycle'] }}</span>
+                            </div>
+                            <div class="freshness{{ $row['is_stale'] ? ' freshness--stale' : '' }}">
+                                @if($row['days_since_sampling'] === null)
+                                    {{ __('cycles.no_samplings') }}
+                                @elseif($row['days_since_sampling'] === 0)
+                                    {{ __('cycles.sampling_today') }}
+                                @else
+                                    {{ __('cycles.sampling_days_ago', ['days' => $row['days_since_sampling']]) }}
+                                @endif
                             </div>
                         </div>
                         <div class="cycle-card__right">

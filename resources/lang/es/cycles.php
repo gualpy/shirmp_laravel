@@ -23,4 +23,7 @@ return [
     'kpi_total_biomass' => 'Biomasa total',
     'kpi_avg_weight'    => 'Peso promedio',
     'day'               => 'Día',
+    'no_samplings'      => 'Sin muestreos registrados',
+    'sampling_today'    => 'Último muestreo: hoy',
+    'sampling_days_ago' => 'Último muestreo: hace :days días',
 ];

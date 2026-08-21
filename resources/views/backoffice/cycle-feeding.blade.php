@@ -91,9 +91,14 @@
         border: 1px solid rgba(12, 122, 106, 0.12);
         font-weight: 700;
     }
-    .table-wrap { overflow:auto; }
+    .table-wrap {
+        overflow: auto;
+        max-height: 520px;
+    }
     .feeding-table { width:100%; border-collapse: collapse; min-width: 560px; }
     .feeding-table th {
+        position: sticky;
+        top: 0;
         text-align:left;
         font-size:.74rem;
         text-transform:uppercase;
@@ -101,6 +106,7 @@
         color:var(--muted);
         padding:12px 10px;
         border-bottom:1px solid var(--border);
+        background: #fff;
     }
     .feeding-table td {
         padding:14px 10px;

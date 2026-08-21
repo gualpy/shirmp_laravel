@@ -425,6 +425,15 @@
                         <span>{{ __('cycle.farm') }} {{ $vm['header']['farm_name'] }}</span>
                         <span>{{ __('cycle.pond') }} {{ $vm['header']['pond_code'] }}</span>
                         <span>{{ __('cycle.started') }} {{ $vm['header']['started_at'] }}</span>
+                        @if($vm['header']['pl_qty'] !== null)
+                            <span>{{ __('cycle.stocked_pl') }} {{ number_format($vm['header']['pl_qty']) }}</span>
+                        @endif
+                        @if($vm['header']['density_pl_m2'] !== null)
+                            <span>{{ __('cycle.density') }} {{ number_format($vm['header']['density_pl_m2'], 2) }} PL/m²</span>
+                        @endif
+                        @if($vm['header']['supplier_name'] !== null)
+                            <span>{{ __('cycle.hatchery') }} {{ $vm['header']['supplier_name'] }}</span>
+                        @endif
                     </div>
                 </div>
                 <span class="detail-status">{{ $vm['header']['status'] }}</span>

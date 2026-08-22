@@ -58,6 +58,11 @@ return [
     'plans_subtitle'     => 'Lectura clara de planes, billing, límites y features disponibles.',
     'limits'             => 'Límites',
     'features'           => 'Features',
+    'plan_name'          => 'Nombre',
+    'plan_price'         => 'Precio ($)',
+    'plan_is_active'     => 'Activo',
+    'plan_save'          => 'Guardar',
+    'plan_updated'       => 'Plan actualizado correctamente.',
 
     // Tenant create
     'create_tenant_title'    => 'Onboarding de Tenant',

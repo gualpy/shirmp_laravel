@@ -67,6 +67,7 @@ use App\Modules\Backoffice\Presentation\Controllers\BackofficeAdminBillingInvoic
 use App\Modules\Backoffice\Presentation\Controllers\BackofficeAdminBillingPaymentStoreController;
 use App\Modules\Backoffice\Presentation\Controllers\BackofficeAdminOpsController;
 use App\Modules\Backoffice\Presentation\Controllers\BackofficeAdminPlansController;
+use App\Modules\Backoffice\Presentation\Controllers\BackofficeAdminPlanUpdateController;
 use App\Modules\Backoffice\Presentation\Controllers\BackofficeAdminTenantBillingController;
 use App\Modules\Backoffice\Presentation\Controllers\BackofficeAdminTenantCreateController;
 use App\Modules\Backoffice\Presentation\Controllers\BackofficeAdminTenantDetailController;
@@ -304,6 +305,8 @@ Route::middleware(['tenant.backoffice', 'auth', 'superadmin'])
 
         Route::get('/plans', BackofficeAdminPlansController::class)
             ->name('backoffice.admin.plans.index');
+        Route::post('/plans/{plan}', BackofficeAdminPlanUpdateController::class)
+            ->name('backoffice.admin.plans.update');
 
         Route::get('/tenants', BackofficeAdminTenantsController::class)
             ->name('backoffice.admin.tenants.index');

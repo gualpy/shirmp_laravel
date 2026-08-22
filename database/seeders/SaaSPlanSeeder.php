@@ -20,7 +20,7 @@ class SaaSPlanSeeder extends Seeder
             priceUsd: 49.00,
             limits: [
                 'max_farms' => 1,
-                'max_cycles_active' => 3,
+                'max_cycles_active' => 4,
                 'max_users' => 3,
             ],
             features: [

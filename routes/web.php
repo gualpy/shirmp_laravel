@@ -45,6 +45,7 @@ use App\Modules\Backoffice\Presentation\Controllers\BackofficeInventoryStoreCont
 use App\Modules\Backoffice\Presentation\Controllers\BackofficeInventoryXlsxExportController;
 use App\Modules\Backoffice\Presentation\Controllers\BackofficeOperationalCostStoreController;
 use App\Modules\Backoffice\Presentation\Controllers\BackofficePondStoreController;
+use App\Modules\Backoffice\Presentation\Controllers\BackofficeProjectionSettingsUpdateController;
 use App\Modules\Backoffice\Presentation\Controllers\BackofficePondsController;
 use App\Modules\Backoffice\Presentation\Controllers\BackofficeResetPasswordController;
 use App\Modules\Backoffice\Presentation\Controllers\BackofficeSessionController;
@@ -150,6 +151,9 @@ Route::middleware(['tenant.backoffice', 'auth', 'subscription.active'])
         Route::post('/settings', BackofficeSettingsUpdateController::class)
             ->middleware('role.module:settings')
             ->name('backoffice.settings.update');
+        Route::post('/settings/projection', BackofficeProjectionSettingsUpdateController::class)
+            ->middleware('role.module:settings')
+            ->name('backoffice.settings.projection.update');
 
         Route::get('/warehouses', BackofficeWarehousesController::class)
             ->middleware('role.module:inventory')

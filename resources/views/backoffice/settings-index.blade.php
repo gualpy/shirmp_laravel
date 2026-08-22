@@ -52,4 +52,30 @@
         </div>
     </form>
 </div>
+
+<div class="card animate-enter-down animate-enter-down-delay-2" style="margin-top:16px;">
+    <h3 class="panel-title">{{ __('settings.projection_title') }}</h3>
+    <div class="section-subtitle" style="margin-bottom:12px;">{{ __('settings.projection_subtitle') }}</div>
+    <form method="POST" action="{{ route('backoffice.settings.projection.update') }}" style="display:grid;gap:12px;max-width:560px;">
+        @csrf
+        <label>
+            <span class="metric-label">{{ __('settings.target_pp_grams') }}</span>
+            <input class="input{{ $errors->has('default_target_pp_grams') ? ' input--error' : '' }}" type="number" min="0.01" step="0.01" name="default_target_pp_grams" value="{{ old('default_target_pp_grams', $vm['projection_settings']['default_target_pp_grams']) }}">
+            @error('default_target_pp_grams') <span class="field-error">{{ $message }}</span> @enderror
+        </label>
+        <label>
+            <span class="metric-label">{{ __('settings.sale_price_per_lb') }}</span>
+            <input class="input{{ $errors->has('default_sale_price_per_lb') ? ' input--error' : '' }}" type="number" min="0.01" step="0.01" name="default_sale_price_per_lb" value="{{ old('default_sale_price_per_lb', $vm['projection_settings']['default_sale_price_per_lb']) }}">
+            @error('default_sale_price_per_lb') <span class="field-error">{{ $message }}</span> @enderror
+        </label>
+        <label>
+            <span class="metric-label">{{ __('settings.feed_cost_factor') }}</span>
+            <input class="input{{ $errors->has('default_feed_cost_factor_per_kg_gain') ? ' input--error' : '' }}" type="number" min="0" step="0.01" name="default_feed_cost_factor_per_kg_gain" value="{{ old('default_feed_cost_factor_per_kg_gain', $vm['projection_settings']['default_feed_cost_factor_per_kg_gain']) }}">
+            @error('default_feed_cost_factor_per_kg_gain') <span class="field-error">{{ $message }}</span> @enderror
+        </label>
+        <div>
+            <button class="cta-primary" type="submit" {{ $canManageSettings ? '' : 'disabled' }} title="{{ $canManageSettings ? __('settings.save') : (($shell['permissions']['settings.manage'] ?? false) ? $shell['write_block_tooltip'] : $shell['permission_block_tooltip']) }}">{{ __('settings.save') }}</button>
+        </div>
+    </form>
+</div>
 @endsection

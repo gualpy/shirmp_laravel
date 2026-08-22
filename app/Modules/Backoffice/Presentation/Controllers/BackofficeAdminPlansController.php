@@ -15,7 +15,7 @@ final class BackofficeAdminPlansController extends Controller
         return view('backoffice.admin.plans-index', [
             'shell' => $shellService->build($request->user()),
             'vm' => ['rows' => $service->list()],
-            'activeMenu' => 'admin',
+            'activeMenu' => 'admin_plans',
         ]);
     }
 }

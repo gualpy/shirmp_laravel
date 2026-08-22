@@ -15,7 +15,7 @@ final class BackofficeAdminBillingController extends Controller
         return view('backoffice.admin.billing-index', [
             'shell' => $shellService->build($request->user()),
             'vm' => $service->adminGlobalView(),
-            'activeMenu' => 'admin',
+            'activeMenu' => 'admin_billing',
         ]);
     }
 }

@@ -15,7 +15,7 @@ final class BackofficeAdminAuditController extends Controller
         return view('backoffice.admin.audit-index', [
             'shell' => $shellService->build($request->user()),
             'vm' => $auditService->globalView($request->only(['tenant_id', 'user', 'action_key', 'date_from', 'date_to'])),
-            'activeMenu' => 'admin',
+            'activeMenu' => 'admin_audit',
         ]);
     }
 }

@@ -15,7 +15,7 @@ final class BackofficeAdminTenantCreateController extends Controller
         return view('backoffice.admin.tenant-create', [
             'shell' => $shellService->build($request->user()),
             'vm' => $service->formViewModel(),
-            'activeMenu' => 'admin',
+            'activeMenu' => 'admin_tenants',
         ]);
     }
 }

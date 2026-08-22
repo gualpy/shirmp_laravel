@@ -15,7 +15,7 @@ final class BackofficeSuperAdminDashboardController extends Controller
         return view('backoffice.admin.dashboard', [
             'shell' => $shellService->build($request->user()),
             'vm' => $service->build(),
-            'activeMenu' => 'admin',
+            'activeMenu' => 'admin_dashboard',
         ]);
     }
 }

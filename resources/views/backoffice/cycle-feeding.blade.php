@@ -77,11 +77,21 @@
         cursor: pointer;
     }
     .primary-btn {
-        background: rgba(12, 122, 106, 0.08);
-        color: var(--primary);
-        border-color: rgba(12, 122, 106, 0.18);
+        background: var(--primary);
+        color: #fff;
+        border-color: var(--primary);
+        box-shadow: 0 8px 18px rgba(12, 122, 106, 0.22);
+        transition: transform .12s ease, box-shadow .12s ease, background .12s ease;
     }
-    .primary-btn[disabled] { opacity: .45; cursor: not-allowed; }
+    .primary-btn:hover {
+        background: #0a685b;
+        box-shadow: 0 10px 22px rgba(12, 122, 106, 0.28);
+    }
+    .primary-btn:focus-visible {
+        outline: 2px solid var(--primary);
+        outline-offset: 2px;
+    }
+    .primary-btn[disabled] { opacity: .45; cursor: not-allowed; box-shadow: none; }
     .inline-link { background: #fff; color: var(--text); }
     .status-flash {
         padding: 12px 14px;
@@ -142,7 +152,7 @@
                         <span>{{ __('cycle.started') }} {{ $vm['header']['started_at'] }}</span>
                     </div>
                 </div>
-                <a href="/backoffice/cycles/{{ $vm['header']['cycle_id'] }}" class="inline-link">{{ __('cycle.back_to_cycle') }}</a>
+                <a href="/backoffice/cycles/{{ $vm['header']['cycle_id'] }}" class="primary-btn">{{ __('cycle.back_to_cycle') }}</a>
             </div>
         </div>
 

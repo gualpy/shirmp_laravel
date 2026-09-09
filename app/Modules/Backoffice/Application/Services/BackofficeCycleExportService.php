@@ -8,40 +8,11 @@ use App\Modules\Production\Domain\Models\Cycle;
 use Illuminate\Support\Str;
 use Maatwebsite\Excel\Facades\Excel;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
-use Symfony\Component\HttpFoundation\StreamedResponse;
 
 final class BackofficeCycleExportService
 {
     public function __construct(private readonly CostingService $costingService)
     {
-    }
-
-    public function downloadSamplings(Cycle $cycle): StreamedResponse
-    {
-        $export = $this->samplingsExport($cycle);
-
-        return $this->csvResponse($cycle, 'samplings', $export['headers'], $export['rows']);
-    }
-
-    public function downloadFeed(Cycle $cycle): StreamedResponse
-    {
-        $export = $this->feedExport($cycle);
-
-        return $this->csvResponse($cycle, 'feed', $export['headers'], $export['rows']);
-    }
-
-    public function downloadMortalities(Cycle $cycle): StreamedResponse
-    {
-        $export = $this->mortalitiesExport($cycle);
-
-        return $this->csvResponse($cycle, 'mortalities', $export['headers'], $export['rows']);
-    }
-
-    public function downloadWater(Cycle $cycle): StreamedResponse
-    {
-        $export = $this->waterExport($cycle);
-
-        return $this->csvResponse($cycle, 'water', $export['headers'], $export['rows']);
     }
 
     public function downloadSamplingsXlsx(Cycle $cycle): BinaryFileResponse
@@ -106,34 +77,6 @@ final class BackofficeCycleExportService
             ['type', 'amount', 'occurred_at', 'notes', 'source'],
             [...$rows, ...$operationalRows]
         );
-    }
-
-    /**
-     * @param  array<int, string>  $headers
-     * @param  array<int, array<int, mixed>>  $rows
-     */
-    private function csvResponse(Cycle $cycle, string $suffix, array $headers, array $rows): StreamedResponse
-    {
-        $cycle->loadMissing('pond');
-
-        $filename = sprintf(
-            '%s.csv',
-            Str::slug('cycle-'.$cycle->id.'-'.$cycle->pond?->code.'-'.$suffix)
-        );
-
-        return response()->streamDownload(function () use ($headers, $rows): void {
-            $handle = fopen('php://output', 'wb');
-            fwrite($handle, "\xEF\xBB\xBF");
-            fputcsv($handle, $headers);
-
-            foreach ($rows as $row) {
-                fputcsv($handle, $row);
-            }
-
-            fclose($handle);
-        }, $filename, [
-            'Content-Type' => 'text/csv; charset=UTF-8',
-        ]);
     }
 
     /**

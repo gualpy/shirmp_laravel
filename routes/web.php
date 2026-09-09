@@ -22,15 +22,11 @@ use App\Modules\Backoffice\Presentation\Controllers\BackofficeCycleHarvestContro
 use App\Modules\Backoffice\Presentation\Controllers\BackofficeCycleHarvestStoreController;
 use App\Modules\Backoffice\Presentation\Controllers\BackofficeCycleSamplingController;
 use App\Modules\Backoffice\Presentation\Controllers\BackofficeCycleSamplingStoreController;
-use App\Modules\Backoffice\Presentation\Controllers\BackofficeCycleFeedExportController;
 use App\Modules\Backoffice\Presentation\Controllers\BackofficeCycleFeedXlsxExportController;
 use App\Modules\Backoffice\Presentation\Controllers\BackofficeCycleListController;
 use App\Modules\Backoffice\Presentation\Controllers\BackofficeCycleMortalityController;
-use App\Modules\Backoffice\Presentation\Controllers\BackofficeCycleMortalityExportController;
 use App\Modules\Backoffice\Presentation\Controllers\BackofficeCycleMortalityXlsxExportController;
-use App\Modules\Backoffice\Presentation\Controllers\BackofficeCycleSamplingExportController;
 use App\Modules\Backoffice\Presentation\Controllers\BackofficeCycleSamplingXlsxExportController;
-use App\Modules\Backoffice\Presentation\Controllers\BackofficeCycleWaterExportController;
 use App\Modules\Backoffice\Presentation\Controllers\BackofficeCycleWaterXlsxExportController;
 use App\Modules\Backoffice\Presentation\Controllers\BackofficeDailyMortalityStoreController;
 use App\Modules\Backoffice\Presentation\Controllers\BackofficeForgotPasswordController;
@@ -217,27 +213,15 @@ Route::middleware(['tenant.backoffice', 'auth', 'subscription.active'])
             ->middleware('role.module:production')
             ->name('backoffice.cycles.show');
 
-        Route::get('/cycles/{cycleId}/exports/samplings.csv', BackofficeCycleSamplingExportController::class)
-            ->middleware('role.module:reports')
-            ->name('backoffice.cycles.exports.samplings');
         Route::get('/cycles/{cycleId}/exports/samplings.xlsx', BackofficeCycleSamplingXlsxExportController::class)
             ->middleware('role.module:reports')
             ->name('backoffice.cycles.exports.samplings.xlsx');
-        Route::get('/cycles/{cycleId}/exports/feed.csv', BackofficeCycleFeedExportController::class)
-            ->middleware('role.module:reports')
-            ->name('backoffice.cycles.exports.feed');
         Route::get('/cycles/{cycleId}/exports/feed.xlsx', BackofficeCycleFeedXlsxExportController::class)
             ->middleware('role.module:reports')
             ->name('backoffice.cycles.exports.feed.xlsx');
-        Route::get('/cycles/{cycleId}/exports/mortalities.csv', BackofficeCycleMortalityExportController::class)
-            ->middleware('role.module:reports')
-            ->name('backoffice.cycles.exports.mortalities');
         Route::get('/cycles/{cycleId}/exports/mortalities.xlsx', BackofficeCycleMortalityXlsxExportController::class)
             ->middleware('role.module:reports')
             ->name('backoffice.cycles.exports.mortalities.xlsx');
-        Route::get('/cycles/{cycleId}/exports/water.csv', BackofficeCycleWaterExportController::class)
-            ->middleware('role.module:reports')
-            ->name('backoffice.cycles.exports.water');
         Route::get('/cycles/{cycleId}/exports/water.xlsx', BackofficeCycleWaterXlsxExportController::class)
             ->middleware('role.module:reports')
             ->name('backoffice.cycles.exports.water.xlsx');

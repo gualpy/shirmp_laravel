@@ -77,7 +77,7 @@ final class BackofficeCycleReportService
             'footer' => [
                 'generated_at' => CarbonImmutable::now()->format('Y-m-d H:i'),
                 'footer_text' => $branding['footer_text'],
-                'system_signature' => 'Generado por Shrimp SaaS',
+                'system_signature' => 'Generado por '.config('app.name', 'ShrimpApp'),
             ],
         ];
     }

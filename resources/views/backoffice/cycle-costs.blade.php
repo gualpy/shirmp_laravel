@@ -31,6 +31,60 @@
         margin-bottom: 6px;
         text-transform: uppercase;
         letter-spacing: .08em;
+        display: flex;
+        align-items: center;
+        gap: 5px;
+    }
+    .kpi-info {
+        position: relative;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 15px;
+        height: 15px;
+        border-radius: 50%;
+        background: rgba(12, 122, 106, 0.12);
+        color: var(--primary);
+        font-size: .68rem;
+        font-weight: 800;
+        text-transform: none;
+        letter-spacing: normal;
+        cursor: help;
+    }
+    .kpi-info__tip {
+        position: absolute;
+        bottom: calc(100% + 8px);
+        left: 50%;
+        transform: translateX(-50%);
+        width: 220px;
+        background: #1f2a33;
+        color: #fff;
+        font-size: .74rem;
+        font-weight: 500;
+        line-height: 1.35;
+        padding: 8px 10px;
+        border-radius: 10px;
+        text-transform: none;
+        letter-spacing: normal;
+        opacity: 0;
+        visibility: hidden;
+        transition: opacity .12s ease;
+        z-index: 5;
+        pointer-events: none;
+    }
+    .kpi-info__tip::after {
+        content: '';
+        position: absolute;
+        top: 100%;
+        left: 50%;
+        transform: translateX(-50%);
+        border: 5px solid transparent;
+        border-top-color: #1f2a33;
+    }
+    .kpi-info:hover .kpi-info__tip,
+    .kpi-info:focus .kpi-info__tip {
+        opacity: 1;
+        visibility: visible;
     }
     .kpi-card__value {
         font-size: 1.34rem;
@@ -88,11 +142,21 @@
         justify-content: center;
     }
     .primary-btn {
-        background: rgba(12, 122, 106, 0.08);
-        color: var(--primary);
-        border-color: rgba(12, 122, 106, 0.18);
+        background: var(--primary);
+        color: #fff;
+        border-color: var(--primary);
+        box-shadow: 0 8px 18px rgba(12, 122, 106, 0.22);
+        transition: transform .12s ease, box-shadow .12s ease, background .12s ease;
     }
-    .primary-btn[disabled] { opacity: .45; cursor: not-allowed; }
+    .primary-btn:hover {
+        background: #0a685b;
+        box-shadow: 0 10px 22px rgba(12, 122, 106, 0.28);
+    }
+    .primary-btn:focus-visible {
+        outline: 2px solid var(--primary);
+        outline-offset: 2px;
+    }
+    .primary-btn[disabled] { opacity: .45; cursor: not-allowed; box-shadow: none; }
     .secondary-btn, .inline-link { background: #fff; color: var(--text); }
     .warning-list {
         display: grid;
@@ -180,7 +244,7 @@
                 </div>
                 <div style="display:flex;gap:10px;flex-wrap:wrap;">
                     <a href="/backoffice/cycles/{{ $vm['header']['cycle_id'] }}/exports/costs.xlsx" class="inline-link">{{ __('cycle.export_excel') }}</a>
-                    <a href="/backoffice/cycles/{{ $vm['header']['cycle_id'] }}" class="inline-link">{{ __('cycle.back_to_cycle') }}</a>
+                    <a href="/backoffice/cycles/{{ $vm['header']['cycle_id'] }}" class="primary-btn">{{ __('cycle.back_to_cycle') }}</a>
                 </div>
             </div>
         </div>
@@ -190,11 +254,11 @@
         @endif
 
         <div class="kpi-grid">
-            <div class="kpi-card"><div class="kpi-card__label">{{ __('cycle.feed_cost') }}</div><div class="kpi-card__value">${{ number_format($vm['summary']['totals']['feed_cost'], 2) }}</div></div>
-            <div class="kpi-card"><div class="kpi-card__label">{{ __('cycle.operational_cost') }}</div><div class="kpi-card__value">${{ number_format($vm['summary']['totals']['operational_cost'], 2) }}</div></div>
-            <div class="kpi-card"><div class="kpi-card__label">{{ __('cycle.total_cost') }}</div><div class="kpi-card__value">${{ number_format($vm['summary']['totals']['total_cost'], 2) }}</div></div>
-            <div class="kpi-card"><div class="kpi-card__label">{{ __('cycle.cost_per_lb') }}</div><div class="kpi-card__value">{{ $vm['summary']['metrics']['cost_per_lb'] !== null ? '$'.number_format($vm['summary']['metrics']['cost_per_lb'], 4) : __('cycle.no_harvest_yet') }}</div></div>
-            <div class="kpi-card"><div class="kpi-card__label">{{ __('cycle.cost_per_ha') }}</div><div class="kpi-card__value">${{ number_format($vm['summary']['metrics']['cost_per_ha'], 4) }}</div></div>
+            <div class="kpi-card"><div class="kpi-card__label">{{ __('cycle.feed_cost') }}<span class="kpi-info" tabindex="0">i<span class="kpi-info__tip">{{ __('cycle.tooltip_feed_cost') }}</span></span></div><div class="kpi-card__value">${{ number_format($vm['summary']['totals']['feed_cost'], 2) }}</div></div>
+            <div class="kpi-card"><div class="kpi-card__label">{{ __('cycle.operational_cost') }}<span class="kpi-info" tabindex="0">i<span class="kpi-info__tip">{{ __('cycle.tooltip_operational_cost') }}</span></span></div><div class="kpi-card__value">${{ number_format($vm['summary']['totals']['operational_cost'], 2) }}</div></div>
+            <div class="kpi-card"><div class="kpi-card__label">{{ __('cycle.total_cost') }}<span class="kpi-info" tabindex="0">i<span class="kpi-info__tip">{{ __('cycle.tooltip_total_cost') }}</span></span></div><div class="kpi-card__value">${{ number_format($vm['summary']['totals']['total_cost'], 2) }}</div></div>
+            <div class="kpi-card"><div class="kpi-card__label">{{ __('cycle.cost_per_lb') }}<span class="kpi-info" tabindex="0">i<span class="kpi-info__tip">{{ __('cycle.tooltip_cost_per_lb') }}</span></span></div><div class="kpi-card__value">{{ $vm['summary']['metrics']['cost_per_lb'] !== null ? '$'.number_format($vm['summary']['metrics']['cost_per_lb'], 4) : __('cycle.no_harvest_yet') }}</div></div>
+            <div class="kpi-card"><div class="kpi-card__label">{{ __('cycle.cost_per_ha') }}<span class="kpi-info" tabindex="0">i<span class="kpi-info__tip">{{ __('cycle.tooltip_cost_per_ha') }}</span></span></div><div class="kpi-card__value">${{ number_format($vm['summary']['metrics']['cost_per_ha'], 4) }}</div></div>
         </div>
 
         @if($vm['summary']['missing_cost_inputs'] !== [])

@@ -51,6 +51,8 @@ return [
     'pricing_cta'     => 'Elegir plan',
     'pricing_month_suffix' => '/mes',
     'pricing_year_suffix'  => '/año',
+    'pricing_contact_sales' => 'A medida',
+    'pricing_cta_contact'   => 'Contactar ventas',
 
     'final_cta_title' => '¿Listo para dejar las hojas de cálculo?',
     'final_cta_body'  => 'Creá tu cuenta hoy y activá tu operación en minutos.',

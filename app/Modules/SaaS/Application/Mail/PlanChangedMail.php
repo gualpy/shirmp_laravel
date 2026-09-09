@@ -28,7 +28,6 @@ final class PlanChangedMail extends Mailable
         'cost_engine' => 'Motor de costos',
         'water_quality' => 'Calidad de agua',
         'advanced_reports' => 'Reportes avanzados',
-        'api_access' => 'Acceso a API',
         'export_excel' => 'Exportar a Excel',
         'export_pdf' => 'Exportar a PDF',
     ];

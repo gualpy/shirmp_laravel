@@ -243,14 +243,43 @@ final class TenantOnboardingService
             ->all();
     }
 
+    /**
+     * Same as signupPlans() but also includes contact-sales plans (no
+     * self-serve price, e.g. Enterprise) for marketing display. Never use
+     * this for the actual signup/checkout flow - those plans have no
+     * price_usd to build an invoice from.
+     *
+     * @return list<array{id: int, name: string, code: string, billing_type: string, price_usd: ?string, is_contact_sales: bool, highlights: list<string>}>
+     */
+    public function landingPlans(): array
+    {
+        return Plan::query()
+            ->where('is_active', true)
+            ->where('billing_type', '!=', PlanBillingType::ONPREM->value)
+            ->with(['limits', 'features'])
+            ->orderByRaw('price_usd IS NULL, price_usd')
+            ->get()
+            ->map(fn (Plan $plan): array => [
+                'id' => $plan->id,
+                'name' => $plan->name,
+                'code' => $plan->code,
+                'billing_type' => $plan->billing_type->value,
+                'price_usd' => $plan->price_usd !== null ? number_format((float) $plan->price_usd, 2) : null,
+                'is_contact_sales' => $plan->price_usd === null,
+                'highlights' => $this->planHighlights($plan),
+            ])
+            ->values()
+            ->all();
+    }
+
     /** @return list<string> */
     private function planHighlights(Plan $plan): array
     {
         $limitLabels = [
-            'max_farms' => ['granja', 'granjas'],
-            'max_ponds' => ['piscina', 'piscinas'],
-            'max_cycles_active' => ['ciclo activo', 'ciclos activos'],
-            'max_users' => ['usuario', 'usuarios'],
+            'max_farms' => ['granja', 'granjas', 'Granjas ilimitadas'],
+            'max_ponds' => ['piscina', 'piscinas', 'Piscinas ilimitadas'],
+            'max_cycles_active' => ['ciclo activo', 'ciclos activos', 'Ciclos activos ilimitados'],
+            'max_users' => ['usuario', 'usuarios', 'Usuarios ilimitados'],
         ];
 
         $featureLabels = [
@@ -259,7 +288,6 @@ final class TenantOnboardingService
             'cost_engine' => 'Motor de costos',
             'water_quality' => 'Calidad de agua',
             'advanced_reports' => 'Reportes avanzados',
-            'api_access' => 'Acceso a API',
             'export_excel' => 'Exportación a Excel',
             'export_pdf' => 'Exportación a PDF',
         ];
@@ -267,11 +295,17 @@ final class TenantOnboardingService
         $highlights = [];
 
         foreach ($plan->limits as $limit) {
-            if (! isset($limitLabels[$limit->key]) || $limit->value === null) {
+            if (! isset($limitLabels[$limit->key])) {
                 continue;
             }
 
-            [$singular, $plural] = $limitLabels[$limit->key];
+            [$singular, $plural, $unlimitedLabel] = $limitLabels[$limit->key];
+
+            if ($limit->value === null) {
+                $highlights[] = $unlimitedLabel;
+                continue;
+            }
+
             $noun = ((int) $limit->value) === 1 ? $singular : $plural;
             $highlights[] = sprintf('Hasta %d %s', $limit->value, $noun);
         }

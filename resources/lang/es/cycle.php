@@ -64,6 +64,10 @@ return [
     'no_feedings'             => 'No hay registros de alimentación para este ciclo aún.',
     'no_feed_types'           => 'No hay tipos de alimento configurados para este tenant. Contactá al administrador.',
     'feeding_saved'           => 'Alimentación registrada correctamente.',
+    'feeding_cost_label'      => 'Costo en alimento',
+    'feeding_avg_cost_label'  => 'Promedio $/kg',
+    'feeding_closed_harvested' => 'Ciclo cosechado · No se pueden registrar nuevas alimentaciones.',
+    'feeding_closed_cancelled' => 'Ciclo cancelado · No se pueden registrar nuevas alimentaciones.',
 
     // Sampling
     'sampling_title'          => 'Muestreo de Peso',

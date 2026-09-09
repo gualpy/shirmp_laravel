@@ -13,9 +13,9 @@
     }
     .mini-kpis {
         display: grid;
-        grid-template-columns: repeat(1, minmax(0, 1fr));
+        grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
         gap: 12px;
-        max-width: 320px;
+        max-width: 620px;
     }
     .mini-kpi {
         background: linear-gradient(180deg, #ffffff, #fbfdff);
@@ -93,6 +93,18 @@
     }
     .primary-btn[disabled] { opacity: .45; cursor: not-allowed; box-shadow: none; }
     .inline-link { background: #fff; color: var(--text); }
+    .closed-cycle-notice {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 14px 16px;
+        border-radius: 14px;
+        border: 1px dashed #c9d7e4;
+        background: rgba(255, 255, 255, 0.62);
+        color: var(--muted);
+        font-weight: 600;
+        font-size: .92rem;
+    }
     .status-flash {
         padding: 12px 14px;
         border-radius: 14px;
@@ -140,6 +152,7 @@
 
 @section('content')
     @php($canManageFeeding = ($shell['permissions']['feeding.manage'] ?? false) && ! $vm['read_only_mode'])
+    @php($isCycleActive = $vm['header']['status'] === 'active')
     <div class="feeding-shell">
         <div class="card card-soft">
             <div style="display:flex;justify-content:space-between;align-items:flex-end;gap:14px;flex-wrap:wrap;">
@@ -162,6 +175,10 @@
 
         <div class="mini-kpis">
             <div class="mini-kpi"><div class="mini-kpi__label">{{ __('cycle.accum_feed') }}</div><div class="mini-kpi__value">{{ number_format($vm['summary']['total_feed_kg'],2) }} kg</div></div>
+            <div class="mini-kpi"><div class="mini-kpi__label">{{ __('cycle.feeding_cost_label') }}</div><div class="mini-kpi__value">${{ number_format($vm['summary']['total_feed_cost'],2) }}</div></div>
+            @if($vm['summary']['avg_cost_per_kg'] !== null)
+                <div class="mini-kpi"><div class="mini-kpi__label">{{ __('cycle.feeding_avg_cost_label') }}</div><div class="mini-kpi__value">${{ number_format($vm['summary']['avg_cost_per_kg'],2) }}/kg</div></div>
+            @endif
         </div>
 
         <div class="feeding-grid">
@@ -169,7 +186,11 @@
                 <h2 class="section-heading" style="font-size:1.18rem;margin-bottom:4px;">{{ __('cycle.record_feeding') }}</h2>
                 <div class="section-subtitle" style="font-size:.9rem;margin-bottom:14px;">{{ __('cycle.record_feeding_sub') }}</div>
 
-                @if($vm['feed_types'] === [])
+                @if(! $isCycleActive)
+                    <div class="closed-cycle-notice">
+                        🔒 {{ $vm['header']['status'] === 'harvested' ? __('cycle.feeding_closed_harvested') : __('cycle.feeding_closed_cancelled') }}
+                    </div>
+                @elseif($vm['feed_types'] === [])
                     <div class="empty-state">{{ __('cycle.no_feed_types') }}</div>
                 @else
                     <form method="POST" action="/backoffice/cycles/{{ $vm['header']['cycle_id'] }}/feeding" class="entry-form">
@@ -188,7 +209,7 @@
                         </label>
                         <label>
                             <span class="field-label">{{ __('cycle.amount_kg') }}</span>
-                            <input type="number" min="0.001" step="0.001" name="amount_kg" value="{{ old('amount_kg') }}" class="field-control{{ $errors->has('amount_kg') ? ' input--error' : '' }}">@error('amount_kg') <span class="field-error">{{ $message }}</span> @enderror
+                            <input type="number" min="0.001" step="0.001" placeholder="0.00" name="amount_kg" value="{{ old('amount_kg') }}" class="field-control{{ $errors->has('amount_kg') ? ' input--error' : '' }}">@error('amount_kg') <span class="field-error">{{ $message }}</span> @enderror
                         </label>
                         <label>
                             <span class="field-label">{{ __('cycle.notes') }}</span>
@@ -225,7 +246,7 @@
                             <tbody>
                                 @foreach($vm['rows'] as $row)
                                     <tr>
-                                        <td>{{ $row['fed_at'] }}</td>
+                                        <td>{{ $row['fed_at_display'] }}</td>
                                         <td>{{ $row['feed_type'] }}</td>
                                         <td>{{ number_format($row['amount_kg'],2) }}</td>
                                         <td>{{ $row['notes'] ?: __('cycle.no_notes') }}</td>

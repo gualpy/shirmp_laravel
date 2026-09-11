@@ -7,6 +7,7 @@ use App\Models\Tenant;
 use App\Modules\Backoffice\Presentation\Requests\BackofficeLoginRequest;
 use App\Modules\Auth\Application\DTO\LoginDTO;
 use App\Modules\Auth\Application\Services\AuthService;
+use App\Modules\Auth\Domain\Enums\UserRole;
 use App\Multitenancy\TenantContext;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -62,7 +63,9 @@ final class BackofficeSessionController extends Controller
         $request->session()->put('backoffice_tenant_slug', $tenant->slug);
         $request->session()->forget('backoffice_login_redirected');
 
-        return redirect()->intended(route('backoffice.home'));
+        $defaultRoute = $user->role === UserRole::SUPER_ADMIN ? 'backoffice.admin.dashboard' : 'backoffice.home';
+
+        return redirect()->intended(route($defaultRoute));
     }
 
     public function destroy(Request $request): RedirectResponse

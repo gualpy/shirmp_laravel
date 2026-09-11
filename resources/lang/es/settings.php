@@ -13,4 +13,10 @@ return [
     'report_footer_text'     => 'Pie de página para reportes',
     'save'                   => 'Guardar cambios',
     'saved'                  => 'Datos de la empresa actualizados correctamente.',
+    'projection_title'       => 'Parámetros de proyección de cosecha',
+    'projection_subtitle'    => 'Valores usados para estimar fecha de cosecha, biomasa, ingresos y ganancia proyectada en cada ciclo.',
+    'target_pp_grams'        => 'Peso objetivo (g)',
+    'sale_price_per_lb'      => 'Precio de venta ($/lb)',
+    'feed_cost_factor'       => 'Costo por kg de ganancia ($/kg)',
+    'projection_saved'       => 'Parámetros de proyección actualizados correctamente.',
 ];

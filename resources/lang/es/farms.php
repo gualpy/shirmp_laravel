@@ -55,6 +55,7 @@ return [
     'stocking_date'      => 'Fecha de siembra',
     'stocked_pl'         => 'PL sembradas',
     'hatchery'           => 'Laboratorio',
+    'select_hatchery'    => 'Selecciona un laboratorio',
     'batch'              => 'Lote',
     'initial_abw'        => 'ABW inicial (g)',
     'cycle_notes'        => 'Notas del ciclo',

@@ -15,7 +15,7 @@ final class BackofficeAdminTenantsController extends Controller
         return view('backoffice.admin.tenants-index', [
             'shell' => $shellService->build($request->user()),
             'vm' => $service->list($request->only(['plan', 'status', 'billing_type', 'read_only'])),
-            'activeMenu' => 'admin',
+            'activeMenu' => 'admin_tenants',
         ]);
     }
 }

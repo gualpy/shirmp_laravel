@@ -4,10 +4,12 @@ namespace App\Modules\SaaS\Application\Services;
 
 use App\Models\Tenant;
 use App\Models\User;
+use App\Modules\Auth\Domain\Enums\UserRole;
 use App\Modules\Production\Domain\Enums\CycleStatus;
 use App\Modules\Production\Domain\Models\Cycle;
 use App\Modules\Production\Domain\Models\Farm;
 use App\Modules\Production\Domain\Models\Pond;
+use App\Modules\SaaS\Application\Mail\PlanChangedMail;
 use App\Modules\SaaS\Domain\Enums\PlanBillingType;
 use App\Modules\SaaS\Domain\Enums\SubscriptionStatus;
 use App\Modules\SaaS\Domain\Enums\VerificationSource;
@@ -17,6 +19,7 @@ use App\Modules\SaaS\Domain\Models\PlanLimit;
 use App\Modules\SaaS\Domain\Models\TenantSubscription;
 use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Validation\ValidationException;
 
 final class SaaSService
@@ -176,6 +179,13 @@ final class SaaSService
             $this->assertSingleActiveOrTrialSubscription($subscription->tenant, $subscription->id);
         }
 
+        $previousPlan = null;
+        $planIsChanging = isset($payload['plan_id']) && (int) $payload['plan_id'] !== $subscription->plan_id;
+
+        if ($planIsChanging) {
+            $previousPlan = $subscription->plan()->first();
+        }
+
         $subscription->fill($payload);
 
         if (isset($payload['plan_id'])) {
@@ -193,8 +203,34 @@ final class SaaSService
         }
 
         $subscription->save();
+        $subscription->refresh();
 
-        return $subscription->refresh();
+        if ($planIsChanging && $previousPlan !== null) {
+            $this->sendPlanChangedEmail($subscription, $previousPlan);
+        }
+
+        return $subscription;
+    }
+
+    private function sendPlanChangedEmail(TenantSubscription $subscription, Plan $previousPlan): void
+    {
+        $tenant = $subscription->tenant()->first();
+        $newPlan = $subscription->plan()->first();
+
+        if ($tenant === null || $newPlan === null) {
+            return;
+        }
+
+        $owner = User::withoutGlobalScopes()
+            ->where('tenant_id', $tenant->id)
+            ->where('role', UserRole::OWNER->value)
+            ->first();
+
+        if ($owner === null) {
+            return;
+        }
+
+        Mail::to($owner->email)->send(new PlanChangedMail($tenant, $owner, $previousPlan, $newPlan));
     }
 
     /**
@@ -203,6 +239,17 @@ final class SaaSService
     public function createPlan(array $payload): Plan
     {
         return Plan::query()->create($payload);
+    }
+
+    /**
+     * @param  array<string, mixed>  $payload
+     */
+    public function updatePlan(Plan $plan, array $payload): Plan
+    {
+        $plan->fill($payload);
+        $plan->save();
+
+        return $plan->refresh();
     }
 
     /**

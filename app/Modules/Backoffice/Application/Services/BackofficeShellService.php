@@ -101,7 +101,21 @@ final class BackofficeShellService
                         ['key' => 'settings', 'label' => __('settings.menu_label'), 'href' => '/backoffice/settings', 'visible' => $permissions['settings.view'], 'enabled' => true],
                     ],
                 ],
-                ['key' => 'admin', 'label' => __('layout.menu_admin'), 'href' => '/backoffice/admin', 'visible' => $isSuperAdmin, 'enabled' => true],
+                [
+                    'key' => 'admin',
+                    'label' => __('layout.menu_admin'),
+                    'href' => '/backoffice/admin',
+                    'visible' => $isSuperAdmin,
+                    'enabled' => true,
+                    'children' => [
+                        ['key' => 'admin_dashboard', 'label' => __('layout.menu_admin_dashboard'), 'href' => '/backoffice/admin', 'visible' => $isSuperAdmin, 'enabled' => true],
+                        ['key' => 'admin_tenants', 'label' => __('layout.menu_admin_tenants'), 'href' => '/backoffice/admin/tenants', 'visible' => $isSuperAdmin, 'enabled' => true],
+                        ['key' => 'admin_plans', 'label' => __('layout.menu_admin_plans'), 'href' => '/backoffice/admin/plans', 'visible' => $isSuperAdmin, 'enabled' => true],
+                        ['key' => 'admin_billing', 'label' => __('layout.menu_admin_billing'), 'href' => '/backoffice/admin/billing', 'visible' => $isSuperAdmin, 'enabled' => true],
+                        ['key' => 'admin_audit', 'label' => __('layout.menu_admin_audit'), 'href' => '/backoffice/admin/audit', 'visible' => $isSuperAdmin, 'enabled' => true],
+                        ['key' => 'admin_ops', 'label' => __('layout.menu_admin_ops'), 'href' => '/backoffice/admin/ops', 'visible' => $isSuperAdmin, 'enabled' => true],
+                    ],
+                ],
             ],
         ];
     }

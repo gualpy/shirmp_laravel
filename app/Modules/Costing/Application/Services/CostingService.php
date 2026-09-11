@@ -33,12 +33,12 @@ final class CostingService extends BaseService
         return (float) $cycle->harvests()->sum('total_lbs');
     }
 
-    public function costPerLb(Cycle $cycle): float
+    public function costPerLb(Cycle $cycle): ?float
     {
         $totalLbs = $this->totalHarvestLbs($cycle);
 
         if ($totalLbs <= 0) {
-            return 0.0;
+            return null;
         }
 
         return round($this->totalCost($cycle) / $totalLbs, 4);
@@ -94,7 +94,7 @@ final class CostingService extends BaseService
                 'total_harvest_lbs' => $totalHarvestLbs,
             ],
             'metrics' => [
-                'cost_per_lb' => round($this->costPerLb($cycle), 4),
+                'cost_per_lb' => $this->costPerLb($cycle),
                 'cost_per_ha' => round($this->costPerHa($cycle), 4),
             ],
             'missing_cost_inputs' => $this->missingCostInputs($cycle),

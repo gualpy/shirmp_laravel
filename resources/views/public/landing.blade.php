@@ -121,17 +121,43 @@
                     <div class="pricing-card {{ $plan['code'] === 'pro' ? 'pricing-card--featured' : '' }}">
                         <span class="pricing-plan-name">{{ $plan['name'] }}</span>
                         <div class="pricing-price">
-                            ${{ $plan['price_usd'] }}
-                            <span>{{ $plan['billing_type'] === 'yearly' ? __('landing.pricing_year_suffix') : __('landing.pricing_month_suffix') }}</span>
+                            @if($plan['is_contact_sales'])
+                                {{ __('landing.pricing_contact_sales') }}
+                            @else
+                                ${{ $plan['price_usd'] }}
+                                <span>{{ $plan['billing_type'] === 'yearly' ? __('landing.pricing_year_suffix') : __('landing.pricing_month_suffix') }}</span>
+                            @endif
                         </div>
                         <ul class="pricing-features">
                             @foreach($plan['highlights'] as $highlight)
                                 <li>{{ $highlight }}</li>
                             @endforeach
                         </ul>
-                        <a class="pricing-cta" href="{{ route('signup.create') }}">{{ __('landing.pricing_cta') }}</a>
+                        @if($plan['is_contact_sales'])
+                            <a class="pricing-cta" href="mailto:{{ config('mail.from.address') }}">{{ __('landing.pricing_cta_contact') }}</a>
+                        @else
+                            <a class="pricing-cta" href="{{ route('signup.create') }}">{{ __('landing.pricing_cta') }}</a>
+                        @endif
                     </div>
                 @endforeach
+
+                {{-- PREVIEW ONLY: hardcoded, not wired to a real plan --}}
+                <div class="pricing-card">
+                    <span class="pricing-plan-name">Growth</span>
+                    <div class="pricing-price">
+                        $119
+                        <span>/mes</span>
+                    </div>
+                    <ul class="pricing-features">
+                        <li>Hasta 2 granjas</li>
+                        <li>Hasta 8 ciclos activos</li>
+                        <li>Hasta 6 usuarios</li>
+                        <li>Dashboard operativo</li>
+                        <li>Alertas automáticas</li>
+                        <li>Motor de costos</li>
+                    </ul>
+                    <a class="pricing-cta" href="{{ route('signup.create') }}">{{ __('landing.pricing_cta') }}</a>
+                </div>
             </div>
         </div>
     </section>

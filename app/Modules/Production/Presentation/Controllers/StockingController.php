@@ -34,7 +34,7 @@ final class StockingController extends Controller
 
         $stocking = $cycle->stocking;
 
-        $payload = array_merge($stocking->only(['stocked_at', 'pl_qty', 'hatchery_code', 'batch_code', 'initial_pp_grams']), $request->validated());
+        $payload = array_merge($stocking->only(['stocked_at', 'pl_qty', 'supplier_id', 'batch_code', 'initial_pp_grams']), $request->validated());
 
         return new StockingResource($action->execute($cycle, $stocking, StockingDataDTO::fromArray($payload)));
     }

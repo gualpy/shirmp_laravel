@@ -15,7 +15,7 @@ final class BackofficeAdminOpsController extends Controller
         return view('backoffice.admin.ops', [
             'shell' => $shellService->build($request->user()),
             'vm' => $service->build(),
-            'activeMenu' => 'admin',
+            'activeMenu' => 'admin_ops',
         ]);
     }
 }

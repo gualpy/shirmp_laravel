@@ -10,6 +10,7 @@
             linear-gradient(120deg, rgba(255, 255, 255, 0.97), rgba(247, 251, 255, 0.92)),
             radial-gradient(circle at top right, rgba(47, 143, 255, 0.12), transparent 32%);
     }
+    .detail-hero { padding: 14px 18px; }
     .detail-hero__row {
         display: flex;
         justify-content: space-between;
@@ -17,6 +18,13 @@
         gap: 16px;
         flex-wrap: wrap;
     }
+    .detail-hero__title {
+        margin: 0;
+        font-size: 1.28rem;
+        font-weight: 800;
+        letter-spacing: -.03em;
+    }
+    .detail-hero__dot { color: var(--muted); font-weight: 600; margin: 0 2px; }
     .detail-status {
         display: inline-flex;
         align-items: center;
@@ -37,56 +45,52 @@
         border-radius: 999px;
         background: currentColor;
     }
+    .detail-status--harvested { background: rgba(100, 116, 133, 0.12); color: #4d5c6b; }
+    .detail-status--cancelled { background: rgba(198, 54, 54, 0.1); color: #c63636; }
     .detail-meta {
         display: flex;
         gap: 10px;
         flex-wrap: wrap;
-        margin-top: 8px;
+        margin-top: 6px;
         color: var(--muted);
-        font-size: .9rem;
+        font-size: .87rem;
+    }
+    .ops-section-title {
+        margin: 0 0 10px;
+        font-size: .78rem;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: .1em;
+        color: var(--muted);
     }
     .actions {
         display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
-        gap: 12px;
+        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+        gap: 10px;
     }
-    .action-btn {
-        background: linear-gradient(145deg, #0f8d79, #0a6f95);
-        color: #fff;
-        border: none;
-        border-radius: 18px;
-        padding: 14px 40px 14px 16px;
-        font-size: .94rem;
-        font-weight: 800;
-        box-shadow: 0 14px 28px rgba(11, 98, 109, 0.2);
+    .action-card {
+        background: #fff;
+        border: 1px solid var(--border);
+        border-radius: 16px;
+        padding: 12px 14px;
         text-decoration: none;
         display: flex;
         align-items: center;
         gap: 12px;
-        position: relative;
-        min-height: 62px;
-        transition: transform .18s ease, box-shadow .18s ease;
+        min-height: 56px;
+        box-shadow: var(--shadow-soft);
+        transition: transform .15s ease, box-shadow .15s ease, border-color .15s ease;
     }
-    .action-btn:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 18px 32px rgba(11, 98, 109, 0.24);
+    .action-card:hover {
+        transform: translateY(-1px);
+        border-color: rgba(12, 122, 106, 0.35);
+        box-shadow: 0 10px 22px rgba(20, 40, 50, 0.1);
     }
-    .action-btn:after {
-        content: "›";
-        font-size: 1.2rem;
-        opacity: .95;
-        position: absolute;
-        right: 16px;
-        top: 50%;
-        transform: translateY(-50%);
+    .action-card:focus-visible {
+        outline: 2px solid var(--primary);
+        outline-offset: 2px;
     }
-    .action-btn.disabled {
-        background: linear-gradient(180deg, #dce3ea, #cfd6de);
-        color: #61707f;
-        box-shadow: none;
-        pointer-events: none;
-    }
-    .action-icon {
+    .action-card__icon {
         flex-shrink: 0;
         width: 34px;
         height: 34px;
@@ -95,13 +99,31 @@
         align-items: center;
         justify-content: center;
         font-size: 1.05rem;
-        background: rgba(255, 255, 255, 0.18);
+        background: rgba(12, 122, 106, 0.09);
     }
-    .secondary-action .action-icon {
-        background: rgba(47, 143, 255, 0.14);
+    .action-card--secondary .action-card__icon {
+        background: rgba(47, 143, 255, 0.12);
     }
-    .action-label {
-        line-height: 1.25;
+    .action-card__body {
+        display: flex;
+        flex-direction: column;
+        gap: 1px;
+        min-width: 0;
+    }
+    .action-card__name {
+        font-weight: 800;
+        font-size: .94rem;
+        color: var(--text);
+        line-height: 1.2;
+    }
+    .action-card__cta {
+        font-weight: 700;
+        font-size: .74rem;
+        color: var(--muted);
+    }
+    .action-card__cta::after {
+        content: "›";
+        margin-left: 3px;
     }
     .kpis {
         display: grid;
@@ -115,13 +137,35 @@
         padding: 16px;
         box-shadow: var(--shadow-soft);
     }
+    .kpi__head {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 8px;
+        margin-bottom: 6px;
+    }
     .kpi .label {
         font-size: .74rem;
         color: var(--muted);
         font-weight: 700;
-        margin-bottom: 6px;
         text-transform: uppercase;
         letter-spacing: .08em;
+    }
+    .kpi__icon {
+        flex-shrink: 0;
+        width: 26px;
+        height: 26px;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: rgba(12, 122, 106, 0.08);
+        color: var(--primary);
+    }
+    .kpi__icon svg { width: 15px; height: 15px; }
+    .kpi--alert .kpi__icon {
+        background: rgba(198, 54, 54, 0.1);
+        color: #c63636;
     }
     .kpi .value {
         font-size: 1.46rem;
@@ -328,32 +372,62 @@
         color: var(--muted);
         background: rgba(255, 255, 255, 0.58);
     }
-    .exports-panel {
-        display: grid;
-        gap: 12px;
-    }
-    .exports-actions {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
-        gap: 10px;
-    }
-    .export-btn {
-        display: inline-flex;
+    .reports-panel {
+        display: flex;
         align-items: center;
         justify-content: space-between;
-        gap: 10px;
-        padding: 10px 12px;
+        gap: 14px;
+        flex-wrap: wrap;
+        padding: 14px 18px;
+    }
+    .reports-panel__title { margin: 0; font-size: 1.02rem; font-weight: 800; }
+    .reports-toolbar {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        flex-wrap: wrap;
+    }
+    .reports-select-wrap { position: relative; display: inline-flex; }
+    .reports-select-wrap::after {
+        content: "▾";
+        position: absolute;
+        right: 12px;
+        top: 50%;
+        transform: translateY(-50%);
+        font-size: .68rem;
+        color: #1f5ea8;
+        pointer-events: none;
+    }
+    .reports-select,
+    .reports-btn {
+        height: 38px;
+        padding: 0 14px;
         border-radius: 12px;
-        border: 1px solid rgba(47, 143, 255, 0.16);
+        border: 1px solid rgba(47, 143, 255, 0.18);
         background: rgba(47, 143, 255, 0.06);
         color: #1f5ea8;
-        text-decoration: none;
+        font: inherit;
         font-weight: 800;
-        font-size: .86rem;
+        font-size: .84rem;
+        display: inline-flex;
+        align-items: center;
+        gap: 7px;
+        text-decoration: none;
+        white-space: nowrap;
+        cursor: pointer;
+        transition: background .12s ease;
     }
-    .export-btn::after {
-        content: "›";
-        font-size: 1rem;
+    .reports-select {
+        appearance: none;
+        -webkit-appearance: none;
+        padding-right: 28px;
+    }
+    .reports-select:hover,
+    .reports-btn:hover { background: rgba(47, 143, 255, 0.13); }
+    .reports-select:focus-visible,
+    .reports-btn:focus-visible {
+        outline: 2px solid var(--primary);
+        outline-offset: 2px;
     }
     .legend--growth {
         margin-top: 10px;
@@ -408,85 +482,135 @@
 @endpush
 
 @section('content')
-    @php($canManageMortality = ($shell['permissions']['mortality.manage'] ?? false) && ! $shell['read_only_mode'])
-    @php($canManageFeeding = ($shell['permissions']['feeding.manage'] ?? false) && ! $shell['read_only_mode'])
-    @php($canManageSampling = ($shell['permissions']['sampling.manage'] ?? false) && ! $shell['read_only_mode'])
-    @php($canManageHarvest = ($shell['permissions']['harvest.manage'] ?? false) && ! $shell['read_only_mode'])
-    @php($canViewCosts = $shell['permissions']['costs.view'] ?? false)
-    @php($canManageWater = ($shell['permissions']['water.manage'] ?? false) && ! $shell['read_only_mode'])
-    @php($canViewReports = $shell['permissions']['reports.view'] ?? false)
+    @php
+        $canManageMortality = ($shell['permissions']['mortality.manage'] ?? false) && ! $shell['read_only_mode'];
+        $canManageFeeding = ($shell['permissions']['feeding.manage'] ?? false) && ! $shell['read_only_mode'];
+        $canManageSampling = ($shell['permissions']['sampling.manage'] ?? false) && ! $shell['read_only_mode'];
+        $canManageHarvest = ($shell['permissions']['harvest.manage'] ?? false) && ! $shell['read_only_mode'];
+        $canViewCosts = $shell['permissions']['costs.view'] ?? false;
+        $canManageWater = ($shell['permissions']['water.manage'] ?? false) && ! $shell['read_only_mode'];
+        $canViewReports = $shell['permissions']['reports.view'] ?? false;
+
+        $statusLabels = [
+            'active' => __('cycle.status_active'),
+            'harvested' => __('cycle.status_harvested'),
+            'cancelled' => __('cycle.status_cancelled'),
+        ];
+        $statusValue = $vm['header']['status'];
+        $statusLabel = $statusLabels[$statusValue] ?? strtoupper($statusValue);
+
+        $opsActions = [];
+        if ($shell['permissions']['mortality.view'] ?? false) {
+            $opsActions[] = [
+                'href' => "/backoffice/cycles/{$vm['header']['cycle_id']}/mortalities",
+                'icon' => '💀',
+                'name' => __('cycle.action_name_mortality'),
+                'cta' => $canManageMortality ? __('cycle.action_cta_register') : __('cycle.action_cta_view'),
+                'tooltip' => $canManageMortality ? __('cycle.record_mortality_tooltip') : __('cycle.view_mortality_tooltip'),
+                'group' => 'primary',
+            ];
+        }
+        if ($shell['permissions']['feeding.view'] ?? false) {
+            $opsActions[] = [
+                'href' => "/backoffice/cycles/{$vm['header']['cycle_id']}/feeding",
+                'icon' => '🍽️',
+                'name' => __('cycle.action_name_feeding'),
+                'cta' => $canManageFeeding ? __('cycle.action_cta_register') : __('cycle.action_cta_view'),
+                'tooltip' => $canManageFeeding ? __('cycle.record_feeding_tooltip') : __('cycle.view_feeding_tooltip'),
+                'group' => 'primary',
+            ];
+        }
+        if ($shell['permissions']['sampling.view'] ?? false) {
+            $opsActions[] = [
+                'href' => "/backoffice/cycles/{$vm['header']['cycle_id']}/sampling",
+                'icon' => '📏',
+                'name' => __('cycle.action_name_sampling'),
+                'cta' => $canManageSampling ? __('cycle.action_cta_register') : __('cycle.action_cta_view'),
+                'tooltip' => $canManageSampling ? __('cycle.record_sampling_tooltip') : __('cycle.view_sampling_tooltip'),
+                'group' => 'primary',
+            ];
+        }
+        if ($shell['permissions']['water.view'] ?? false) {
+            $opsActions[] = [
+                'href' => "/backoffice/water?cycle={$vm['header']['cycle_id']}".($canManageWater ? '#register-water' : ''),
+                'icon' => '💧',
+                'name' => __('cycle.action_name_water'),
+                'cta' => $canManageWater ? __('cycle.action_cta_register') : __('cycle.action_cta_view'),
+                'tooltip' => $canManageWater ? __('cycle.record_water_tooltip') : __('cycle.view_water_tooltip'),
+                'group' => 'primary',
+            ];
+        }
+        if ($shell['permissions']['harvest.view'] ?? false) {
+            $opsActions[] = [
+                'href' => "/backoffice/cycles/{$vm['header']['cycle_id']}/harvest",
+                'icon' => '🦐',
+                'name' => __('cycle.action_name_harvest'),
+                'cta' => $canManageHarvest ? __('cycle.action_cta_register') : __('cycle.action_cta_view'),
+                'tooltip' => $canManageHarvest ? __('cycle.record_harvest_tooltip') : __('cycle.view_harvest_tooltip'),
+                'group' => 'secondary',
+            ];
+        }
+        if ($canViewCosts) {
+            $opsActions[] = [
+                'href' => "/backoffice/cycles/{$vm['header']['cycle_id']}/costs",
+                'icon' => '💰',
+                'name' => __('cycle.action_name_costs'),
+                'cta' => __('cycle.action_cta_view_costs'),
+                'tooltip' => __('cycle.view_costs_tooltip'),
+                'group' => 'secondary',
+            ];
+        }
+    @endphp
     <div class="detail-shell">
         <div class="card card-soft detail-hero animate-enter-down">
             <div class="detail-hero__row">
                 <div>
-                    <h1 class="section-heading" style="margin-bottom:4px;">{{ __('cycle.detail_title') }} #{{ $vm['header']['cycle_id'] }}</h1>
-                    <div class="section-subtitle">{{ __('cycle.detail_subtitle') }}</div>
+                    <h1 class="detail-hero__title">{{ __('cycle.cycle_short') }} #{{ $vm['header']['cycle_id'] }} <span class="detail-hero__dot">·</span> {{ __('cycle.pond') }} {{ $vm['header']['pond_code'] }}</h1>
                     <div class="detail-meta">
                         <span>{{ __('cycle.farm') }} {{ $vm['header']['farm_name'] }}</span>
-                        <span>{{ __('cycle.pond') }} {{ $vm['header']['pond_code'] }}</span>
                         <span>{{ __('cycle.started') }} {{ $vm['header']['started_at'] }}</span>
+                        @if($vm['header']['density_pl_m2'] !== null)
+                            <span>{{ __('cycle.density') }} {{ number_format($vm['header']['density_pl_m2'], 2) }} PL/m²</span>
+                        @endif
+                        @if($vm['header']['supplier_name'] !== null)
+                            <span>{{ __('cycle.hatchery') }} {{ $vm['header']['supplier_name'] }}</span>
+                        @endif
                     </div>
                 </div>
-                <span class="detail-status">{{ $vm['header']['status'] }}</span>
+                <span class="detail-status detail-status--{{ $statusValue }}">{{ $statusLabel }}</span>
             </div>
         </div>
 
-        <div class="actions animate-enter-down animate-enter-down-delay-1">
-            @if($shell['permissions']['mortality.view'] ?? false)
-                <a class="action-btn" href="/backoffice/cycles/{{ $vm['header']['cycle_id'] }}/mortalities" title="{{ $canManageMortality ? __('cycle.record_mortality_tooltip') : __('cycle.view_mortality_tooltip') }}">
-                    <span class="action-icon" aria-hidden="true">💀</span>
-                    <span class="action-label">{{ $canManageMortality ? __('cycle.record_mortality_title') : __('cycle.view_mortality') }}</span>
-                </a>
-            @endif
-            @if($shell['permissions']['feeding.view'] ?? false)
-                <a class="action-btn" href="/backoffice/cycles/{{ $vm['header']['cycle_id'] }}/feeding" title="{{ $canManageFeeding ? __('cycle.record_feeding_tooltip') : __('cycle.view_feeding_tooltip') }}">
-                    <span class="action-icon" aria-hidden="true">🍽️</span>
-                    <span class="action-label">{{ $canManageFeeding ? __('cycle.record_feeding_title') : __('cycle.view_feeding') }}</span>
-                </a>
-            @endif
-            @if($shell['permissions']['sampling.view'] ?? false)
-                <a class="action-btn secondary-action" href="/backoffice/cycles/{{ $vm['header']['cycle_id'] }}/sampling" title="{{ $canManageSampling ? __('cycle.record_sampling_tooltip') : __('cycle.view_sampling_tooltip') }}">
-                    <span class="action-icon" aria-hidden="true">📏</span>
-                    <span class="action-label">{{ $canManageSampling ? __('cycle.record_sampling_title') : __('cycle.view_sampling') }}</span>
-                </a>
-            @endif
-            @if($shell['permissions']['harvest.view'] ?? false)
-                <a class="action-btn secondary-action" href="/backoffice/cycles/{{ $vm['header']['cycle_id'] }}/harvest" title="{{ $canManageHarvest ? __('cycle.record_harvest_tooltip') : __('cycle.view_harvest_tooltip') }}">
-                    <span class="action-icon" aria-hidden="true">🦐</span>
-                    <span class="action-label">{{ $canManageHarvest ? __('cycle.record_harvest_title') : __('cycle.view_harvest') }}</span>
-                </a>
-            @endif
-            @if($canViewCosts)
-                <a class="action-btn secondary-action" href="/backoffice/cycles/{{ $vm['header']['cycle_id'] }}/costs" title="{{ __('cycle.view_costs_tooltip') }}">
-                    <span class="action-icon" aria-hidden="true">💰</span>
-                    <span class="action-label">{{ __('cycle.view_costs') }}</span>
-                </a>
-            @endif
-            @if($shell['permissions']['water.view'] ?? false)
-                <a class="action-btn secondary-action" href="/backoffice/water?cycle={{ $vm['header']['cycle_id'] }}{{ $canManageWater ? '#register-water' : '' }}" title="{{ $canManageWater ? __('cycle.record_water_tooltip') : __('cycle.view_water_tooltip') }}">
-                    <span class="action-icon" aria-hidden="true">💧</span>
-                    <span class="action-label">{{ $canManageWater ? __('cycle.record_water') : __('cycle.view_water') }}</span>
-                </a>
-            @endif
+        <div class="animate-enter-down animate-enter-down-delay-1">
+            <h2 class="ops-section-title">{{ __('cycle.ops_section_title') }}</h2>
+            <div class="actions">
+                @foreach($opsActions as $action)
+                    <a class="action-card action-card--{{ $action['group'] }}" href="{{ $action['href'] }}" title="{{ $action['tooltip'] }}">
+                        <span class="action-card__icon" aria-hidden="true">{{ $action['icon'] }}</span>
+                        <span class="action-card__body">
+                            <span class="action-card__name">{{ $action['name'] }}</span>
+                            <span class="action-card__cta">{{ $action['cta'] }}</span>
+                        </span>
+                    </a>
+                @endforeach
+            </div>
         </div>
 
         @if($canViewReports)
-            <div class="card exports-panel animate-enter-down animate-enter-down-delay-1">
-                <div>
-                    <h3 class="panel-title" style="margin-bottom:4px;">{{ __('cycle.reports_title') }}</h3>
-                    <div class="section-subtitle" style="font-size:.88rem;">{{ __('cycle.reports_subtitle') }}</div>
-                </div>
-                <div class="exports-actions">
-                    <a class="export-btn" href="/backoffice/cycles/{{ $vm['header']['cycle_id'] }}/exports/samplings.csv">{{ __('cycle.samplings_csv') }}</a>
-                    <a class="export-btn" href="/backoffice/cycles/{{ $vm['header']['cycle_id'] }}/exports/samplings.xlsx">{{ __('cycle.samplings_excel') }}</a>
-                    <a class="export-btn" href="/backoffice/cycles/{{ $vm['header']['cycle_id'] }}/exports/feed.csv">{{ __('cycle.feeding_csv') }}</a>
-                    <a class="export-btn" href="/backoffice/cycles/{{ $vm['header']['cycle_id'] }}/exports/feed.xlsx">{{ __('cycle.feeding_excel') }}</a>
-                    <a class="export-btn" href="/backoffice/cycles/{{ $vm['header']['cycle_id'] }}/exports/mortalities.csv">{{ __('cycle.mortality_csv') }}</a>
-                    <a class="export-btn" href="/backoffice/cycles/{{ $vm['header']['cycle_id'] }}/exports/mortalities.xlsx">{{ __('cycle.mortality_excel') }}</a>
-                    <a class="export-btn" href="/backoffice/cycles/{{ $vm['header']['cycle_id'] }}/exports/water.csv">{{ __('cycle.water_csv') }}</a>
-                    <a class="export-btn" href="/backoffice/cycles/{{ $vm['header']['cycle_id'] }}/exports/water.xlsx">{{ __('cycle.water_excel') }}</a>
-                    <a class="export-btn" href="/backoffice/cycles/{{ $vm['header']['cycle_id'] }}/report">{{ __('cycle.executive_report') }}</a>
-                    <a class="export-btn" href="/backoffice/cycles/{{ $vm['header']['cycle_id'] }}/report" target="_blank" rel="noopener">{{ __('cycle.print') }}</a>
+            <div class="card reports-panel animate-enter-down animate-enter-down-delay-1">
+                <h3 class="reports-panel__title">{{ __('cycle.reports_title') }}</h3>
+                <div class="reports-toolbar">
+                    <span class="reports-select-wrap">
+                        <select id="reportsExcelSelect" class="reports-select" aria-label="{{ __('cycle.reports_excel_placeholder') }}">
+                            <option value="" selected>📗 {{ __('cycle.reports_excel_placeholder') }}</option>
+                            <option value="/backoffice/cycles/{{ $vm['header']['cycle_id'] }}/exports/samplings.xlsx">{{ __('cycle.report_row_samplings') }}</option>
+                            <option value="/backoffice/cycles/{{ $vm['header']['cycle_id'] }}/exports/feed.xlsx">{{ __('cycle.report_row_feeding') }}</option>
+                            <option value="/backoffice/cycles/{{ $vm['header']['cycle_id'] }}/exports/mortalities.xlsx">{{ __('cycle.report_row_mortality') }}</option>
+                            <option value="/backoffice/cycles/{{ $vm['header']['cycle_id'] }}/exports/water.xlsx">{{ __('cycle.report_row_water') }}</option>
+                        </select>
+                    </span>
+                    <a class="reports-btn" href="/backoffice/cycles/{{ $vm['header']['cycle_id'] }}/report">📊 {{ __('cycle.executive_report') }}</a>
+                    <a class="reports-btn" href="/backoffice/cycles/{{ $vm['header']['cycle_id'] }}/report" target="_blank" rel="noopener">🖨 {{ __('cycle.print') }}</a>
                 </div>
             </div>
         @endif
@@ -499,12 +623,55 @@
 
         <div id="tab-resumen" class="tab-panel active">
         <div class="kpis animate-enter-down animate-enter-down-delay-2">
-            <div class="kpi"><div class="label">{{ __('cycle.estimated_biomass') }}</div><div class="value">{{ number_format($vm['kpis']['biomass_kg'],2) }} kg</div></div>
-            <div class="kpi"><div class="label">{{ __('cycle.average_weight') }}</div><div class="value">{{ $vm['kpis']['latest_pp_grams'] !== null ? number_format($vm['kpis']['latest_pp_grams'],2).' g' : 'N/A' }}</div></div>
-            <div class="kpi"><div class="label">{{ __('cycle.fcr') }}</div><div class="value">{{ number_format($vm['kpis']['fcr'],3) }}</div></div>
-            <div class="kpi"><div class="label">{{ __('cycle.accum_feed') }}</div><div class="value">{{ number_format($vm['kpis']['total_feed_kg'],2) }} kg</div></div>
-            <div class="kpi"><div class="label">{{ __('cycle.accum_cost') }}</div><div class="value">${{ number_format($vm['kpis']['total_cost_usd'],2) }}</div></div>
-            <div class="kpi"><div class="label">{{ __('cycle.open_alerts') }}</div><div class="value">{{ $vm['kpis']['open_alerts'] }}</div></div>
+            <div class="kpi">
+                <div class="kpi__head">
+                    <div class="label">{{ __('cycle.stocked_pl') }}</div>
+                    <span class="kpi__icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20v-8"/><path d="M12 12c0-4 3-6 6-6 0 4-2 6-6 6z"/><path d="M12 12C12 8 9 6 6 6c0 4 2 6 6 6z"/></svg></span>
+                </div>
+                <div class="value">{{ $vm['kpis']['stocked_pl'] !== null ? number_format($vm['kpis']['stocked_pl']) : 'N/A' }}</div>
+            </div>
+            <div class="kpi">
+                <div class="kpi__head">
+                    <div class="label">{{ __('cycle.estimated_biomass') }}</div>
+                    <span class="kpi__icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="5" r="2"/><path d="M5 22l3-12h8l3 12"/><path d="M5 22h14"/></svg></span>
+                </div>
+                <div class="value">{{ number_format($vm['kpis']['biomass_kg'],2) }} kg</div>
+            </div>
+            <div class="kpi">
+                <div class="kpi__head">
+                    <div class="label">{{ __('cycle.average_weight') }}</div>
+                    <span class="kpi__icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M3 15h18M9 3v18M15 3v18"/></svg></span>
+                </div>
+                <div class="value">{{ $vm['kpis']['latest_pp_grams'] !== null ? number_format($vm['kpis']['latest_pp_grams'],2).' g' : 'N/A' }}</div>
+            </div>
+            <div class="kpi">
+                <div class="kpi__head">
+                    <div class="label">{{ __('cycle.fcr') }}</div>
+                    <span class="kpi__icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 7h13l-3-3M17 17H4l3 3"/></svg></span>
+                </div>
+                <div class="value">{{ number_format($vm['kpis']['fcr'],3) }}</div>
+            </div>
+            <div class="kpi">
+                <div class="kpi__head">
+                    <div class="label">{{ __('cycle.accum_feed') }}</div>
+                    <span class="kpi__icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 11h16"/><path d="M5 11a7 7 0 0 0 14 0"/><path d="M8 15l-1 4M16 15l1 4M6 19h12"/></svg></span>
+                </div>
+                <div class="value">{{ number_format($vm['kpis']['total_feed_kg'],2) }} kg</div>
+            </div>
+            <div class="kpi">
+                <div class="kpi__head">
+                    <div class="label">{{ __('cycle.accum_cost') }}</div>
+                    <span class="kpi__icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v10M15 9.5c0-1.4-1.3-2.5-3-2.5s-3 1-3 2.2c0 3 6 1.5 6 4.5 0 1.4-1.3 2.3-3 2.3s-3-1-3-2.3"/></svg></span>
+                </div>
+                <div class="value">${{ number_format($vm['kpis']['total_cost_usd'],2) }}</div>
+            </div>
+            <div class="kpi{{ $vm['kpis']['open_alerts'] > 0 ? ' kpi--alert' : '' }}">
+                <div class="kpi__head">
+                    <div class="label">{{ __('cycle.open_alerts') }}</div>
+                    <span class="kpi__icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8a6 6 0 0 1 12 0c0 5 2 6 2 6H4s2-1 2-6"/><path d="M10 20a2 2 0 0 0 4 0"/></svg></span>
+                </div>
+                <div class="value">{{ $vm['kpis']['open_alerts'] }}</div>
+            </div>
         </div>
 
         <div class="chart-grid">
@@ -763,5 +930,15 @@
                 document.getElementById(this.dataset.tab).classList.add('active');
             });
         });
+
+        const reportsExcelSelect = document.getElementById('reportsExcelSelect');
+        if (reportsExcelSelect) {
+            reportsExcelSelect.addEventListener('change', function() {
+                if (this.value) {
+                    window.location.href = this.value;
+                    this.value = '';
+                }
+            });
+        }
     </script>
 @endsection

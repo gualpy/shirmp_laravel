@@ -18,6 +18,8 @@ use App\Modules\Production\Domain\Models\Cycle;
 use App\Modules\Production\Domain\Models\Farm;
 use App\Modules\Production\Domain\Models\Pond;
 use App\Modules\SaaS\Application\Services\LicenseService;
+use App\Modules\Suppliers\Domain\Enums\SupplierType;
+use App\Modules\Suppliers\Domain\Models\Supplier;
 use App\Multitenancy\TenantContext;
 use Illuminate\Support\Facades\DB;
 
@@ -115,9 +117,19 @@ final class BackofficeProductionSetupService
             })
             ->values();
 
+        $supplierOptions = Supplier::query()
+            ->where('type', SupplierType::HATCHERY->value)
+            ->where('is_active', true)
+            ->orderBy('name')
+            ->get(['id', 'name'])
+            ->map(fn (Supplier $supplier): array => ['id' => $supplier->id, 'name' => $supplier->name])
+            ->values()
+            ->all();
+
         return [
             'pond_options' => $pondOptions->all(),
             'available_ponds' => $pondOptions->where('disabled', false)->count(),
+            'supplier_options' => $supplierOptions,
             'read_only_mode' => (bool) $this->licenseService->requireActiveOrGrace($tenant)['read_only_mode'],
         ];
     }
@@ -147,7 +159,7 @@ final class BackofficeProductionSetupService
             $this->createStockingAction->execute($cycle, StockingDataDTO::fromArray([
                 'stocked_at' => $payload['stocked_at'],
                 'pl_qty' => $payload['pl_qty'],
-                'hatchery_code' => $payload['hatchery_code'] ?? null,
+                'supplier_id' => $payload['supplier_id'] ?? null,
                 'batch_code' => $payload['batch_code'] ?? null,
                 'initial_pp_grams' => $payload['initial_pp_grams'] ?? null,
             ]));

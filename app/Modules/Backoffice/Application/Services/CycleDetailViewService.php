@@ -29,7 +29,7 @@ final class CycleDetailViewService
      */
     public function build(Cycle $cycle): array
     {
-        $cycle->loadMissing(['pond.farm', 'stocking']);
+        $cycle->loadMissing(['pond.farm', 'stocking.supplier']);
 
         $tenant = $this->tenantContext->currentTenant();
         $readOnlyMode = false;
@@ -53,8 +53,11 @@ final class CycleDetailViewService
                 'pond_code' => (string) ($cycle->pond?->code ?? 'N/A'),
                 'status' => (string) $cycle->status->value,
                 'started_at' => $cycle->started_at?->format('Y-m-d'),
+                'density_pl_m2' => $cycle->stocking?->density_pl_m2 !== null ? round((float) $cycle->stocking->density_pl_m2, 2) : null,
+                'supplier_name' => $cycle->stocking?->supplier?->name,
             ],
             'kpis' => [
+                'stocked_pl' => $cycle->stocking?->pl_qty,
                 'biomass_kg' => round($this->metricsService->biomass_kg($cycle, 1.0) ?? 0, 2),
                 'latest_pp_grams' => $this->metricsService->latest_pp_grams($cycle),
                 'fcr' => round($this->metricsService->fcr($cycle), 3),

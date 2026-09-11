@@ -31,4 +31,10 @@ return [
     'menu_costs'         => 'Costos',
     'menu_water'         => 'Agua',
     'menu_admin'         => 'Admin',
+    'menu_admin_dashboard' => 'Resumen',
+    'menu_admin_tenants'   => 'Tenants',
+    'menu_admin_plans'     => 'Planes',
+    'menu_admin_billing'   => 'Facturación global',
+    'menu_admin_audit'     => 'Auditoría',
+    'menu_admin_ops'       => 'Operaciones',
 ];

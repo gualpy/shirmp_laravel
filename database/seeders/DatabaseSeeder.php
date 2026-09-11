@@ -19,6 +19,8 @@ use App\Modules\Production\Domain\Models\Farm;
 use App\Modules\Production\Domain\Models\Pond;
 use App\Modules\Production\Domain\Models\Sampling;
 use App\Modules\Production\Domain\Models\Stocking;
+use App\Modules\Suppliers\Domain\Enums\SupplierType;
+use App\Modules\Suppliers\Domain\Models\Supplier;
 use App\Modules\WaterQuality\Domain\Models\WaterQualityEntry;
 use Carbon\CarbonImmutable;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
@@ -82,6 +84,12 @@ class DatabaseSeeder extends Seeder
                 );
             });
 
+            $hatcheries = collect(['Bioceanica', 'Larvas del Pacifico', 'Camaronera del Golfo'])
+                ->map(fn (string $name): Supplier => Supplier::withoutGlobalScopes()->updateOrCreate(
+                    ['tenant_id' => $tenant->id, 'name' => $name],
+                    ['type' => SupplierType::HATCHERY->value, 'is_active' => true],
+                ));
+
             $activePond = $ponds->first();
 
             $cycle = Cycle::withoutGlobalScopes()->updateOrCreate(
@@ -115,7 +123,7 @@ class DatabaseSeeder extends Seeder
                 [
                     'stocked_at' => $timelineStart->addDay()->toDateString(),
                     'pl_qty' => 420000,
-                    'hatchery_code' => 'BC',
+                    'supplier_id' => $hatcheries->first()->id,
                     'batch_code' => 'TA-2026-001',
                     'initial_pp_grams' => 0.05,
                     'density_pl_ha' => round(420000 / 4.50, 2),

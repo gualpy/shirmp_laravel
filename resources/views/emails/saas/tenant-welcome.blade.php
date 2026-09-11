@@ -22,7 +22,7 @@
                                 Tu cuenta de <strong>{{ $tenant->company_display_name ?: $tenant->name }}</strong> ya está activa en {{ config('app.name') }}, con el plan <strong>{{ $plan->name }}</strong>.
                             </p>
                             <p style="font-size:0.95rem;line-height:1.6;margin:0 0 24px;">
-                                Ya podés entrar con el usuario y la contraseña que definiste al registrarte.
+                                Ya puedes entrar con el usuario y la contraseña que definiste al registrarte.
                             </p>
                             <table role="presentation" cellpadding="0" cellspacing="0" style="margin:0 0 24px;">
                                 <tr>
@@ -32,7 +32,7 @@
                                 </tr>
                             </table>
                             <p style="font-size:0.85rem;line-height:1.6;color:#5b7388;margin:0;">
-                                Si no reconocés esta actividad, contactanos respondiendo este correo.
+                                Si no reconoces esta actividad, contáctanos respondiendo este correo.
                             </p>
                         </td>
                     </tr>

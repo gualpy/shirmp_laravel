@@ -20,7 +20,7 @@
     }
     .filter-grid {
         display: grid;
-        grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) auto auto;
+        grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) auto;
         gap: 10px;
         align-items: end;
     }
@@ -59,7 +59,66 @@
         background: rgba(12, 122, 106, 0.08);
         color: var(--primary);
     }
+    .kpi-row {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        gap: 12px;
+    }
+    .kpi-tile {
+        padding: 16px 18px;
+    }
+    .kpi-tile__label {
+        font-size: .74rem;
+        color: var(--muted);
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: .08em;
+        margin-bottom: 6px;
+    }
+    .kpi-tile__value {
+        font-size: 1.5rem;
+        font-weight: 800;
+        letter-spacing: -.02em;
+        color: var(--text);
+    }
+    .kpi-tile--critical .kpi-tile__value { color: #c63636; }
+    .kpi-tile--warning .kpi-tile__value { color: #aa6a08; }
     .cycles-grid { display: grid; gap: 12px; }
+    .cycle-card--critical { border-color: #f0b8b3; box-shadow: 0 0 0 1px rgba(198, 54, 54, 0.12); }
+    .cycle-progress {
+        margin-top: 8px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+    .cycle-progress__track {
+        flex: 1;
+        min-width: 80px;
+        max-width: 180px;
+        height: 6px;
+        border-radius: 999px;
+        background: rgba(15, 34, 51, 0.08);
+        overflow: hidden;
+    }
+    .cycle-progress__fill {
+        height: 100%;
+        border-radius: 999px;
+        background: var(--primary);
+    }
+    .cycle-progress__label {
+        font-size: .78rem;
+        color: var(--muted);
+        white-space: nowrap;
+    }
+    .freshness {
+        margin-top: 4px;
+        font-size: .78rem;
+        color: var(--muted);
+    }
+    .freshness--stale {
+        color: #aa6a08;
+        font-weight: 700;
+    }
     .cycle-card {
         text-decoration: none;
         color: inherit;
@@ -164,6 +223,29 @@
 
 @section('content')
     <div class="page-shell">
+        <div class="kpi-row animate-enter-down">
+            <div class="card card-soft kpi-tile">
+                <div class="kpi-tile__label">{{ __('cycles.kpi_active_cycles') }}</div>
+                <div class="kpi-tile__value">{{ $vm['kpis']['active_cycles'] }}</div>
+            </div>
+            <div class="card card-soft kpi-tile">
+                <div class="kpi-tile__label">{{ __('cycles.kpi_total_biomass') }}</div>
+                <div class="kpi-tile__value">{{ number_format($vm['kpis']['total_biomass_kg'], 0) }} kg</div>
+            </div>
+            <div class="card card-soft kpi-tile">
+                <div class="kpi-tile__label">{{ __('cycles.kpi_avg_weight') }}</div>
+                <div class="kpi-tile__value">{{ $vm['kpis']['avg_pp_grams'] !== null ? number_format($vm['kpis']['avg_pp_grams'], 2).' g' : 'N/A' }}</div>
+            </div>
+            <div class="card card-soft kpi-tile {{ $vm['kpis']['critical_alerts'] > 0 ? 'kpi-tile--critical' : '' }}">
+                <div class="kpi-tile__label">{{ __('cycles.critical') }}</div>
+                <div class="kpi-tile__value">{{ $vm['kpis']['critical_alerts'] }}</div>
+            </div>
+            <div class="card card-soft kpi-tile {{ $vm['kpis']['warning_alerts'] > 0 ? 'kpi-tile--warning' : '' }}">
+                <div class="kpi-tile__label">{{ __('cycles.warning') }}</div>
+                <div class="kpi-tile__value">{{ $vm['kpis']['warning_alerts'] }}</div>
+            </div>
+        </div>
+
         <div class="card card-soft filter-card animate-enter-down">
             <div class="filter-head">
                 <div>
@@ -175,7 +257,7 @@
             <form method="GET" action="/backoffice/cycles" class="filter-grid">
                 <label>
                     <span class="field-label">{{ __('cycles.farm') }}</span>
-                    <select name="farm" class="field-control">
+                    <select name="farm" class="field-control" onchange="this.form.submit()">
                         <option value="">{{ __('cycles.all') }}</option>
                         @foreach($vm['options']['farms'] as $farm)
                             <option value="{{ $farm['id'] }}" {{ $vm['filters']['farm'] === $farm['id'] ? 'selected' : '' }}>
@@ -186,7 +268,7 @@
                 </label>
                 <label>
                     <span class="field-label">{{ __('cycles.pond') }}</span>
-                    <select name="pond" class="field-control">
+                    <select name="pond" class="field-control" onchange="this.form.submit()">
                         <option value="">{{ __('cycles.all') }}</option>
                         @foreach($vm['options']['ponds'] as $pond)
                             <option value="{{ $pond['id'] }}" {{ $vm['filters']['pond'] === $pond['id'] ? 'selected' : '' }}>
@@ -195,14 +277,13 @@
                         @endforeach
                     </select>
                 </label>
-                <button type="submit" class="filter-btn filter-btn--primary">{{ __('cycles.filter') }}</button>
                 <a href="/backoffice/cycles" class="filter-btn" style="text-decoration:none;display:inline-flex;align-items:center;justify-content:center;">{{ __('cycles.reset') }}</a>
             </form>
         </div>
 
         <div class="cycles-grid">
             @forelse($vm['rows'] as $row)
-                <a href="{{ $row['detail_href'] }}" class="card cycle-card animate-enter-down animate-enter-down-delay-1">
+                <a href="{{ $row['detail_href'] }}" class="card cycle-card animate-enter-down animate-enter-down-delay-1{{ $row['alerts_critical'] > 0 ? ' cycle-card--critical' : '' }}">
                     <div class="cycle-card__row">
                         <div>
                             <div class="cycle-card__title">{{ $row['pond_code'] }} · {{ $row['farm'] }}</div>
@@ -210,20 +291,39 @@
                                 <span>{{ __('cycles.started') }} {{ $row['started_at'] }}</span>
                                 <span class="status-pill">{{ __('cycles.active') }}</span>
                             </div>
+                            <div class="cycle-progress">
+                                <div class="cycle-progress__track">
+                                    <div class="cycle-progress__fill" style="width:{{ $row['cycle_progress_pct'] }}%;"></div>
+                                </div>
+                                <span class="cycle-progress__label">{{ __('cycles.day') }} {{ $row['days_in_cycle'] }}</span>
+                            </div>
+                            <div class="freshness{{ $row['is_stale'] ? ' freshness--stale' : '' }}">
+                                @if($row['days_since_sampling'] === null)
+                                    {{ __('cycles.no_samplings') }}
+                                @elseif($row['days_since_sampling'] === 0)
+                                    {{ __('cycles.sampling_today') }}
+                                @else
+                                    {{ __('cycles.sampling_days_ago', ['days' => $row['days_since_sampling']]) }}
+                                @endif
+                            </div>
                         </div>
                         <div class="cycle-card__right">
                             <div class="badge-stack">
                                 <span class="cycle-badge cycle-badge--bio">{{ __('cycles.biomass') }} {{ number_format($row['biomass_kg'],2) }} kg</span>
                                 <span class="cycle-badge cycle-badge--pp">{{ __('cycles.avg_weight') }} {{ $row['latest_pp'] !== null ? number_format($row['latest_pp'],2).' g' : 'N/A' }}</span>
-                                <span class="cycle-badge cycle-badge--critical">{{ __('cycles.critical') }} {{ $row['alerts_critical'] }}</span>
-                                <span class="cycle-badge cycle-badge--warning">{{ __('cycles.warning') }} {{ $row['alerts_warning'] }}</span>
+                                @if($row['alerts_critical'] > 0)
+                                    <span class="cycle-badge cycle-badge--critical">{{ __('cycles.critical') }} {{ $row['alerts_critical'] }}</span>
+                                @endif
+                                @if($row['alerts_warning'] > 0)
+                                    <span class="cycle-badge cycle-badge--warning">{{ __('cycles.warning') }} {{ $row['alerts_warning'] }}</span>
+                                @endif
                             </div>
                             <span class="detail-cta">{{ __('cycles.view_detail') }}</span>
                         </div>
                     </div>
                 </a>
             @empty
-                <div class="empty-state animate-enter-down animate-enter-down-delay-1">{{ __('cycles.no_cycles') }}</div>
+                <div class="empty-state animate-enter-down animate-enter-down-delay-1">{{ __('cycles.no_cycles') }}<a href="/backoffice/stocking/create">{{ __('cycles.new_stocking_cta') }}</a></div>
             @endforelse
         </div>
     </div>

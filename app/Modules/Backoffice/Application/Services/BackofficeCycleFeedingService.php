@@ -2,6 +2,7 @@
 
 namespace App\Modules\Backoffice\Application\Services;
 
+use App\Modules\Costing\Application\Services\CostingService;
 use App\Modules\Feeding\Domain\Models\FeedType;
 use App\Modules\Production\Application\Services\MetricsService;
 use App\Modules\Production\Domain\Models\Cycle;
@@ -12,6 +13,7 @@ final class BackofficeCycleFeedingService
 {
     public function __construct(
         private readonly MetricsService $metricsService,
+        private readonly CostingService $costingService,
         private readonly TenantContext $tenantContext,
         private readonly LicenseService $licenseService,
     ) {
@@ -33,9 +35,12 @@ final class BackofficeCycleFeedingService
                 'farm_name' => (string) ($cycle->pond?->farm?->name ?? 'N/A'),
                 'pond_code' => (string) ($cycle->pond?->code ?? 'N/A'),
                 'started_at' => $cycle->started_at?->format('Y-m-d'),
+                'status' => (string) $cycle->status->value,
             ],
             'summary' => [
                 'total_feed_kg' => $this->metricsService->total_feed_kg($cycle),
+                'total_feed_cost' => $this->costingService->totalFeedCost($cycle),
+                'avg_cost_per_kg' => $this->averageCostPerKg($cycle),
             ],
             'rows' => $cycle->feedEntries()
                 ->with('feedType:id,name')
@@ -44,7 +49,7 @@ final class BackofficeCycleFeedingService
                 ->get()
                 ->map(fn ($entry): array => [
                     'id' => $entry->id,
-                    'fed_at' => $entry->fed_at?->format('Y-m-d'),
+                    'fed_at_display' => $this->formatFedAt($entry->fed_at),
                     'feed_type' => (string) ($entry->feedType?->name ?? 'N/A'),
                     'amount_kg' => (float) $entry->amount_kg,
                     'notes' => $entry->notes,
@@ -60,8 +65,46 @@ final class BackofficeCycleFeedingService
                 ->all(),
             'read_only_mode' => (bool) $this->licenseService->requireActiveOrGrace($tenant)['read_only_mode'],
             'defaults' => [
-                'fed_at' => now()->format('Y-m-d'),
+                'fed_at' => now()->format('Y-m-d\TH:i'),
             ],
         ];
+    }
+
+    /**
+     * Feed cost ÷ feed kg, both from the same source CostingService/MetricsService
+     * already use elsewhere (Costos del Ciclo). Purely a display ratio of two
+     * already-authoritative numbers — not a new cost formula.
+     */
+    private function averageCostPerKg(Cycle $cycle): ?float
+    {
+        $totalKg = $this->metricsService->total_feed_kg($cycle);
+
+        if ($totalKg <= 0) {
+            return null;
+        }
+
+        return round($this->costingService->totalFeedCost($cycle) / $totalKg, 4);
+    }
+
+    /**
+     * Historical feed entries were saved without a real time-of-day (before
+     * time tracking was added), so they read as 00:00. Showing that as a
+     * literal time would misrepresent it as "fed at midnight" — show the
+     * date only in that case. A genuine non-midnight timestamp is shown in
+     * full, matching the rest of the backoffice's date+time style.
+     */
+    private function formatFedAt(?\Illuminate\Support\Carbon $fedAt): ?string
+    {
+        if ($fedAt === null) {
+            return null;
+        }
+
+        if ($fedAt->format('H:i:s') === '00:00:00') {
+            return $fedAt->format('d/m/Y');
+        }
+
+        $meridiem = $fedAt->format('a') === 'am' ? 'a.m.' : 'p.m.';
+
+        return $fedAt->format('d/m/Y').' · '.$fedAt->format('g:i').' '.$meridiem;
     }
 }

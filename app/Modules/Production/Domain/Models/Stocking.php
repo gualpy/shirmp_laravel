@@ -3,6 +3,7 @@
 namespace App\Modules\Production\Domain\Models;
 
 use App\Models\Tenant;
+use App\Modules\Suppliers\Domain\Models\Supplier;
 use App\Multitenancy\Traits\HasTenant;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -16,9 +17,9 @@ class Stocking extends Model
     protected $fillable = [
         'tenant_id',
         'cycle_id',
+        'supplier_id',
         'stocked_at',
         'pl_qty',
-        'hatchery_code',
         'batch_code',
         'initial_pp_grams',
         'density_pl_m2',
@@ -43,5 +44,10 @@ class Stocking extends Model
     public function cycle(): BelongsTo
     {
         return $this->belongsTo(Cycle::class);
+    }
+
+    public function supplier(): BelongsTo
+    {
+        return $this->belongsTo(Supplier::class);
     }
 }

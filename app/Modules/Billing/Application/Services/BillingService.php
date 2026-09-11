@@ -3,7 +3,10 @@
 namespace App\Modules\Billing\Application\Services;
 
 use App\Models\Tenant;
+use App\Models\User;
 use App\Modules\Audit\Application\Services\AuditLogService;
+use App\Modules\Auth\Domain\Enums\UserRole;
+use App\Modules\Billing\Application\Mail\PaymentFailedMail;
 use App\Modules\Billing\Domain\Enums\BillingInvoiceStatus;
 use App\Modules\Billing\Domain\Enums\BillingPaymentProvider;
 use App\Modules\Billing\Domain\Enums\BillingPaymentStatus;
@@ -14,6 +17,7 @@ use App\Modules\SaaS\Domain\Models\TenantSubscription;
 use Carbon\CarbonImmutable;
 use Carbon\CarbonInterface;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Support\Facades\Mail;
 use InvalidArgumentException;
 
 final class BillingService
@@ -258,7 +262,29 @@ final class BillingService
 
         $payment->update(['status' => BillingPaymentStatus::FAILED->value]);
 
+        $this->sendPaymentFailedEmail($payment);
+
         return $payment->refresh();
+    }
+
+    private function sendPaymentFailedEmail(BillingPayment $payment): void
+    {
+        $invoice = BillingInvoice::query()->withoutGlobalScopes()->with('tenant')->find($payment->invoice_id);
+
+        if ($invoice === null || $invoice->tenant === null) {
+            return;
+        }
+
+        $owner = User::withoutGlobalScopes()
+            ->where('tenant_id', $invoice->tenant->id)
+            ->where('role', UserRole::OWNER->value)
+            ->first();
+
+        if ($owner === null) {
+            return;
+        }
+
+        Mail::to($owner->email)->send(new PaymentFailedMail($invoice->tenant, $owner, $invoice));
     }
 
     private function nextInvoiceNumber(): string

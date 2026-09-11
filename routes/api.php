@@ -24,6 +24,7 @@ use App\Modules\Production\Presentation\Controllers\FarmController;
 use App\Modules\Production\Presentation\Controllers\HarvestController;
 use App\Modules\Production\Presentation\Controllers\HealthController;
 use App\Modules\Production\Presentation\Controllers\PondController;
+use App\Modules\Suppliers\Presentation\Controllers\SupplierController;
 use App\Modules\Production\Presentation\Controllers\SamplingController;
 use App\Modules\Production\Presentation\Controllers\StockingController;
 use App\Modules\SaaS\Presentation\Controllers\AdminPlanController;
@@ -49,7 +50,7 @@ Route::prefix('v1')->group(function (): void {
 
     Route::prefix('auth')->group(function (): void {
         Route::post('/register', RegisterController::class);
-        Route::post('/login', LoginController::class);
+        Route::post('/login', LoginController::class)->middleware('throttle:6,1');
         Route::get('/me', MeController::class)->middleware(['auth:sanctum', 'subscription.active']);
         Route::post('/logout', LogoutController::class)->middleware(['auth:sanctum', 'subscription.active', 'write.allowed']);
     });
@@ -82,6 +83,10 @@ Route::prefix('v1')->group(function (): void {
             Route::get('/feed-types', [FeedTypeController::class, 'index']);
             Route::post('/feed-types', [FeedTypeController::class, 'store']);
             Route::patch('/feed-types/{feedType}', [FeedTypeController::class, 'update']);
+
+            Route::get('/suppliers', [SupplierController::class, 'index']);
+            Route::post('/suppliers', [SupplierController::class, 'store']);
+            Route::patch('/suppliers/{supplier}', [SupplierController::class, 'update']);
 
             Route::get('/cycles/{cycle}/feed-entries', [FeedEntryController::class, 'index']);
             Route::post('/cycles/{cycle}/feed-entries', [FeedEntryController::class, 'store']);
@@ -136,7 +141,9 @@ Route::prefix('v1')->group(function (): void {
     Route::prefix('admin')
         ->middleware(['auth:sanctum', 'superadmin'])
         ->group(function (): void {
+            Route::get('/plans', [AdminPlanController::class, 'index']);
             Route::post('/plans', [AdminPlanController::class, 'store']);
+            Route::patch('/plans/{plan}', [AdminPlanController::class, 'update']);
             Route::post('/plans/{plan}/limits', [AdminPlanLimitController::class, 'store']);
             Route::post('/plans/{plan}/features', [AdminPlanFeatureController::class, 'store']);
             Route::post('/tenants/{tenant}/assign-plan', [AdminTenantSubscriptionController::class, 'assignPlan']);

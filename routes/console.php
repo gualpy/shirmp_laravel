@@ -10,6 +10,7 @@ Artisan::command('inspire', function () {
 
 Schedule::command('alerts:evaluate')->dailyAt('01:30');
 Schedule::command('billing:mark-overdue')->dailyAt('01:45');
+Schedule::command('billing:send-expired-notices')->dailyAt('08:00');
 Schedule::command('billing:send-renewal-reminders')->dailyAt('08:00');
 Schedule::command('backup:run')->dailyAt('02:00');
 Schedule::command('backup:prune')->dailyAt('02:20');

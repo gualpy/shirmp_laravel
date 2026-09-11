@@ -11,7 +11,7 @@ final class LandingController extends Controller
     public function __invoke(TenantOnboardingService $onboardingService): View
     {
         return view('public.landing', [
-            'plans' => $onboardingService->signupPlans(),
+            'plans' => $onboardingService->landingPlans(),
         ]);
     }
 }

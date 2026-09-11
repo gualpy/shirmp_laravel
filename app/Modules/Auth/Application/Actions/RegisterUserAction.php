@@ -4,9 +4,11 @@ namespace App\Modules\Auth\Application\Actions;
 
 use App\Models\Tenant;
 use App\Modules\Auth\Application\DTO\RegisterUserDTO;
+use App\Modules\Auth\Application\Mail\TeamMemberWelcomeMail;
 use App\Modules\Auth\Application\Services\AuthService;
 use App\Modules\SaaS\Application\Services\SaaSService;
 use App\Modules\Shared\Application\Actions\BaseAction;
+use Illuminate\Support\Facades\Mail;
 
 final class RegisterUserAction extends BaseAction
 {
@@ -25,6 +27,8 @@ final class RegisterUserAction extends BaseAction
 
         $user = $this->authService->register($dto, $tenant);
         $token = $this->authService->createToken($user, $dto->deviceName);
+
+        Mail::to($user->email)->send(new TeamMemberWelcomeMail($tenant, $user));
 
         return [
             'token_type' => 'Bearer',

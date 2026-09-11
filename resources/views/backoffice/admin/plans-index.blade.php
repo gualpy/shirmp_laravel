@@ -8,6 +8,10 @@
     <div class="section-subtitle">{{ __('admin.plans_subtitle') }}</div>
 </div>
 
+@if(session('status'))
+    <div class="card" style="margin-bottom:16px;border-color:#b9e2cf;background:#eefaf4;color:#176448;">{{ session('status') }}</div>
+@endif
+
 <div style="display:grid;gap:14px;">
 @foreach($vm['rows'] as $row)
     <div class="card">
@@ -18,7 +22,7 @@
             </div>
             <span class="status-badge status-{{ $row['is_active'] ? 'active' : 'expired' }}">{{ $row['is_active'] ? __('app.active') : __('app.inactive') }}</span>
         </div>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px;">
             <div>
                 <strong>{{ __('admin.limits') }}</strong>
                 <ul>
@@ -36,6 +40,23 @@
                 </ul>
             </div>
         </div>
+        <form method="POST" action="{{ route('backoffice.admin.plans.update', $row['id']) }}" style="display:grid;grid-template-columns:1fr 160px auto auto;gap:10px;align-items:end;">
+            @csrf
+            <label>
+                <span class="metric-label">{{ __('admin.plan_name') }}</span>
+                <input class="input" name="name" value="{{ $row['name'] }}">
+            </label>
+            <label>
+                <span class="metric-label">{{ __('admin.plan_price') }}</span>
+                <input class="input" type="number" min="0" step="0.01" name="price_usd" value="{{ $row['price_usd'] }}">
+            </label>
+            <label style="display:flex;align-items:center;gap:8px;white-space:nowrap;">
+                <input type="hidden" name="is_active" value="0">
+                <input type="checkbox" name="is_active" value="1" @checked($row['is_active'])>
+                <span class="metric-label" style="margin:0;">{{ __('admin.plan_is_active') }}</span>
+            </label>
+            <button class="cta-primary" type="submit">{{ __('admin.plan_save') }}</button>
+        </form>
     </div>
 @endforeach
 </div>

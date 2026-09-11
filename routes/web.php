@@ -22,17 +22,14 @@ use App\Modules\Backoffice\Presentation\Controllers\BackofficeCycleHarvestContro
 use App\Modules\Backoffice\Presentation\Controllers\BackofficeCycleHarvestStoreController;
 use App\Modules\Backoffice\Presentation\Controllers\BackofficeCycleSamplingController;
 use App\Modules\Backoffice\Presentation\Controllers\BackofficeCycleSamplingStoreController;
-use App\Modules\Backoffice\Presentation\Controllers\BackofficeCycleFeedExportController;
 use App\Modules\Backoffice\Presentation\Controllers\BackofficeCycleFeedXlsxExportController;
 use App\Modules\Backoffice\Presentation\Controllers\BackofficeCycleListController;
 use App\Modules\Backoffice\Presentation\Controllers\BackofficeCycleMortalityController;
-use App\Modules\Backoffice\Presentation\Controllers\BackofficeCycleMortalityExportController;
 use App\Modules\Backoffice\Presentation\Controllers\BackofficeCycleMortalityXlsxExportController;
-use App\Modules\Backoffice\Presentation\Controllers\BackofficeCycleSamplingExportController;
 use App\Modules\Backoffice\Presentation\Controllers\BackofficeCycleSamplingXlsxExportController;
-use App\Modules\Backoffice\Presentation\Controllers\BackofficeCycleWaterExportController;
 use App\Modules\Backoffice\Presentation\Controllers\BackofficeCycleWaterXlsxExportController;
 use App\Modules\Backoffice\Presentation\Controllers\BackofficeDailyMortalityStoreController;
+use App\Modules\Backoffice\Presentation\Controllers\BackofficeForgotPasswordController;
 use App\Modules\Backoffice\Presentation\Controllers\BackofficeFarmStoreController;
 use App\Modules\Backoffice\Presentation\Controllers\BackofficeFarmsController;
 use App\Modules\Backoffice\Presentation\Controllers\BackofficeHomeController;
@@ -44,7 +41,9 @@ use App\Modules\Backoffice\Presentation\Controllers\BackofficeInventoryStoreCont
 use App\Modules\Backoffice\Presentation\Controllers\BackofficeInventoryXlsxExportController;
 use App\Modules\Backoffice\Presentation\Controllers\BackofficeOperationalCostStoreController;
 use App\Modules\Backoffice\Presentation\Controllers\BackofficePondStoreController;
+use App\Modules\Backoffice\Presentation\Controllers\BackofficeProjectionSettingsUpdateController;
 use App\Modules\Backoffice\Presentation\Controllers\BackofficePondsController;
+use App\Modules\Backoffice\Presentation\Controllers\BackofficeResetPasswordController;
 use App\Modules\Backoffice\Presentation\Controllers\BackofficeSessionController;
 use App\Modules\Backoffice\Presentation\Controllers\BackofficeSettingsController;
 use App\Modules\Backoffice\Presentation\Controllers\BackofficeSettingsUpdateController;
@@ -64,6 +63,7 @@ use App\Modules\Backoffice\Presentation\Controllers\BackofficeAdminBillingInvoic
 use App\Modules\Backoffice\Presentation\Controllers\BackofficeAdminBillingPaymentStoreController;
 use App\Modules\Backoffice\Presentation\Controllers\BackofficeAdminOpsController;
 use App\Modules\Backoffice\Presentation\Controllers\BackofficeAdminPlansController;
+use App\Modules\Backoffice\Presentation\Controllers\BackofficeAdminPlanUpdateController;
 use App\Modules\Backoffice\Presentation\Controllers\BackofficeAdminTenantBillingController;
 use App\Modules\Backoffice\Presentation\Controllers\BackofficeAdminTenantCreateController;
 use App\Modules\Backoffice\Presentation\Controllers\BackofficeAdminTenantDetailController;
@@ -82,10 +82,19 @@ Route::get('/readyz', ReadyzController::class)->name('readyz');
 Route::get('/', LandingController::class)->name('landing');
 Route::get('/app', [BackofficeSessionController::class, 'create'])->name('app.login');
 Route::get('/login', [BackofficeSessionController::class, 'create'])->name('login');
-Route::post('/login', [BackofficeSessionController::class, 'store'])->name('backoffice.login.store');
+Route::post('/login', [BackofficeSessionController::class, 'store'])->middleware('throttle:6,1')->name('backoffice.login.store');
 Route::post('/logout', [BackofficeSessionController::class, 'destroy'])
     ->middleware('auth')
     ->name('logout');
+
+Route::get('/forgot-password', [BackofficeForgotPasswordController::class, 'create'])->name('password.request');
+Route::post('/forgot-password', [BackofficeForgotPasswordController::class, 'store'])
+    ->middleware('throttle:6,1')
+    ->name('password.email');
+Route::get('/reset-password', [BackofficeResetPasswordController::class, 'create'])->name('password.reset');
+Route::post('/reset-password', [BackofficeResetPasswordController::class, 'store'])
+    ->middleware('throttle:6,1')
+    ->name('password.update');
 
 Route::get('/signup', [SignupController::class, 'create'])->name('signup.create');
 Route::post('/signup', [SignupController::class, 'store'])
@@ -139,6 +148,9 @@ Route::middleware(['tenant.backoffice', 'auth', 'subscription.active'])
         Route::post('/settings', BackofficeSettingsUpdateController::class)
             ->middleware('role.module:settings')
             ->name('backoffice.settings.update');
+        Route::post('/settings/projection', BackofficeProjectionSettingsUpdateController::class)
+            ->middleware('role.module:settings')
+            ->name('backoffice.settings.projection.update');
 
         Route::get('/warehouses', BackofficeWarehousesController::class)
             ->middleware('role.module:inventory')
@@ -201,27 +213,15 @@ Route::middleware(['tenant.backoffice', 'auth', 'subscription.active'])
             ->middleware('role.module:production')
             ->name('backoffice.cycles.show');
 
-        Route::get('/cycles/{cycleId}/exports/samplings.csv', BackofficeCycleSamplingExportController::class)
-            ->middleware('role.module:reports')
-            ->name('backoffice.cycles.exports.samplings');
         Route::get('/cycles/{cycleId}/exports/samplings.xlsx', BackofficeCycleSamplingXlsxExportController::class)
             ->middleware('role.module:reports')
             ->name('backoffice.cycles.exports.samplings.xlsx');
-        Route::get('/cycles/{cycleId}/exports/feed.csv', BackofficeCycleFeedExportController::class)
-            ->middleware('role.module:reports')
-            ->name('backoffice.cycles.exports.feed');
         Route::get('/cycles/{cycleId}/exports/feed.xlsx', BackofficeCycleFeedXlsxExportController::class)
             ->middleware('role.module:reports')
             ->name('backoffice.cycles.exports.feed.xlsx');
-        Route::get('/cycles/{cycleId}/exports/mortalities.csv', BackofficeCycleMortalityExportController::class)
-            ->middleware('role.module:reports')
-            ->name('backoffice.cycles.exports.mortalities');
         Route::get('/cycles/{cycleId}/exports/mortalities.xlsx', BackofficeCycleMortalityXlsxExportController::class)
             ->middleware('role.module:reports')
             ->name('backoffice.cycles.exports.mortalities.xlsx');
-        Route::get('/cycles/{cycleId}/exports/water.csv', BackofficeCycleWaterExportController::class)
-            ->middleware('role.module:reports')
-            ->name('backoffice.cycles.exports.water');
         Route::get('/cycles/{cycleId}/exports/water.xlsx', BackofficeCycleWaterXlsxExportController::class)
             ->middleware('role.module:reports')
             ->name('backoffice.cycles.exports.water.xlsx');
@@ -289,6 +289,8 @@ Route::middleware(['tenant.backoffice', 'auth', 'superadmin'])
 
         Route::get('/plans', BackofficeAdminPlansController::class)
             ->name('backoffice.admin.plans.index');
+        Route::post('/plans/{plan}', BackofficeAdminPlanUpdateController::class)
+            ->name('backoffice.admin.plans.update');
 
         Route::get('/tenants', BackofficeAdminTenantsController::class)
             ->name('backoffice.admin.tenants.index');
